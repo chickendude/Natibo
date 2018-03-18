@@ -19,8 +19,6 @@ import ch.ralena.glossikaschedule.adapter.DayAdapter;
 import ch.ralena.glossikaschedule.object.Day;
 import io.realm.Realm;
 
-import static ch.ralena.glossikaschedule.MainActivity.MAIN_FRAGMENT_TAG;
-
 public class DayFragment extends DialogFragment {
 	private Realm realm;
 
@@ -86,7 +84,7 @@ public class DayFragment extends DialogFragment {
 	@Override
 	public void onDismiss(DialogInterface dialog) {
 		if (getFragmentManager() != null) {
-			MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentByTag(MAIN_FRAGMENT_TAG);
+			MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentByTag(MainFragment.MAIN_FRAGMENT_TAG);
 			if (mainFragment != null) {
 				mainFragment.removeHighlight();
 				mainFragment.updateAdapter();

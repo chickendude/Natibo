@@ -4,18 +4,18 @@
 		android:id="@+id/languagesGroup">
 		<item android:title="@string/languages"
 			  android:icon="@drawable/ic_list"
-			  android:id="@+id/languages"/>
+			  android:id="@+id/nav_languages"/>
 		<item android:title="@string/add_new_language"
 			  android:icon="@drawable/ic_plus"
-			  android:id="@+id/addNewSchedule"/>
+			  android:id="@+id/nav_new_schedule"/>
 	</group>
 	<group
 		android:id="@+id/actionsGroup">
 		<item android:title="@string/settings"
 			  android:icon="@drawable/ic_settings"
-			  android:id="@+id/settings"/>
+			  android:id="@+id/nav_settings"/>
 		<item android:title="@string/import_language_pack"
 			  android:icon="@drawable/ic_import"
-			  android:id="@+id/importPack"/>
+			  android:id="@+id/nav_import"/>
 	</group>
 </menu>

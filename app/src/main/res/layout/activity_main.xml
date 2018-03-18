@@ -45,21 +45,6 @@
 			app:itemTextColor="@color/menu_text_color"
 			app:menu="@menu/nav_drawer"
 			app:headerLayout="@layout/header_navigation">
-<!--
-
-			<LinearLayout
-				android:layout_marginTop="130dp"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:orientation="vertical">
-
-				<android.support.v7.widget.RecyclerView
-					android:id="@+id/navigationRecyclerView"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:background="#FFFFFF"/>
-			</LinearLayout>
--->
 		</android.support.design.widget.NavigationView>
 	</android.support.v4.widget.DrawerLayout>
 </android.support.design.widget.CoordinatorLayout>

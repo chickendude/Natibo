@@ -11,24 +11,23 @@ import android.widget.TextView;
 
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.object.Schedule;
+import io.reactivex.subjects.PublishSubject;
 import io.realm.RealmResults;
 
-public class NavigationAdapter extends RecyclerView.Adapter {
-	public interface OnItemClickListener {
-		void onNewSchedule();
-		void onScheduleClicked(Schedule schedule);
+public class LanguageListAdapter extends RecyclerView.Adapter {
+
+	PublishSubject<Schedule> scheduleSubject = PublishSubject.create();
+
+	public PublishSubject<Schedule> asObservable() {
+		return scheduleSubject;
 	}
 
-	private static final int TYPE_LANGUAGE = 1;
-	private static final int TYPE_ADD_SCHEDULE = 2;
 	private Context context;
-	private OnItemClickListener listener;
 	private RealmResults<Schedule> schedules;
 	private int currentPosition;
 
-	public NavigationAdapter(Context context, RealmResults<Schedule> schedules, int currentPosition) {
+	public LanguageListAdapter(Context context, RealmResults<Schedule> schedules) {
 		this.context = context;
-		listener = (OnItemClickListener) context;
 		this.schedules = schedules;
 		this.currentPosition = currentPosition;
 	}
@@ -44,13 +43,8 @@ public class NavigationAdapter extends RecyclerView.Adapter {
 	@Override
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		View view;
-		if (viewType == TYPE_LANGUAGE) {
-			view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_menu_language, parent, false);
-			return new ViewHolder(view);
-		} else {
-			view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_add_new_schedule, parent, false);
-			return new ViewHolderNew(view);
-		}
+		view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_menu_language, parent, false);
+		return new ViewHolder(view);
 	}
 
 	@Override
@@ -61,16 +55,7 @@ public class NavigationAdapter extends RecyclerView.Adapter {
 
 	@Override
 	public int getItemCount() {
-		return schedules.size() + 1;
-	}
-
-	@Override
-	public int getItemViewType(int position) {
-		if (position < getItemCount() - 1) {
-			return TYPE_LANGUAGE;
-		} else {
-			return TYPE_ADD_SCHEDULE;
-		}
+		return schedules.size();
 	}
 
 	private class ViewHolder extends RecyclerView.ViewHolder {
@@ -83,20 +68,17 @@ public class NavigationAdapter extends RecyclerView.Adapter {
 		public ViewHolder(View view) {
 			super(view);
 			this.view = view;
-			languageName = (TextView) view.findViewById(R.id.languageLabel);
-			scheduleType = (TextView) view.findViewById(R.id.scheduleTypeLabel);
-			flagImage = (ImageView) view.findViewById(R.id.flagImageView);
-			this.view.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View view) {
-					ViewGroup parent = (ViewGroup) view.getParent();
-					int numViews = parent.getChildCount();
-					for (int i = 0; i < numViews; i++) {
-						parent.getChildAt(i).setBackgroundResource(R.drawable.menu_language);
-					}
-					ViewHolder.this.view.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimaryLight));
-					listener.onScheduleClicked(schedule);
+			languageName = view.findViewById(R.id.languageLabel);
+			scheduleType = view.findViewById(R.id.scheduleTypeLabel);
+			flagImage = view.findViewById(R.id.flagImageView);
+			this.view.setOnClickListener(v -> {
+				ViewGroup parent = (ViewGroup) v.getParent();
+				int numViews = parent.getChildCount();
+				for (int i = 0; i < numViews; i++) {
+					parent.getChildAt(i).setBackgroundResource(R.drawable.menu_language);
 				}
+				ViewHolder.this.view.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimaryLight));
+				scheduleSubject.onNext(schedule);
 			});
 		}
 
@@ -111,13 +93,6 @@ public class NavigationAdapter extends RecyclerView.Adapter {
 			languageName.setText(schedule.getLanguage());
 			scheduleType.setText(schedule.getTitle());
 			flagImage.setImageResource(schedule.getLanguageType().getDrawable());
-		}
-	}
-
-	private class ViewHolderNew extends RecyclerView.ViewHolder {
-		public ViewHolderNew(View itemView) {
-			super(itemView);
-			itemView.setOnClickListener(view -> listener.onNewSchedule());
 		}
 	}
 }

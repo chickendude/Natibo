@@ -23,6 +23,7 @@ import io.realm.RealmList;
 
 // TODO: Long press with popup menu to ask to fill in all previous days
 public class MainFragment extends Fragment {
+	public static final String MAIN_FRAGMENT_TAG = "main_fragment";
 	private static final String TAG = MainFragment.class.getSimpleName();
 	public static final String TAG_DAY_ID = "tag_day_id";
 	private static final String DAY_FRAGMENT_TAG = "day_fragment";
@@ -49,7 +50,7 @@ public class MainFragment extends Fragment {
 
 		// get the arguments passed in
 		Bundle bundle = getArguments();
-		String id = bundle.getString(MainActivity.TAG_SCHEDULE_ID);
+		String id = bundle.getString(LanguageListFragment.TAG_SCHEDULE_ID);
 		schedule = realm.where(Schedule.class).equalTo("id", id).findFirst();
 
 		// set up title
