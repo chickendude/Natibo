@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
 apply plugin: 'realm-android'
+apply plugin: 'kotlin-android'
 
 android {
 	compileSdkVersion 27
@@ -44,7 +44,7 @@ dependencies {
 	// rxJava
 	compile 'io.reactivex.rxjava2:rxjava:2.1.7'
 	compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-	compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 	debugCompile 'com.facebook.stetho:stetho:1.5.0'
 	debugCompile 'com.uphyca:stetho_realm:2.1.0'
 

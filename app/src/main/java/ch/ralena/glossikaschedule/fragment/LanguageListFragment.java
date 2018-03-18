@@ -34,6 +34,10 @@ public class LanguageListFragment extends Fragment {
 		realm = Realm.getDefaultInstance();
 		schedules = realm.where(Schedule.class).findAll();
 
+		if (schedules.size() == 0) {
+
+		}
+
 		Log.d(TAG, "" + schedules.size());
 
 		// set up recyclerlist and adapter
