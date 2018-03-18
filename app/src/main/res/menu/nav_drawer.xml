@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<group
+		android:id="@+id/languagesGroup">
+		<item android:title="@string/languages"
+			  android:icon="@drawable/ic_list"
+			  android:id="@+id/languages"/>
+		<item android:title="@string/add_new_language"
+			  android:icon="@drawable/ic_plus"
+			  android:id="@+id/addNewSchedule"/>
+	</group>
+	<group
+		android:id="@+id/actionsGroup">
+		<item android:title="@string/settings"
+			  android:icon="@drawable/ic_settings"
+			  android:id="@+id/settings"/>
+		<item android:title="@string/import_language_pack"
+			  android:icon="@drawable/ic_import"
+			  android:id="@+id/importPack"/>
+	</group>
+</menu>

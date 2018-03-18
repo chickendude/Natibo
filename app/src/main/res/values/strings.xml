@@ -1,0 +1,11 @@
+<resources>
+	<string name="app_name">Glossika Native</string>
+	<string name="drawer_open">Open navigation drawer</string>
+	<string name="drawer_close">Close navigation drawer</string>
+	<string name="mark_days_as_complete">Would you like to mark all days before Day %d as complete? (Swipe right to dismiss)</string>
+	<string name="minutes_abbreviation">mins</string>
+	<string name="add_new_language">Add New Language</string>
+	<string name="import_language_pack">Import Language Pack</string>
+	<string name="settings">Settings</string>
+	<string name="languages">Languages</string>
+</resources>
