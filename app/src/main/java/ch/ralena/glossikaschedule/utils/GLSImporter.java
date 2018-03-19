@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
+import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -22,6 +23,7 @@ import java.util.zip.ZipInputStream;
  * Methods for importing a .gsl file into the database.
  */
 public class GLSImporter {
+	public static final String TAG = GLSImporter.class.getSimpleName();
 	private static int BUFFER_SIZE = 1024;
 	private static List<String> ACCEPTED_LANGUAGES = Arrays.asList("EN", "ZS");
 
@@ -30,6 +32,7 @@ public class GLSImporter {
 		// TODO: 18/03/18 2. Add into database
 		// TODO: 18/03/18 3. Verify file names/strip the 'EN - ' bit out
 		// TODO: 18/03/18 4. Create fragment where you can view all of your audio files
+		// TODO: 18/03/18 5. Dialog + progress bar
 
 		ContentResolver contentResolver = ctx.getContentResolver();
 		String dbName = "";
@@ -43,15 +46,28 @@ public class GLSImporter {
 			cursor.close();
 		}
 
-		if (dbName.toLowerCase().endsWith(".gsl")) {
+		if (dbName.toLowerCase().endsWith(".gls")) {
 
 			BufferedOutputStream bos;
 			InputStream is;
 
 			try {
 				is = contentResolver.openInputStream(uri);
+
+				// first pass
 				ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is));
 				ZipEntry zipEntry;
+				int numFiles = 0;
+				long totalSize = 0;
+
+				while ((zipEntry = zis.getNextEntry()) != null) {
+					numFiles++;
+					totalSize += zipEntry.getSize();
+				}
+				Log.d(TAG, String.format("Num Files: %d, Total size: %d", numFiles, totalSize));
+
+				// second pass
+				zis = new ZipInputStream(new BufferedInputStream(is));
 
 				// loop through files in the .gls zip
 				while ((zipEntry = zis.getNextEntry()) != null) {
