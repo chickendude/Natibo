@@ -1,5 +1,7 @@
 package ch.ralena.glossikaschedule;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -18,12 +20,14 @@ import ch.ralena.glossikaschedule.adapter.LanguageListAdapter;
 import ch.ralena.glossikaschedule.fragment.LanguageListFragment;
 import ch.ralena.glossikaschedule.fragment.MainFragment;
 import ch.ralena.glossikaschedule.object.Schedule;
+import ch.ralena.glossikaschedule.utils.GLSImporter;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity implements DayAdapter.OnItemCheckedListener {
 	private static final String TAG = MainActivity.class.getSimpleName();
 	private static final String TAG_SCHEDULE_INDEX = "save_schedule_index";
+	private static final int REQUEST_PICK_GLS = 1;
 
 	DrawerLayout drawerLayout;
 	NavigationView navigationView;
@@ -54,22 +58,9 @@ public class MainActivity extends AppCompatActivity implements DayAdapter.OnItem
 		realm = Realm.getDefaultInstance();
 		schedules = realm.where(Schedule.class).findAll();
 
-		// if we don't have any schedules yet, request to create one, otherwise load the first schedule
-//		if (schedules.size() == 0) {
-//			loadNewScheduleActivity(false);
-//		} else {
-//			if(getIntent().getBooleanExtra(EXTRA_NEW_SCHEDULE, false)) {
-//				loadedSchedule = schedules.last();
-//			} else if (savedInstanceState != null) {
-//				int scheduleIndex = savedInstanceState.getInt(TAG_SCHEDULE_INDEX);
-//				loadedSchedule = schedules.get(scheduleIndex);
-//			} else {
-//				loadedSchedule = schedules.first();
-//			}
-//		}
-
 		// set up nav drawer
 		setupNavigationDrawer();
+		loadLanguageListFragment();
 	}
 
 	@Override
@@ -108,15 +99,31 @@ public class MainActivity extends AppCompatActivity implements DayAdapter.OnItem
 							loadLanguageListFragment();
 							break;
 						case R.id.nav_new_schedule:
+							loadNewScheduleActivity();
 							break;
 						case R.id.nav_settings:
 							break;
 						case R.id.nav_import:
+							importLanguagPack();
 							break;
 					}
 
 					return true;
 				});
+		navigationView.setCheckedItem(R.id.nav_languages);
+	}
+
+	private void importLanguagPack() {
+		Intent mediaIntent = new Intent(Intent.ACTION_GET_CONTENT);
+		mediaIntent.setType("application/*");
+		startActivityForResult(mediaIntent, REQUEST_PICK_GLS);
+	}
+
+	private void loadNewScheduleActivity() {
+		// close side drawer
+		drawerLayout.closeDrawers();
+		Intent intent = new Intent(this, NewScheduleActivity.class);
+		startActivity(intent);
 	}
 
 	private void loadLanguageListFragment() {
@@ -125,6 +132,14 @@ public class MainActivity extends AppCompatActivity implements DayAdapter.OnItem
 				.beginTransaction()
 				.replace(R.id.fragmentPlaceHolder, fragment)
 				.commit();
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == REQUEST_PICK_GLS && resultCode == Activity.RESULT_OK) {
+			GLSImporter.importPack(this, data.getData());
+		}
 	}
 
 	@Override
