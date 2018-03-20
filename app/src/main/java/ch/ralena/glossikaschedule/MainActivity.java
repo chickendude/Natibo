@@ -17,10 +17,10 @@ import android.view.View;
 
 import ch.ralena.glossikaschedule.adapter.DayAdapter;
 import ch.ralena.glossikaschedule.adapter.LanguageListAdapter;
+import ch.ralena.glossikaschedule.fragment.LanguageImportFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageListFragment;
 import ch.ralena.glossikaschedule.fragment.MainFragment;
 import ch.ralena.glossikaschedule.object.Schedule;
-import ch.ralena.glossikaschedule.utils.GLSImporter;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
@@ -138,7 +138,14 @@ public class MainActivity extends AppCompatActivity implements DayAdapter.OnItem
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == REQUEST_PICK_GLS && resultCode == Activity.RESULT_OK) {
-			GLSImporter.importPack(this, data.getData());
+			LanguageImportFragment fragment = new LanguageImportFragment();
+			Bundle bundle = new Bundle();
+			bundle.putParcelable(LanguageImportFragment.EXTRA_URI, data.getData());
+			fragment.setArguments(bundle);
+
+			fragmentManager.beginTransaction()
+					.replace(R.id.fragmentPlaceHolder, fragment)
+					.commit();
 		}
 	}
 
