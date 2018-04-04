@@ -61,40 +61,31 @@ public class GLSImporter {
 		Thread thread = new Thread(() -> {
 			Realm realm = Realm.getDefaultInstance();
 			ContentResolver contentResolver = ctx.getContentResolver();
-			String dbName = "";
+			String packFileName = "";
 
 			Cursor cursor =
 					contentResolver.query(uri, null, null, null, null);
 			if (cursor != null) {
 				int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
 				cursor.moveToFirst();
-				dbName = cursor.getString(nameIndex);
+				packFileName = cursor.getString(nameIndex);
 				cursor.close();
 			}
 
-			if (dbName.toLowerCase().endsWith(".gls")) {
+			if (packFileName.toLowerCase().endsWith(".gls")) {
 
 				BufferedOutputStream bos;
 				InputStream is;
 
 				try {
-					is = contentResolver.openInputStream(uri);
-
 					// first pass
+					is = contentResolver.openInputStream(uri);
 					ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is));
-					ZipEntry zipEntry;
-					int numFiles = 0;
 
-					// calculate number of files
-					while ((zipEntry = zis.getNextEntry()) != null) {
-						// only count the sentence mp3 files
-						if (zipEntry.getName().contains("mp3")) {
-							numFiles++;
-							totalSentencesSubject.onNext(numFiles);
-						}
-					}
+					countFiles(zis);
 
 					// second pass
+					ZipEntry zipEntry;
 					is = contentResolver.openInputStream(uri);
 					zis = new ZipInputStream(new BufferedInputStream(is));
 
@@ -134,6 +125,7 @@ public class GLSImporter {
 								bos.flush();
 								bos.close();
 
+								// now set up database objects which we will fill in after extracting all mp3s
 								realm.executeTransaction(r -> {
 									// load language pack or create it if it doesn't exist
 									Language lang = realm.where(Language.class).equalTo("language_id", language).findFirst();
@@ -141,6 +133,7 @@ public class GLSImporter {
 										lang = realm.createObject(Language.class, language);
 									}
 
+									// create a language pack (ie. F1, F2, F3) for the language if it doesn't exist
 									Pack pack = lang.getPack(book);
 									if (pack == null) {
 										pack = realm.createObject(Pack.class, UUID.randomUUID().toString());
@@ -148,9 +141,10 @@ public class GLSImporter {
 										lang.getPacks().add(pack);
 									}
 
+									// find index of current sentence (sentence #1-1000, #1001-2000, etc)
 									int index = Integer.parseInt(number.replace(".mp3", ""));
 
-									// load sentences
+									// load sentence with this index or create one if it doesn't exist
 									RealmList<Sentence> sentences = pack.getSentences();
 									Sentence sentence = pack.getSentenceWithIndex(index);
 									if (sentence == null) {
@@ -162,8 +156,10 @@ public class GLSImporter {
 									Log.d(TAG, "Added sentence no. " + index);
 								});
 							} else {
-								// invalid file
+								Log.d(TAG, "Skipping: " + entryName);
 							}
+						} else if (entryName.contains(".gsp")) {
+							fileNumber++;
 						}
 					}
 
@@ -179,5 +175,27 @@ public class GLSImporter {
 		});
 		thread.start();
 
+	}
+
+	private void countFiles(ZipInputStream zis) throws IOException {
+		final byte[] buffer = new byte[BUFFER_SIZE];
+		ZipEntry zipEntry;
+		int numFiles = 0;
+		StringBuilder builder = new StringBuilder();
+		int bytesRead;
+
+		// calculate number of files
+		while ((zipEntry = zis.getNextEntry()) != null) {
+			// only count the sentence mp3 files
+			if (zipEntry.getName().contains("mp3")) {
+				numFiles++;
+				totalSentencesSubject.onNext(numFiles);
+			} else if (zipEntry.getName().contains(".gsp")) {
+				while ((bytesRead = zis.read(buffer, 0, BUFFER_SIZE)) >= 0) {
+					builder.append(new String(buffer, 0, bytesRead));
+				}
+			}
+		}
+		Log.d(TAG, builder.toString());
 	}
 }
