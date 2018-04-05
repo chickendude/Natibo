@@ -10,6 +10,8 @@ public class Language extends RealmObject {
 	@Index
 	private String language_id;
 
+	private String long_name;
+
 	RealmList<Pack> packs;
 
 	public String getLanguage_id() {
@@ -27,5 +29,13 @@ public class Language extends RealmObject {
 			}
 		}
 		return null;
+	}
+
+	public String getLong_name() {
+		return long_name;
+	}
+
+	public void setLong_name(String long_name) {
+		this.long_name = long_name;
 	}
 }

@@ -4,10 +4,12 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class LanguageType implements Parcelable {
+	String id;
 	String name;
 	int drawable;
 
-	public LanguageType(String name, int drawable) {
+	public LanguageType(String id, String name, int drawable) {
+		this.id	= id;
 		this.name = name;
 		this.drawable = drawable;
 	}
@@ -29,6 +31,7 @@ public class LanguageType implements Parcelable {
 	}
 
 	protected LanguageType(Parcel in) {
+		id = in.readString();
 		name = in.readString();
 		drawable = in.readInt();
 	}
@@ -52,6 +55,7 @@ public class LanguageType implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel parcel, int i) {
+		parcel.writeString(id);
 		parcel.writeString(name);
 		parcel.writeInt(drawable);
 	}

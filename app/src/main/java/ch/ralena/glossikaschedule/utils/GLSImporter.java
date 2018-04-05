@@ -82,7 +82,7 @@ public class GLSImporter {
 					is = contentResolver.openInputStream(uri);
 					ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is));
 
-					countFiles(zis);
+					countFiles(zis, realm);
 
 					// second pass
 					ZipEntry zipEntry;
@@ -177,7 +177,11 @@ public class GLSImporter {
 
 	}
 
-	private void countFiles(ZipInputStream zis) throws IOException {
+	/**
+	 * Counts the number of files in a pack and does some basic verification to ensure files are
+	 * in order.
+	 **/
+	private boolean countFiles(ZipInputStream zis, Realm realm) throws IOException {
 		final byte[] buffer = new byte[BUFFER_SIZE];
 		ZipEntry zipEntry;
 		int numFiles = 0;
@@ -185,17 +189,48 @@ public class GLSImporter {
 		int bytesRead;
 
 		// calculate number of files
+		String baseLanguage = null;
+		String targetLanguage = null;
 		while ((zipEntry = zis.getNextEntry()) != null) {
 			// only count the sentence mp3 files
 			if (zipEntry.getName().contains("mp3")) {
 				numFiles++;
 				totalSentencesSubject.onNext(numFiles);
 			} else if (zipEntry.getName().contains(".gsp")) {
+				// extract base language and target language from file name
+				String[] nameParts = zipEntry.getName().split("-");
+				baseLanguage = nameParts[0].trim();
+				targetLanguage = nameParts[1].trim();
+				// extract contents of file into the StringBuilder
 				while ((bytesRead = zis.read(buffer, 0, BUFFER_SIZE)) >= 0) {
 					builder.append(new String(buffer, 0, bytesRead));
 				}
 			}
 		}
+
+		if(baseLanguage == null || targetLanguage == null)
+			return false;
+
+		Language base = realm.where(Language.class).equalTo("language_id", baseLanguage).findFirst();
+		if (base == null) {
+			base = realm.createObject(Language.class, baseLanguage);
+		}
+
+		Language target = realm.where(Language.class).equalTo("language_id", baseLanguage).findFirst();
+		if (base == null) {
+			target = realm.createObject(Language.class, baseLanguage);
+		}
+
+		String[] sentenceList = builder.toString().split("\n");
+		String[] sections = sentenceList[0].split("\t");
+
+		for (String line : sentenceList) {
+			if (sections[0].equals("index")) {
+
+			}
+		}
+
 		Log.d(TAG, builder.toString());
+		return true;
 	}
 }
