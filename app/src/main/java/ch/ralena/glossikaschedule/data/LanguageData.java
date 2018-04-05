@@ -12,6 +12,15 @@ public class LanguageData {
 		languages = getLanguages();
 	}
 
+	public static LanguageType getLanguageById(String id) {
+		for (LanguageType languageType : languages) {
+			if (languageType.id.equals(id))
+				return languageType;
+		}
+		return null;
+	}
+
+
 	public static List<LanguageType> getLanguages() {
 		List<LanguageType> languages = new ArrayList<>();
 		languages.add(new LanguageType("","Arabic (Standard)", R.drawable.flag_arabic_msa));

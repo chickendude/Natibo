@@ -8,14 +8,14 @@ import io.realm.annotations.PrimaryKey;
 public class Language extends RealmObject {
 	@PrimaryKey
 	@Index
-	private String language_id;
+	private String languageId;
 
-	private String long_name;
+	private String longName;
 
 	RealmList<Pack> packs;
 
-	public String getLanguage_id() {
-		return language_id;
+	public String getLanguageId() {
+		return languageId;
 	}
 
 	public RealmList<Pack> getPacks() {
@@ -31,11 +31,11 @@ public class Language extends RealmObject {
 		return null;
 	}
 
-	public String getLong_name() {
-		return long_name;
+	public String getLongName() {
+		return longName;
 	}
 
-	public void setLong_name(String long_name) {
-		this.long_name = long_name;
+	public void setLongName(String longName) {
+		this.longName = longName;
 	}
 }

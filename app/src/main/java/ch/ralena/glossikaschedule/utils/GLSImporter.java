@@ -20,6 +20,8 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import ch.ralena.glossikaschedule.data.LanguageData;
+import ch.ralena.glossikaschedule.data.LanguageType;
 import ch.ralena.glossikaschedule.object.Language;
 import ch.ralena.glossikaschedule.object.Pack;
 import ch.ralena.glossikaschedule.object.Sentence;
@@ -128,18 +130,10 @@ public class GLSImporter {
 								// now set up database objects which we will fill in after extracting all mp3s
 								realm.executeTransaction(r -> {
 									// load language pack or create it if it doesn't exist
-									Language lang = realm.where(Language.class).equalTo("language_id", language).findFirst();
-									if (lang == null) {
-										lang = realm.createObject(Language.class, language);
-									}
+									Language lang = realm.where(Language.class).equalTo("languageId", language).findFirst();
 
 									// create a language pack (ie. F1, F2, F3) for the language if it doesn't exist
 									Pack pack = lang.getPack(book);
-									if (pack == null) {
-										pack = realm.createObject(Pack.class, UUID.randomUUID().toString());
-										pack.setBook(book);
-										lang.getPacks().add(pack);
-									}
 
 									// find index of current sentence (sentence #1-1000, #1001-2000, etc)
 									int index = Integer.parseInt(number.replace(".mp3", ""));
@@ -150,6 +144,7 @@ public class GLSImporter {
 									if (sentence == null) {
 										sentence = new Sentence();
 										sentence.setIndex(index);
+										sentence.setUri(audioFile.getAbsolutePath());
 										sentences.add(sentence);
 									}
 
@@ -189,11 +184,13 @@ public class GLSImporter {
 		int bytesRead;
 
 		// calculate number of files
-		String baseLanguage = null;
-		String targetLanguage = null;
+		String baseLanguage = "";
+		String targetLanguage = "";
+		String packName = "";
 		while ((zipEntry = zis.getNextEntry()) != null) {
 			// only count the sentence mp3 files
 			if (zipEntry.getName().contains("mp3")) {
+				packName = zipEntry.getName().split(" - ")[1];
 				numFiles++;
 				totalSentencesSubject.onNext(numFiles);
 			} else if (zipEntry.getName().contains(".gsp")) {
@@ -208,23 +205,69 @@ public class GLSImporter {
 			}
 		}
 
-		if(baseLanguage == null || targetLanguage == null)
+		// these hold the language id and the full name for the language
+		LanguageType baseType = LanguageData.getLanguageById(baseLanguage);
+		LanguageType targetType = LanguageData.getLanguageById(targetLanguage);
+
+		if(baseLanguage.length() < 2 || targetLanguage.length() < 2 || baseType == null || targetType == null)
 			return false;
 
-		Language base = realm.where(Language.class).equalTo("language_id", baseLanguage).findFirst();
+		// --- begin transaction
+		realm.beginTransaction();
+
+		// create base language and pack if they don't exist
+		Language base = realm.where(Language.class).equalTo("languageId", baseLanguage).findFirst();
 		if (base == null) {
 			base = realm.createObject(Language.class, baseLanguage);
+			base.setLongName(baseType.getName());
 		}
 
-		Language target = realm.where(Language.class).equalTo("language_id", baseLanguage).findFirst();
-		if (base == null) {
-			target = realm.createObject(Language.class, baseLanguage);
+		Pack basePack = base.getPack(packName);
+		if (basePack == null) {
+			basePack = realm.createObject(Pack.class, UUID.randomUUID().toString());
+			basePack.setBook(packName);
+			base.getPacks().add(basePack);
 		}
+
+		// create target language and pack if they don't exist
+		Language target = realm.where(Language.class).equalTo("languageId", targetLanguage).findFirst();
+		if (target == null) {
+			target = realm.createObject(Language.class, targetLanguage);
+			target.setLongName(targetType.getName());
+		}
+
+		Pack targetPack = target.getPack(packName);
+		if (targetPack == null) {
+			targetPack = realm.createObject(Pack.class, UUID.randomUUID().toString());
+			targetPack.setBook(packName);
+			target.getPacks().add(targetPack);
+		}
+
+		realm.commitTransaction();
+		// --- end transaction
 
 		String[] sentenceList = builder.toString().split("\n");
 		String[] sections = sentenceList[0].split("\t");
 
 		for (String line : sentenceList) {
+			String[] sentenceParts = line.split("\t");
+
+			for (int i = 0; i< sentenceParts.length; i++) {
+				switch (sections[i]) {
+					case "index":
+						break;
+					case "sentence":
+						break;
+					case "translation":
+						break;
+					case "IPA":
+						break;
+					case "romanization":
+						break;
+				}
+			}
+
+
 			if (sections[0].equals("index")) {
 
 			}
