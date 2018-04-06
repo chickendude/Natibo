@@ -1,5 +1,8 @@
 package ch.ralena.glossikaschedule.object;
 
+import java.util.UUID;
+
+import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.Index;
@@ -37,4 +40,24 @@ public class Pack extends RealmObject {
 		}
 		return null;
 	}
+
+	public void createSentenceOrUpdate(Realm realm, int index, String sentence, String ipa, String romanization, String uri) {
+		realm.executeTransaction(r -> {
+			Sentence newSentence = getSentenceWithIndex(index);
+			if (newSentence == null) {
+				newSentence = r.createObject(Sentence.class, UUID.randomUUID().toString());
+				sentences.add(newSentence);
+			}
+			newSentence.setIndex(index);
+			if (sentence != null)
+				newSentence.setText(sentence);
+			if (ipa != null)
+				newSentence.setIpa(ipa);
+			if (romanization != null)
+				newSentence.setRomanization(romanization);
+			if (uri != null)
+				newSentence.setUri(uri);
+		});
+	}
 }
+

@@ -10,7 +10,8 @@ public class DebugApplication extends MainApplication {
 		Stetho.initialize(
 				Stetho.newInitializerBuilder(this)
 						.enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-						.enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
+						.enableWebKitInspector(RealmInspectorModulesProvider.builder(this)
+								.withLimit(5000).build())
 						.build());
 	}
 }

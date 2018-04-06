@@ -24,10 +24,8 @@ import ch.ralena.glossikaschedule.data.LanguageData;
 import ch.ralena.glossikaschedule.data.LanguageType;
 import ch.ralena.glossikaschedule.object.Language;
 import ch.ralena.glossikaschedule.object.Pack;
-import ch.ralena.glossikaschedule.object.Sentence;
 import io.reactivex.subjects.PublishSubject;
 import io.realm.Realm;
-import io.realm.RealmList;
 
 /**
  * Methods for importing a .gsl file into the database.
@@ -128,28 +126,12 @@ public class GLSImporter {
 								bos.close();
 
 								// now set up database objects which we will fill in after extracting all mp3s
-								realm.executeTransaction(r -> {
-									// load language pack or create it if it doesn't exist
-									Language lang = realm.where(Language.class).equalTo("languageId", language).findFirst();
+								int index = Integer.parseInt(number.replace(".mp3", ""));
+								Language lang = realm.where(Language.class).equalTo("languageId", language).findFirst();
+								Pack pack = lang.getPack(book);
+								pack.createSentenceOrUpdate(realm, index, null, null, null, audioFile.getAbsolutePath());
 
-									// create a language pack (ie. F1, F2, F3) for the language if it doesn't exist
-									Pack pack = lang.getPack(book);
-
-									// find index of current sentence (sentence #1-1000, #1001-2000, etc)
-									int index = Integer.parseInt(number.replace(".mp3", ""));
-
-									// load sentence with this index or create one if it doesn't exist
-									RealmList<Sentence> sentences = pack.getSentences();
-									Sentence sentence = pack.getSentenceWithIndex(index);
-									if (sentence == null) {
-										sentence = new Sentence();
-										sentence.setIndex(index);
-										sentence.setUri(audioFile.getAbsolutePath());
-										sentences.add(sentence);
-									}
-
-									Log.d(TAG, "Added sentence no. " + index);
-								});
+								Log.d(TAG, "Added sentence no. " + index);
 							} else {
 								Log.d(TAG, "Skipping: " + entryName);
 							}
@@ -209,7 +191,7 @@ public class GLSImporter {
 		LanguageType baseType = LanguageData.getLanguageById(baseLanguage);
 		LanguageType targetType = LanguageData.getLanguageById(targetLanguage);
 
-		if(baseLanguage.length() < 2 || targetLanguage.length() < 2 || baseType == null || targetType == null)
+		if (baseLanguage.length() < 2 || targetLanguage.length() < 2 || baseType == null || targetType == null)
 			return false;
 
 		// --- begin transaction
@@ -249,28 +231,37 @@ public class GLSImporter {
 		String[] sentenceList = builder.toString().split("\n");
 		String[] sections = sentenceList[0].split("\t");
 
-		for (String line : sentenceList) {
-			String[] sentenceParts = line.split("\t");
+		for (int i = 1; i < sentenceList.length; i++) {
+			String[] sentenceParts = sentenceList[i].split("\t");
+			int index = Integer.parseInt(sentenceParts[0]);
 
-			for (int i = 0; i< sentenceParts.length; i++) {
-				switch (sections[i]) {
+			String sentence = null;
+			String translation = null;
+			String ipa = null;
+			String romanization = null;
+			for (int j = 0; j < sentenceParts.length; j++) {
+				String value = sentenceParts[j];
+				switch (sections[j]) {
 					case "index":
 						break;
 					case "sentence":
+						sentence = value;
 						break;
 					case "translation":
+						translation = value;
 						break;
 					case "IPA":
+						ipa = value;
 						break;
 					case "romanization":
+						romanization = value;
 						break;
 				}
 			}
 
-
-			if (sections[0].equals("index")) {
-
-			}
+			// create or update target and base sentences
+			targetPack.createSentenceOrUpdate(realm, index, translation, ipa, romanization, null);
+			basePack.createSentenceOrUpdate(realm, index, sentence, null, null, null);
 		}
 
 		Log.d(TAG, builder.toString());
