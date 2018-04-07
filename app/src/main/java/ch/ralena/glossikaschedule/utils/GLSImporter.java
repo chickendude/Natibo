@@ -199,7 +199,6 @@ public class GLSImporter {
 		Language base = realm.where(Language.class).equalTo("languageId", baseLanguage).findFirst();
 		if (base == null) {
 			base = realm.createObject(Language.class, baseLanguage);
-			base.setLongName(baseType.getName());
 		}
 
 		Pack basePack = base.getPack(packName);
@@ -213,7 +212,6 @@ public class GLSImporter {
 		Language target = realm.where(Language.class).equalTo("languageId", targetLanguage).findFirst();
 		if (target == null) {
 			target = realm.createObject(Language.class, targetLanguage);
-			target.setLongName(targetType.getName());
 		}
 
 		Pack targetPack = target.getPack(packName);

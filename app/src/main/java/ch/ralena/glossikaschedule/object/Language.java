@@ -12,8 +12,6 @@ public class Language extends RealmObject {
 	@Index
 	private String languageId;
 
-	private String longName;
-
 	RealmList<Pack> packs;
 
 	public String getLanguageId() {
@@ -34,17 +32,13 @@ public class Language extends RealmObject {
 	}
 
 	public String getLongName() {
-		return longName;
-	}
-
-	public void setLongName(String longName) {
-		this.longName = longName;
+		return getLanguageType().getName();
 	}
 
 	public LanguageType getLanguageType() {
 		LanguageType languageType = null;
 		for (LanguageType language : LanguageData.languages) {
-			if (this.longName.equals(language.getName())) {
+			if (this.languageId.equals(language.getId())) {
 				return language;
 			}
 		}

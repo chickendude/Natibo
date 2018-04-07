@@ -14,6 +14,10 @@ public class LanguageType implements Parcelable {
 		this.drawable = drawable;
 	}
 
+	public String getId() {
+		return id;
+	}
+
 	public String getName() {
 		return name;
 	}
