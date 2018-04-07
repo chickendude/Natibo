@@ -9,4 +9,7 @@
 	<string name="settings">Settings</string>
 	<string name="languages">Languages</string>
 	<string name="extracting_sentence">Extracting sentence</string>
+	<string name="packs">Packs:</string>
+	<string name="sentences">Sentences:</string>
+	<string name="language_flag">Language Flag</string>
 </resources>

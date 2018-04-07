@@ -52,7 +52,8 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 	class ViewHolder extends RecyclerView.ViewHolder {
 		private View view;
 		private TextView languageName;
-		private TextView scheduleType;
+		private TextView numPacks;
+		private TextView numSentences;
 		private ImageView flagImage;
 		private Language language;
 
@@ -60,7 +61,8 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 			super(view);
 			this.view = view;
 			languageName = view.findViewById(R.id.languageLabel);
-			scheduleType = view.findViewById(R.id.scheduleTypeLabel);
+			numPacks = view.findViewById(R.id.numPacksLabel);
+			numSentences = view.findViewById(R.id.numSentencesLabel);
 			flagImage = view.findViewById(R.id.flagImageView);
 			this.view.setOnClickListener(v -> languageSubject.onNext(language));
 		}
@@ -69,6 +71,8 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 			this.language = language;
 			view.setBackgroundResource(R.drawable.menu_language);
 			languageName.setText(language.getLongName());
+			numPacks.setText("" + language.getPacks().size());
+			numSentences.setText("" + language.getSentenceCount());
 //			scheduleType.setText(schedule.getTitle());
 			flagImage.setImageResource(language.getLanguageType().getDrawable());
 		}

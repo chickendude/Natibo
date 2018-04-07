@@ -50,4 +50,12 @@ public class Language extends RealmObject {
 		}
 		return languageType;
 	}
+
+	public int getSentenceCount() {
+		int numSentences = 0;
+		for (Pack pack : packs) {
+			numSentences += pack.getSentences().size();
+		}
+		return numSentences;
+	}
 }
