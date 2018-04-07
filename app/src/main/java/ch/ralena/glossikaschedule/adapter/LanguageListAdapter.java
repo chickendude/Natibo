@@ -10,24 +10,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import ch.ralena.glossikaschedule.R;
-import ch.ralena.glossikaschedule.object.Schedule;
+import ch.ralena.glossikaschedule.object.Language;
 import io.reactivex.subjects.PublishSubject;
 import io.realm.RealmResults;
 
 public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapter.ViewHolder> {
 
-	PublishSubject<Schedule> scheduleSubject = PublishSubject.create();
+	PublishSubject<Language> languageSubject = PublishSubject.create();
 
-	public PublishSubject<Schedule> asObservable() {
-		return scheduleSubject;
+	public PublishSubject<Language> asObservable() {
+		return languageSubject;
 	}
 
 	private Context context;
-	private RealmResults<Schedule> schedules;
+	private RealmResults<Language> languages;
 
-	public LanguageListAdapter(Context context, RealmResults<Schedule> schedules) {
+	public LanguageListAdapter(Context context, RealmResults<Language> languages) {
 		this.context = context;
-		this.schedules = schedules;
+		this.languages = languages;
 	}
 
 	@NonNull
@@ -41,12 +41,12 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 		if (position < getItemCount())
-			holder.bindView(schedules.get(position));
+			holder.bindView(languages.get(position));
 	}
 
 	@Override
 	public int getItemCount() {
-		return schedules.size();
+		return languages.size();
 	}
 
 	class ViewHolder extends RecyclerView.ViewHolder {
@@ -54,7 +54,7 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 		private TextView languageName;
 		private TextView scheduleType;
 		private ImageView flagImage;
-		private Schedule schedule;
+		private Language language;
 
 		ViewHolder(View view) {
 			super(view);
@@ -62,15 +62,15 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 			languageName = view.findViewById(R.id.languageLabel);
 			scheduleType = view.findViewById(R.id.scheduleTypeLabel);
 			flagImage = view.findViewById(R.id.flagImageView);
-			this.view.setOnClickListener(v -> scheduleSubject.onNext(schedule));
+			this.view.setOnClickListener(v -> languageSubject.onNext(language));
 		}
 
-		void bindView(Schedule schedule) {
-			this.schedule = schedule;
+		void bindView(Language language) {
+			this.language = language;
 			view.setBackgroundResource(R.drawable.menu_language);
-			languageName.setText(schedule.getLanguage());
-			scheduleType.setText(schedule.getTitle());
-			flagImage.setImageResource(schedule.getLanguageType().getDrawable());
+			languageName.setText(language.getLongName());
+//			scheduleType.setText(schedule.getTitle());
+			flagImage.setImageResource(language.getLanguageType().getDrawable());
 		}
 	}
 }

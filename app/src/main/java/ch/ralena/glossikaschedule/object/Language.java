@@ -1,5 +1,7 @@
 package ch.ralena.glossikaschedule.object;
 
+import ch.ralena.glossikaschedule.data.LanguageData;
+import ch.ralena.glossikaschedule.data.LanguageType;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.Index;
@@ -37,5 +39,15 @@ public class Language extends RealmObject {
 
 	public void setLongName(String longName) {
 		this.longName = longName;
+	}
+
+	public LanguageType getLanguageType() {
+		LanguageType languageType = null;
+		for (LanguageType language : LanguageData.languages) {
+			if (this.longName.equals(language.getName())) {
+				return language;
+			}
+		}
+		return languageType;
 	}
 }

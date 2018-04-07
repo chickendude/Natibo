@@ -9,6 +9,7 @@ import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -110,8 +111,6 @@ public class GLSImporter {
 								// set up file path
 								File audioFile = new File(ctx.getFilesDir() + "/" + language + "/" + number);
 
-								Log.d(TAG, audioFile.toURI().toString());
-
 								// actually write the file
 								byte buffer[] = new byte[BUFFER_SIZE];
 								FileOutputStream fos = new FileOutputStream(audioFile);
@@ -130,8 +129,6 @@ public class GLSImporter {
 								Language lang = realm.where(Language.class).equalTo("languageId", language).findFirst();
 								Pack pack = lang.getPack(book);
 								pack.createSentenceOrUpdate(realm, index, null, null, null, audioFile.getAbsolutePath());
-
-								Log.d(TAG, "Added sentence no. " + index);
 							} else {
 								Log.d(TAG, "Skipping: " + entryName);
 							}
@@ -162,8 +159,9 @@ public class GLSImporter {
 		final byte[] buffer = new byte[BUFFER_SIZE];
 		ZipEntry zipEntry;
 		int numFiles = 0;
-		StringBuilder builder = new StringBuilder();
 		int bytesRead;
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		// calculate number of files
 		String baseLanguage = "";
@@ -171,18 +169,18 @@ public class GLSImporter {
 		String packName = "";
 		while ((zipEntry = zis.getNextEntry()) != null) {
 			// only count the sentence mp3 files
-			if (zipEntry.getName().contains("mp3")) {
+			if (zipEntry.getName().endsWith("mp3")) {
 				packName = zipEntry.getName().split(" - ")[1];
 				numFiles++;
 				totalSentencesSubject.onNext(numFiles);
-			} else if (zipEntry.getName().contains(".gsp")) {
+			} else if (zipEntry.getName().endsWith(".gsp")) {
 				// extract base language and target language from file name
 				String[] nameParts = zipEntry.getName().split("-");
 				baseLanguage = nameParts[0].trim();
 				targetLanguage = nameParts[1].trim();
 				// extract contents of file into the StringBuilder
 				while ((bytesRead = zis.read(buffer, 0, BUFFER_SIZE)) >= 0) {
-					builder.append(new String(buffer, 0, bytesRead));
+					baos.write(buffer, 0, bytesRead);
 				}
 			}
 		}
@@ -228,7 +226,7 @@ public class GLSImporter {
 		realm.commitTransaction();
 		// --- end transaction
 
-		String[] sentenceList = builder.toString().split("\n");
+		String[] sentenceList = baos.toString("UTF-8").split("\n");
 		String[] sections = sentenceList[0].split("\t");
 
 		for (int i = 1; i < sentenceList.length; i++) {
@@ -264,7 +262,6 @@ public class GLSImporter {
 			basePack.createSentenceOrUpdate(realm, index, sentence, null, null, null);
 		}
 
-		Log.d(TAG, builder.toString());
 		return true;
 	}
 }

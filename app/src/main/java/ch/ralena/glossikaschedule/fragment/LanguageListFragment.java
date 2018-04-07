@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.adapter.LanguageListAdapter;
-import ch.ralena.glossikaschedule.object.Schedule;
+import ch.ralena.glossikaschedule.object.Language;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
@@ -21,7 +21,7 @@ public class LanguageListFragment extends Fragment {
 	private static final String TAG = LanguageListFragment.class.getSimpleName();
 	public static final String TAG_SCHEDULE_ID = "schedule_id";
 
-	RealmResults<Schedule> schedules;
+	RealmResults<Language> languages;
 
 	private Realm realm;
 
@@ -32,17 +32,17 @@ public class LanguageListFragment extends Fragment {
 
 		// load schedules from database
 		realm = Realm.getDefaultInstance();
-		schedules = realm.where(Schedule.class).findAll();
+		languages = realm.where(Language.class).findAll();
 
-		if (schedules.size() == 0) {
+		if (languages.size() == 0) {
 
 		}
 
-		Log.d(TAG, "" + schedules.size());
+		Log.d(TAG, "" + languages.size());
 
 		// set up recyclerlist and adapter
 		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-		LanguageListAdapter adapter = new LanguageListAdapter(getContext(), schedules);
+		LanguageListAdapter adapter = new LanguageListAdapter(getContext(), languages);
 		recyclerView.setAdapter(adapter);
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
 		recyclerView.setLayoutManager(layoutManager);
@@ -52,16 +52,16 @@ public class LanguageListFragment extends Fragment {
 		return view;
 	}
 
-	private void loadMainFragment(Schedule schedule) {
+	private void loadMainFragment(Language language) {
 		// load new fragment
-		MainFragment mainFragment = new MainFragment();
-		Bundle bundle = new Bundle();
-		bundle.putString(TAG_SCHEDULE_ID, schedule.getId());
-		mainFragment.setArguments(bundle);
-		getFragmentManager()
-				.beginTransaction()
-				.replace(R.id.fragmentPlaceHolder, mainFragment, MainFragment.MAIN_FRAGMENT_TAG)
-				.commit();
+//		MainFragment mainFragment = new MainFragment();
+//		Bundle bundle = new Bundle();
+//		bundle.putString(TAG_SCHEDULE_ID, schedule.getId());
+//		mainFragment.setArguments(bundle);
+//		getFragmentManager()
+//				.beginTransaction()
+//				.replace(R.id.fragmentPlaceHolder, mainFragment, MainFragment.MAIN_FRAGMENT_TAG)
+//				.commit();
 	}
 
 }
