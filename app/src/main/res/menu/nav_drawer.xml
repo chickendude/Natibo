@@ -3,6 +3,11 @@
 	<group
 		android:id="@+id/languagesGroup">
 		<item
+			android:id="@+id/nav_schedules"
+			android:checkable="true"
+			android:icon="@drawable/ic_courses"
+			android:title="@string/courses"/>
+		<item
 			android:id="@+id/nav_languages"
 			android:checkable="true"
 			android:icon="@drawable/ic_list"
