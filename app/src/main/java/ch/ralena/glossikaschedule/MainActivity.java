@@ -13,16 +13,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import ch.ralena.glossikaschedule.adapter.DayAdapter;
 import ch.ralena.glossikaschedule.adapter.LanguageListAdapter;
 import ch.ralena.glossikaschedule.fragment.LanguageImportFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageListFragment;
-import ch.ralena.glossikaschedule.fragment.MainFragment;
 import ch.ralena.glossikaschedule.object.Schedule;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-public class MainActivity extends AppCompatActivity implements DayAdapter.OnItemCheckedListener {
+public class MainActivity extends AppCompatActivity {
 	private static final String TAG = MainActivity.class.getSimpleName();
 	private static final String TAG_SCHEDULE_INDEX = "save_schedule_index";
 	private static final int REQUEST_PICK_GLS = 1;
@@ -145,12 +143,6 @@ public class MainActivity extends AppCompatActivity implements DayAdapter.OnItem
 					.replace(R.id.fragmentPlaceHolder, fragment)
 					.commit();
 		}
-	}
-
-	@Override
-	public void onItemChecked() {
-		MainFragment mainFragment = (MainFragment) fragmentManager.findFragmentByTag(MainFragment.MAIN_FRAGMENT_TAG);
-		mainFragment.updateDay();
 	}
 
 	@Override
