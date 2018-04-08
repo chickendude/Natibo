@@ -77,16 +77,6 @@ public class SentenceListFragment extends Fragment {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		// load new fragment
-//		MainFragment mainFragment = new MainFragment();
-//		Bundle bundle = new Bundle();
-//		bundle.putString(TAG_LANGUAGE_ID, schedule.getId());
-//		mainFragment.setArguments(bundle);
-//		getFragmentManager()
-//				.beginTransaction()
-//				.replace(R.id.fragmentPlaceHolder, mainFragment, MainFragment.MAIN_FRAGMENT_TAG)
-//				.commit();
 	}
 
 }
