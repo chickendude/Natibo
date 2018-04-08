@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -156,37 +154,12 @@ public class MainActivity extends AppCompatActivity implements DayAdapter.OnItem
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.toolbar, menu);
-		return true;
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
 				drawerLayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
 				return true;
-			case R.id.action_delete:
-				deleteSchedule();
-				return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	private void deleteSchedule() {
-		final Snackbar snackbar = Snackbar.make(findViewById(R.id.fragmentPlaceHolder), "Delete " + loadedSchedule.getLanguage() + "?\n(Can't be undone!)", Snackbar.LENGTH_INDEFINITE);
-		snackbar.setAction("Delete", view -> {
-			// find array index of the currently loaded schedule
-			int position = schedules.indexOf(loadedSchedule);
-
-			// delete the schedule
-			realm.executeTransaction(r -> {
-				schedules.deleteFromRealm(position);
-			});
-
-			snackbar.dismiss();
-		});
-		snackbar.show();
 	}
 }
