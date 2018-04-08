@@ -13,7 +13,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import ch.ralena.glossikaschedule.adapter.LanguageListAdapter;
 import ch.ralena.glossikaschedule.fragment.LanguageImportFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageListFragment;
 import ch.ralena.glossikaschedule.object.Schedule;
@@ -28,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
 	DrawerLayout drawerLayout;
 	NavigationView navigationView;
 	private FragmentManager fragmentManager;
-	LanguageListAdapter languageListAdapter;
 	ActionBarDrawerToggle drawerToggle;
 
 	RealmResults<Schedule> schedules;
@@ -153,5 +151,9 @@ public class MainActivity extends AppCompatActivity {
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	public void setNavigationDrawerItemChecked(int itemNum) {
+		navigationView.setCheckedItem(itemNum);
 	}
 }

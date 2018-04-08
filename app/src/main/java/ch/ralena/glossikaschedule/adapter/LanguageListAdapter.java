@@ -34,7 +34,7 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 		View view;
-		view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_menu_language, parent, false);
+		view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_language_list, parent, false);
 		return new ViewHolder(view);
 	}
 
@@ -69,7 +69,6 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 
 		void bindView(Language language) {
 			this.language = language;
-			view.setBackgroundResource(R.drawable.menu_language);
 			languageName.setText(language.getLongName());
 			numPacks.setText("" + language.getPacks().size());
 			numSentences.setText("" + language.getSentenceCount());
