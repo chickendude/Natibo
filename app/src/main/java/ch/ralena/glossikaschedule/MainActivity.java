@@ -92,9 +92,6 @@ public class MainActivity extends AppCompatActivity {
 						case R.id.nav_languages:
 							loadLanguageListFragment();
 							break;
-						case R.id.nav_new_schedule:
-							loadNewScheduleActivity();
-							break;
 						case R.id.nav_settings:
 							break;
 						case R.id.nav_import:
@@ -111,13 +108,6 @@ public class MainActivity extends AppCompatActivity {
 		Intent mediaIntent = new Intent(Intent.ACTION_GET_CONTENT);
 		mediaIntent.setType("application/*");
 		startActivityForResult(mediaIntent, REQUEST_PICK_GLS);
-	}
-
-	private void loadNewScheduleActivity() {
-		// close side drawer
-		drawerLayout.closeDrawers();
-		Intent intent = new Intent(this, NewScheduleActivity.class);
-		startActivity(intent);
 	}
 
 	private void loadLanguageListFragment() {
