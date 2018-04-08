@@ -50,7 +50,7 @@ public class MainFragment extends Fragment {
 
 		// get the arguments passed in
 		Bundle bundle = getArguments();
-		String id = bundle.getString(LanguageListFragment.TAG_SCHEDULE_ID);
+		String id = bundle.getString(LanguageDetailFragment.TAG_LANGUAGE_ID);
 		schedule = realm.where(Schedule.class).equalTo("id", id).findFirst();
 
 		// set up title

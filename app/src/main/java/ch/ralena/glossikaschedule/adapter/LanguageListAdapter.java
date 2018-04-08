@@ -72,7 +72,6 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 			languageName.setText(language.getLongName());
 			numPacks.setText("" + language.getPacks().size());
 			numSentences.setText("" + language.getSentenceCount());
-//			scheduleType.setText(schedule.getTitle());
 			flagImage.setImageResource(language.getLanguageType().getDrawable());
 		}
 	}

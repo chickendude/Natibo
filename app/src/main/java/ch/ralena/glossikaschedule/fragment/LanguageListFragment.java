@@ -20,7 +20,6 @@ import io.realm.RealmResults;
 
 public class LanguageListFragment extends Fragment {
 	private static final String TAG = LanguageListFragment.class.getSimpleName();
-	public static final String TAG_SCHEDULE_ID = "schedule_id";
 
 	RealmResults<Language> languages;
 
@@ -48,7 +47,7 @@ public class LanguageListFragment extends Fragment {
 		RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
 		recyclerView.setLayoutManager(layoutManager);
 
-		adapter.asObservable().subscribe(this::loadMainFragment);
+		adapter.asObservable().subscribe(this::loadLanguageDetailFragment);
 
 		return view;
 	}
@@ -59,16 +58,17 @@ public class LanguageListFragment extends Fragment {
 		((MainActivity) getActivity()).setNavigationDrawerItemChecked(R.id.nav_languages);
 	}
 
-	private void loadMainFragment(Language language) {
+	private void loadLanguageDetailFragment(Language language) {
 		// load new fragment
-//		MainFragment mainFragment = new MainFragment();
-//		Bundle bundle = new Bundle();
-//		bundle.putString(TAG_SCHEDULE_ID, schedule.getId());
-//		mainFragment.setArguments(bundle);
-//		getFragmentManager()
-//				.beginTransaction()
-//				.replace(R.id.fragmentPlaceHolder, mainFragment, MainFragment.MAIN_FRAGMENT_TAG)
-//				.commit();
+		LanguageDetailFragment fragment = new LanguageDetailFragment();
+		Bundle bundle = new Bundle();
+		bundle.putString(LanguageDetailFragment.TAG_LANGUAGE_ID, language.getLanguageId());
+		fragment.setArguments(bundle);
+		getFragmentManager()
+				.beginTransaction()
+				.replace(R.id.fragmentPlaceHolder, fragment)
+				.addToBackStack(null)
+				.commit();
 	}
 
 }

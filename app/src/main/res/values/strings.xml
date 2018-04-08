@@ -12,4 +12,5 @@
 	<string name="packs">Packs:</string>
 	<string name="sentences">Sentences:</string>
 	<string name="language_flag">Language Flag</string>
+	<string name="flag_image">Flag Image</string>
 </resources>

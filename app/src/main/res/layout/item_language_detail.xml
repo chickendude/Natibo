@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:clickable="true"
+	android:focusable="true"
+	android:foreground="@drawable/language_list"
+	android:gravity="center"
+	android:orientation="horizontal"
+	android:padding="8dp"
+	tools:background="@color/colorPrimaryDark">
+
+	<TextView
+		android:id="@+id/bookLabel"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textAlignment="center"
+		android:textColor="@color/colorTextDark"
+		android:textSize="20sp"
+		android:textStyle="bold"
+		tools:text="F1"/>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical">
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center_horizontal"
+			android:orientation="horizontal">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="4dp"
+				android:text="@string/sentences"
+				android:textColor="@color/colorTextDark"
+				android:textSize="12sp"/>
+
+			<TextView
+				android:id="@+id/numSentencesLabel"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="@color/colorTextDark"
+				android:textSize="12sp"
+				tools:text="4000"/>
+
+		</LinearLayout>
+	</LinearLayout>
+</LinearLayout>
