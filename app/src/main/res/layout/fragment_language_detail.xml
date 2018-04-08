@@ -20,9 +20,9 @@
 		android:layout_height="wrap_content"
 		android:layout_alignBottom="@id/flagImageView"
 		android:alpha="0.9"
-		android:background="@color/colorPrimaryDark"
+		android:background="@color/colorPrimary"
 		android:textAlignment="center"
-		android:textColor="@color/colorTextDark"
+		android:textColor="@color/colorTextWhite"
 		android:textSize="20sp"
 		tools:text="Armenian"/>
 
@@ -31,5 +31,5 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_below="@id/flagImageView"
-		android:background="@color/colorPrimaryDark"/>
+		android:background="@color/colorPrimary"/>
 </RelativeLayout>

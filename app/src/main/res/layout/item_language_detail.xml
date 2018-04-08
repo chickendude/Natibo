@@ -17,7 +17,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:textAlignment="center"
-		android:textColor="@color/colorTextDark"
+		android:textColor="@color/colorTextWhite"
 		android:textSize="20sp"
 		android:textStyle="bold"
 		tools:text="F1"/>
@@ -38,14 +38,14 @@
 				android:layout_height="wrap_content"
 				android:layout_marginEnd="4dp"
 				android:text="@string/sentences"
-				android:textColor="@color/colorTextDark"
+				android:textColor="@color/colorTextWhite"
 				android:textSize="12sp"/>
 
 			<TextView
 				android:id="@+id/numSentencesLabel"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:textColor="@color/colorTextDark"
+				android:textColor="@color/colorTextWhite"
 				android:textSize="12sp"
 				tools:text="4000"/>
 

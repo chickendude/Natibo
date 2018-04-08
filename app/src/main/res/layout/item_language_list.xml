@@ -3,10 +3,10 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
-	android:clickable="true"
-	android:focusable="true"
 	android:layout_height="wrap_content"
-	android:layout_margin="4dp">
+	android:layout_margin="4dp"
+	android:clickable="true"
+	android:focusable="true">
 
 	<LinearLayout
 		android:layout_width="match_parent"
@@ -26,8 +26,9 @@
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:orientation="vertical"
 			android:gravity="center"
+			android:background="@color/colorBackgroundDark"
+			android:orientation="vertical"
 			android:padding="3dp">
 
 			<TextView
@@ -37,6 +38,7 @@
 				android:textAlignment="center"
 				android:textSize="14sp"
 				android:textStyle="bold"
+				android:textColor="@color/colorTextDark"
 				tools:text="Arabic (Egyptian)"/>
 
 			<LinearLayout
@@ -49,12 +51,14 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_marginEnd="4dp"
+					android:textColor="@color/colorTextLight"
 					android:text="@string/packs"
 					android:textSize="12sp"/>
 
 				<TextView
 					android:id="@+id/numPacksLabel"
 					android:layout_width="wrap_content"
+					android:textColor="@color/colorTextLight"
 					android:layout_height="wrap_content"
 					android:textSize="12sp"
 					tools:text="3"/>
@@ -68,6 +72,7 @@
 
 				<TextView
 					android:layout_width="wrap_content"
+					android:textColor="@color/colorTextLight"
 					android:layout_height="wrap_content"
 					android:layout_marginEnd="4dp"
 					android:text="@string/sentences"
@@ -76,6 +81,7 @@
 				<TextView
 					android:id="@+id/numSentencesLabel"
 					android:layout_width="wrap_content"
+					android:textColor="@color/colorTextLight"
 					android:layout_height="wrap_content"
 					android:textSize="12sp"
 					tools:text="4000"/>

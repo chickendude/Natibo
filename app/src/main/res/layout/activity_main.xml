@@ -23,7 +23,7 @@
 				android:id="@+id/toolbar"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:background="?attr/colorPrimaryDark"
+				android:background="@color/colorPrimaryDark"
 				android:fitsSystemWindows="true"
 				android:minHeight="?attr/actionBarSize"
 				android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
@@ -41,10 +41,10 @@
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
 			android:layout_gravity="start"
+			app:headerLayout="@layout/header_navigation"
 			app:itemIconTint="@color/menu_text_color"
 			app:itemTextColor="@color/menu_text_color"
-			app:menu="@menu/nav_drawer"
-			app:headerLayout="@layout/header_navigation">
+			app:menu="@menu/nav_drawer">
 		</android.support.design.widget.NavigationView>
 	</android.support.v4.widget.DrawerLayout>
 </android.support.design.widget.CoordinatorLayout>
