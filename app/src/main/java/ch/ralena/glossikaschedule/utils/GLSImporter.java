@@ -132,8 +132,6 @@ public class GLSImporter {
 							} else {
 								Log.d(TAG, "Skipping: " + entryName);
 							}
-						} else if (entryName.contains(".gsp")) {
-							fileNumber++;
 						}
 					}
 

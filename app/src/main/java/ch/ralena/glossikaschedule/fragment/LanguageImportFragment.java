@@ -44,20 +44,25 @@ public class LanguageImportFragment extends Fragment {
 				)
 		);
 		importer.progressObservable().subscribe(
-				progress -> getActivity().runOnUiThread(
-						() -> {
-							sentenceNumberText.setText(String.valueOf(progress));
-							progressBar.setProgress(progress);
-							// if pack has finished loading, go to the language list screen.
-							if (progressBar.getMax() == progress) {
-								LanguageListFragment fragment = new LanguageListFragment();
-								getFragmentManager().beginTransaction()
-										.replace(R.id.fragmentPlaceHolder, fragment)
-										.commit();
-							}
-						}
-				)
+				progress -> {
+					if (getActivity() != null)
+						getActivity().runOnUiThread(
+								() -> {
+									sentenceNumberText.setText(String.valueOf(progress));
+									progressBar.setProgress(progress);
+									// if pack has finished loading, go to the language list screen.
+									if (progressBar.getMax() == progress) {
+										LanguageListFragment fragment = new LanguageListFragment();
+										getFragmentManager().beginTransaction()
+												.replace(R.id.fragmentPlaceHolder, fragment)
+												.commit();
+									}
+								}
+						);
+				}
 		);
-		importer.importPack(getContext(), uri);
+		importer.importPack(
+
+				getContext(), uri);
 	}
 }
