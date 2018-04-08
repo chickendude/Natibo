@@ -13,4 +13,7 @@
 	<string name="sentences">Sentences:</string>
 	<string name="language_flag">Language Flag</string>
 	<string name="flag_image">Flag Image</string>
+	<string name="ipa">IPA</string>
+	<string name="rom">ROM</string>
+	<string name="alt">ALT</string>
 </resources>

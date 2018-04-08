@@ -34,8 +34,8 @@ public class LanguageDetailFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_language_detail, container, false);
 
-		String id = getArguments().getString(TAG_LANGUAGE_ID);
 		// load schedules from database
+		String id = getArguments().getString(TAG_LANGUAGE_ID);
 		realm = Realm.getDefaultInstance();
 		language = realm.where(Language.class).equalTo("languageId", id).findFirst();
 		packs = language.getPacks();
@@ -55,7 +55,7 @@ public class LanguageDetailFragment extends Fragment {
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
 		recyclerView.setLayoutManager(layoutManager);
 
-		adapter.asObservable().subscribe(this::loadMainFragment);
+		adapter.asObservable().subscribe(this::loadSentenceListFragment);
 
 		return view;
 	}
@@ -66,16 +66,18 @@ public class LanguageDetailFragment extends Fragment {
 		((MainActivity) getActivity()).setNavigationDrawerItemChecked(R.id.nav_languages);
 	}
 
-	private void loadMainFragment(Pack pack) {
+	private void loadSentenceListFragment(Pack pack) {
 		// load new fragment
-//		MainFragment mainFragment = new MainFragment();
-//		Bundle bundle = new Bundle();
-//		bundle.putString(TAG_LANGUAGE_ID, schedule.getId());
-//		mainFragment.setArguments(bundle);
-//		getFragmentManager()
-//				.beginTransaction()
-//				.replace(R.id.fragmentPlaceHolder, mainFragment, MainFragment.MAIN_FRAGMENT_TAG)
-//				.commit();
+		SentenceListFragment fragment = new SentenceListFragment();
+		Bundle bundle = new Bundle();
+		bundle.putString(SentenceListFragment.TAG_LANGUAGE_ID, language.getLanguageId());
+		bundle.putString(SentenceListFragment.TAG_PACK_ID, pack.getId());
+		fragment.setArguments(bundle);
+		getFragmentManager()
+				.beginTransaction()
+				.replace(R.id.fragmentPlaceHolder, fragment)
+				.addToBackStack(null)
+				.commit();
 	}
 
 }
