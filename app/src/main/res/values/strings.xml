@@ -17,4 +17,6 @@
 	<string name="ipa">IPA</string>
 	<string name="rom">ROM</string>
 	<string name="alt">ALT</string>
+	<string name="no_courses">You aren\'t currently studying any courses, please create a course!</string>
+	<string name="no_languages">You haven\'t loaded any languages yet, please load a language pack (or two)!</string>
 </resources>

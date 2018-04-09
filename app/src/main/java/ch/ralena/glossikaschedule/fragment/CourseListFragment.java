@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
@@ -27,24 +28,32 @@ public class CourseListFragment extends Fragment {
 	@Nullable
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_language_list, container, false);
+		View view = inflater.inflate(R.layout.fragment_course_list, container, false);
 
 		// load schedules from database
 		realm = Realm.getDefaultInstance();
 		courses = realm.where(Course.class).findAll();
 
-		if (courses.size() == 0) {
-
-		}
-
-		// set up recyclerlist and adapter
+		// load views
 		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-		CourseListAdapter adapter = new CourseListAdapter(courses);
-		recyclerView.setAdapter(adapter);
-		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-		recyclerView.setLayoutManager(layoutManager);
+		TextView noCoursesText = view.findViewById(R.id.noCoursesText);
 
-		adapter.asObservable().subscribe(this::loadCourseDetailFragment);
+		if (courses.size() == 0) {
+			noCoursesText.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.GONE);
+		} else {
+			// hide "No Courses" text
+			noCoursesText.setVisibility(View.GONE);
+			recyclerView.setVisibility(View.VISIBLE);
+
+			// set up recyclerlist and adapter
+			CourseListAdapter adapter = new CourseListAdapter(courses);
+			recyclerView.setAdapter(adapter);
+			RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+			recyclerView.setLayoutManager(layoutManager);
+
+			adapter.asObservable().subscribe(this::loadCourseDetailFragment);
+		}
 
 		return view;
 	}
@@ -52,7 +61,7 @@ public class CourseListFragment extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		((MainActivity) getActivity()).setNavigationDrawerItemChecked(R.id.nav_languages);
+		((MainActivity) getActivity()).setNavigationDrawerItemChecked(R.id.nav_courses);
 	}
 
 	private void loadCourseDetailFragment(Course course) {

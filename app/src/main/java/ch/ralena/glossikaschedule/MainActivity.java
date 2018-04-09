@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
 		// set up nav drawer
 		setupNavigationDrawer();
-		loadLanguageListFragment();
+		loadCourseListFragment();
 	}
 
 	/**
@@ -96,13 +96,13 @@ public class MainActivity extends AppCompatActivity {
 
 					return true;
 				});
-		navigationView.setCheckedItem(R.id.nav_languages);
+		navigationView.setCheckedItem(R.id.nav_courses);
 	}
 
 	/**
 	 * Opens a file browser to search for a language pack to import into the app.
 	 */
-	private void importLanguagPack() {
+	public void importLanguagPack() {
 		Intent mediaIntent = new Intent(Intent.ACTION_GET_CONTENT);
 		mediaIntent.setType("application/*");
 		startActivityForResult(mediaIntent, REQUEST_PICK_GLS);

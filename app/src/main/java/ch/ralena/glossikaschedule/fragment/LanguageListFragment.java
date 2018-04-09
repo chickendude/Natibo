@@ -3,13 +3,14 @@ package ch.ralena.glossikaschedule.fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
@@ -34,20 +35,30 @@ public class LanguageListFragment extends Fragment {
 		realm = Realm.getDefaultInstance();
 		languages = realm.where(Language.class).findAll();
 
-		if (languages.size() == 0) {
+		// load views
+		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+		TextView noLanguagesText = view.findViewById(R.id.noCoursesText);
+		FloatingActionButton fab = view.findViewById(R.id.fab);
 
+		if (languages.size() == 0) {
+			noLanguagesText.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.GONE);
+		} else {
+			// hide "No Courses" text
+			noLanguagesText.setVisibility(View.GONE);
+			recyclerView.setVisibility(View.VISIBLE);
+
+			// set up recyclerlist and adapter
+			LanguageListAdapter adapter = new LanguageListAdapter(languages);
+			recyclerView.setAdapter(adapter);
+			RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
+			recyclerView.setLayoutManager(layoutManager);
+
+			adapter.asObservable().subscribe(this::loadLanguageDetailFragment);
 		}
 
-		Log.d(TAG, "" + languages.size());
-
-		// set up recyclerlist and adapter
-		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-		LanguageListAdapter adapter = new LanguageListAdapter(languages);
-		recyclerView.setAdapter(adapter);
-		RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
-		recyclerView.setLayoutManager(layoutManager);
-
-		adapter.asObservable().subscribe(this::loadLanguageDetailFragment);
+		// set up FAB
+		fab.setOnClickListener(v -> ((MainActivity)getActivity()).importLanguagPack());
 
 		return view;
 	}
