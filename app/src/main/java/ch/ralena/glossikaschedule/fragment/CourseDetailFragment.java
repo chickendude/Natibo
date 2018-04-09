@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.adapter.LanguageDetailAdapter;
 import ch.ralena.glossikaschedule.object.Language;
@@ -58,12 +57,6 @@ public class CourseDetailFragment extends Fragment {
 		adapter.asObservable().subscribe(this::loadSentenceListFragment);
 
 		return view;
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		((MainActivity) getActivity()).setNavigationDrawerItemChecked(R.id.nav_languages);
 	}
 
 	private void loadSentenceListFragment(Pack pack) {

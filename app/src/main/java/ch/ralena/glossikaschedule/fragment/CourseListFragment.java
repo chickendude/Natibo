@@ -59,9 +59,10 @@ public class CourseListFragment extends Fragment {
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
+	public void onStart() {
+		super.onStart();
 		((MainActivity) getActivity()).setNavigationDrawerItemChecked(R.id.nav_courses);
+		getActivity().setTitle(getString(R.string.courses));
 	}
 
 	private void loadCourseDetailFragment(Course course) {
