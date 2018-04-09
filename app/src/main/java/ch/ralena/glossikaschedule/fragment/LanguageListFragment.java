@@ -42,7 +42,7 @@ public class LanguageListFragment extends Fragment {
 
 		// set up recyclerlist and adapter
 		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-		LanguageListAdapter adapter = new LanguageListAdapter(getContext(), languages);
+		LanguageListAdapter adapter = new LanguageListAdapter(languages);
 		recyclerView.setAdapter(adapter);
 		RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
 		recyclerView.setLayoutManager(layoutManager);

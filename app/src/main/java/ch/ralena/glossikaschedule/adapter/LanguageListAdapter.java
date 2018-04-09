@@ -1,6 +1,5 @@
 package ch.ralena.glossikaschedule.adapter;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -22,11 +21,9 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 		return languageSubject;
 	}
 
-	private Context context;
 	private RealmResults<Language> languages;
 
-	public LanguageListAdapter(Context context, RealmResults<Language> languages) {
-		this.context = context;
+	public LanguageListAdapter(RealmResults<Language> languages) {
 		this.languages = languages;
 	}
 

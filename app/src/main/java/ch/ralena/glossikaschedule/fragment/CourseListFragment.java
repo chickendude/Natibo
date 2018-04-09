@@ -4,24 +4,23 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
-import ch.ralena.glossikaschedule.adapter.LanguageListAdapter;
-import ch.ralena.glossikaschedule.object.Language;
+import ch.ralena.glossikaschedule.adapter.CourseListAdapter;
+import ch.ralena.glossikaschedule.object.Course;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
 public class CourseListFragment extends Fragment {
 	private static final String TAG = CourseListFragment.class.getSimpleName();
 
-	RealmResults<Language> languages;
+	RealmResults<Course> courses;
 
 	private Realm realm;
 
@@ -32,22 +31,20 @@ public class CourseListFragment extends Fragment {
 
 		// load schedules from database
 		realm = Realm.getDefaultInstance();
-		languages = realm.where(Language.class).findAll();
+		courses = realm.where(Course.class).findAll();
 
-		if (languages.size() == 0) {
+		if (courses.size() == 0) {
 
 		}
 
-		Log.d(TAG, "" + languages.size());
-
 		// set up recyclerlist and adapter
 		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-		LanguageListAdapter adapter = new LanguageListAdapter(getContext(), languages);
+		CourseListAdapter adapter = new CourseListAdapter(courses);
 		recyclerView.setAdapter(adapter);
-		RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
+		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
 		recyclerView.setLayoutManager(layoutManager);
 
-		adapter.asObservable().subscribe(this::loadLanguageDetailFragment);
+		adapter.asObservable().subscribe(this::loadCourseDetailFragment);
 
 		return view;
 	}
@@ -58,11 +55,11 @@ public class CourseListFragment extends Fragment {
 		((MainActivity) getActivity()).setNavigationDrawerItemChecked(R.id.nav_languages);
 	}
 
-	private void loadLanguageDetailFragment(Language language) {
+	private void loadCourseDetailFragment(Course course) {
 		// load new fragment
-		LanguageDetailFragment fragment = new LanguageDetailFragment();
+		CourseDetailFragment fragment = new CourseDetailFragment();
 		Bundle bundle = new Bundle();
-		bundle.putString(LanguageDetailFragment.TAG_LANGUAGE_ID, language.getLanguageId());
+		bundle.putString(CourseDetailFragment.TAG_COURSE_ID, course.getId());
 		fragment.setArguments(bundle);
 		getFragmentManager()
 				.beginTransaction()
