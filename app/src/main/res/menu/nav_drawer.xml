@@ -3,7 +3,7 @@
 	<group
 		android:id="@+id/languagesGroup">
 		<item
-			android:id="@+id/nav_schedules"
+			android:id="@+id/nav_courses"
 			android:checkable="true"
 			android:icon="@drawable/ic_courses"
 			android:title="@string/courses"/>

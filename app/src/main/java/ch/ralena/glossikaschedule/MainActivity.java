@@ -13,11 +13,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import ch.ralena.glossikaschedule.fragment.CourseListFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageImportFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageListFragment;
-import ch.ralena.glossikaschedule.object.Schedule;
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
 	private static final String TAG = MainActivity.class.getSimpleName();
@@ -28,9 +27,6 @@ public class MainActivity extends AppCompatActivity {
 	NavigationView navigationView;
 	private FragmentManager fragmentManager;
 	ActionBarDrawerToggle drawerToggle;
-
-	RealmResults<Schedule> schedules;
-	Schedule loadedSchedule;
 
 	private Realm realm;
 
@@ -50,20 +46,16 @@ public class MainActivity extends AppCompatActivity {
 
 		// load schedules from database
 		realm = Realm.getDefaultInstance();
-		schedules = realm.where(Schedule.class).findAll();
 
 		// set up nav drawer
 		setupNavigationDrawer();
 		loadLanguageListFragment();
 	}
 
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		int scheduleIndex = loadedSchedule == null ? 0 : schedules.indexOf(loadedSchedule);
-		outState.putInt(TAG_SCHEDULE_INDEX, scheduleIndex);
-	}
-
+	/**
+	 * Setup the Action Bar, the hamburger button to toggle the navigation drawer, and prepare the
+	 * navigation view and act on menu selections.
+	 */
 	private void setupNavigationDrawer() {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setHomeButtonEnabled(true);
@@ -92,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
 						case R.id.nav_languages:
 							loadLanguageListFragment();
 							break;
+						case R.id.nav_courses:
+							loadCourseListFragment();
+							break;
 						case R.id.nav_settings:
 							break;
 						case R.id.nav_import:
@@ -104,14 +99,31 @@ public class MainActivity extends AppCompatActivity {
 		navigationView.setCheckedItem(R.id.nav_languages);
 	}
 
+	/**
+	 * Opens a file browser to search for a language pack to import into the app.
+	 */
 	private void importLanguagPack() {
 		Intent mediaIntent = new Intent(Intent.ACTION_GET_CONTENT);
 		mediaIntent.setType("application/*");
 		startActivityForResult(mediaIntent, REQUEST_PICK_GLS);
 	}
 
+	/**
+	 * Loads the LanguageListFragment fragment.
+	 */
 	private void loadLanguageListFragment() {
 		LanguageListFragment fragment = new LanguageListFragment();
+		fragmentManager
+				.beginTransaction()
+				.replace(R.id.fragmentPlaceHolder, fragment)
+				.commit();
+	}
+
+	/**
+	 * Loads the CourseListFragment fragment.
+	 */
+	private void loadCourseListFragment() {
+		CourseListFragment fragment = new CourseListFragment();
 		fragmentManager
 				.beginTransaction()
 				.replace(R.id.fragmentPlaceHolder, fragment)

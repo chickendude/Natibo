@@ -1,11 +1,7 @@
 package ch.ralena.glossikaschedule.data;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
-import ch.ralena.glossikaschedule.object.Day;
-import ch.ralena.glossikaschedule.object.Schedule;
-import ch.ralena.glossikaschedule.object.StudyItem;
 import io.realm.Realm;
 
 public class ScheduleData {
@@ -1030,24 +1026,7 @@ public class ScheduleData {
 		String[][] scheduleStrings = selectedSchedule.getSchedule();
 		// save schedule into db
 		realm.executeTransaction(r -> {
-			// create schedule object
-			Schedule schedule = r.createObject(Schedule.class, UUID.randomUUID().toString());
-			schedule.setTitle(title);
-			schedule.setLanguage(selectedLanguage.getName());
-			// add all days to the schedule
-			int dayNumber = 1;
-			for (String[] dayItems : scheduleStrings) {
-				Day day = r.createObject(Day.class, UUID.randomUUID().toString());
-				day.setDayNumber(dayNumber++);
-				// each day has a set of files to listen to
-				for (String dayItem : dayItems) {
-					StudyItem studyItem = r.createObject(StudyItem.class, UUID.randomUUID().toString());
-					studyItem.setTitle(dayItem);
-					studyItem.setCompleted(false);
-					day.getStudyItems().add(studyItem);
-				}
-				schedule.getSchedule().add(day);
-			}
+
 		});
 	}
 }
