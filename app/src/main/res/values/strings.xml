@@ -19,4 +19,15 @@
 	<string name="alt">ALT</string>
 	<string name="no_courses">You aren\'t currently studying any courses, please create a course!</string>
 	<string name="no_languages">You haven\'t loaded any languages yet, please load a language pack (or two)!</string>
+	<string name="pre_packaged">Pre-Packaged</string>
+	<string name="pre_packaged_detailed">The traditional Glossika schedules, pre-made and ready to go!</string>
+	<string name="pre_packaged_button">Select a Pre-Packaged Course</string>
+	<string name="glossika_ai">Glossika AI</string>
+	<string name="glossika_ai_details">The new Glossika format, minus the AI! Choose how many sentences a day you want to learn, how many days to review them, and more!</string>
+	<string name="glossika_ai_button">Create an AI-style Course</string>
+	<string name="byoc">BYOC</string>
+	<string name="byoc_details">Build your own course, mimic the old schedules, GMS, GSR, or create something entirely new. Your imagination (and my ability to code these features in...) is the limit!</string>
+	<string name="byoc_button">Build Your Own Course</string>
+	<string name="target_language">Target Language</string>
+	<string name="base_language">Base Language</string>
 </resources>

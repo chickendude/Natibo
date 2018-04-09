@@ -22,4 +22,9 @@
 		<!-- remove the shadow from under the title bar -->
 	</style>
 
+	<style name="buttonStyle" parent="@android:style/Widget.Button.Small">
+		<item name="android:textColor">#FFFFFF</item>
+		<item name="android:textSize">17sp</item>
+	</style>
+
 </resources>

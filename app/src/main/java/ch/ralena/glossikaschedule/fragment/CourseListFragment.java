@@ -3,6 +3,7 @@ package ch.ralena.glossikaschedule.fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,6 +38,7 @@ public class CourseListFragment extends Fragment {
 		// load views
 		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
 		TextView noCoursesText = view.findViewById(R.id.noCoursesText);
+		FloatingActionButton fab = view.findViewById(R.id.fab);
 
 		if (courses.size() == 0) {
 			noCoursesText.setVisibility(View.VISIBLE);
@@ -55,6 +57,9 @@ public class CourseListFragment extends Fragment {
 			adapter.asObservable().subscribe(this::loadCourseDetailFragment);
 		}
 
+		// set up FAB
+		fab.setOnClickListener(v -> loadCourseCreateFragment());
+
 		return view;
 	}
 
@@ -71,6 +76,16 @@ public class CourseListFragment extends Fragment {
 		Bundle bundle = new Bundle();
 		bundle.putString(CourseDetailFragment.TAG_COURSE_ID, course.getId());
 		fragment.setArguments(bundle);
+		getFragmentManager()
+				.beginTransaction()
+				.replace(R.id.fragmentPlaceHolder, fragment)
+				.addToBackStack(null)
+				.commit();
+	}
+
+	private void loadCourseCreateFragment() {
+		// load new fragment
+		CourseCreateFragment fragment = new CourseCreateFragment();
 		getFragmentManager()
 				.beginTransaction()
 				.replace(R.id.fragmentPlaceHolder, fragment)
