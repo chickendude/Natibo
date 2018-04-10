@@ -48,7 +48,7 @@ public class CourseCreateFragment extends Fragment {
 		baseSpinner = view.findViewById(R.id.baseSpinner);
 		targetSpinner = view.findViewById(R.id.targetSpinner);
 
-		ArrayAdapter<String> adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, languagesArray);
+		ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, languagesArray);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		baseSpinner.setAdapter(adapter);
 		targetSpinner.setAdapter(adapter);
@@ -101,7 +101,7 @@ public class CourseCreateFragment extends Fragment {
 	}
 
 	private boolean checkLanguagesSet() {
-		return false;
+		return languages.contains(baseLanguage) && languages.contains(targetLanguage) && targetLanguage != baseLanguage;
 	}
 
 	private void loadOldCourseFragment() {
@@ -117,5 +117,11 @@ public class CourseCreateFragment extends Fragment {
 	private void loadAiCourseFragment() {
 		if (!checkLanguagesSet())
 			return;
+		CourseAiCreateFragment fragment = new CourseAiCreateFragment();
+		// TODO: add languages into bundle
+		getFragmentManager().beginTransaction()
+				.replace(R.id.fragmentPlaceHolder, fragment)
+				.addToBackStack(null)
+				.commit();
 	}
 }
