@@ -140,10 +140,12 @@
 							android:textSize="14sp"/>
 
 						<RadioGroup
+							android:id="@+id/reviewScheduleRadioGroup"
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content">
 
 							<RadioButton
+								android:id="@+id/fourDayRadio"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:text="6 / 4 / 3 / 2"/>
@@ -155,6 +157,7 @@
 								android:textSize="12sp"/>
 
 							<RadioButton
+								android:id="@+id/fiveDayRadio"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:text="7 / 5 / 4 / 3 / 2"/>
@@ -166,6 +169,7 @@
 								android:textSize="12sp"/>
 
 							<RadioButton
+								android:id="@+id/customDayRadio"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:text="? / ? / ?"/>
@@ -175,6 +179,12 @@
 								android:layout_height="wrap_content"
 								android:text="Create a custom pattern. Separate each day's reps by a space ( ), comma (,), or slash (/), e.g. '5 4 3 2 1', '5,4,3,2,1', or '5/4/3/2/1'."
 								android:textSize="12sp"/>
+
+							<EditText
+								android:id="@+id/customScheduleEdit"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:hint="5 4 3 2 1"/>
 						</RadioGroup>
 					</LinearLayout>
 				</LinearLayout>
