@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +34,8 @@ public class CourseAiCreateFragment extends Fragment {
 	RadioButton fiveDayRadio;
 	RadioButton customDayRadio;
 
-	TextWatcher textWatcher = new TextWatcher() {
+	// text watchers
+	TextWatcher sentencesPerDayTextWatcher = new TextWatcher() {
 		@Override
 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -57,6 +59,54 @@ public class CourseAiCreateFragment extends Fragment {
 
 		}
 	};
+	TextWatcher customScheduleTextWatcher = new TextWatcher() {
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before, int count) {
+			if (s.length() > 0) {
+				String[] numbers = s.toString().split("[*.,/ ]");
+				boolean areAllNumbers = true;
+				for (String number : numbers) {
+					areAllNumbers = areAllNumbers && Utils.isNumeric(number);
+				}
+				if (areAllNumbers) {
+					String pattern = TextUtils.join(" / ", numbers);
+					customDayRadio.setText(pattern);
+				}
+			} else {
+				customDayRadio.setText("? / ? / ?");
+			}
+		}
+
+		@Override
+		public void afterTextChanged(Editable s) {
+
+		}
+	};
+
+	// seek bar change listener
+	SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+		@Override
+		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+			sentencesPerDayEdit.removeTextChangedListener(sentencesPerDayTextWatcher);
+			sentencesPerDayEdit.setText("" + (progress + 1));
+			sentencesPerDayEdit.setSelection(sentencesPerDayEdit.getText().length());
+			sentencesPerDayEdit.addTextChangedListener(sentencesPerDayTextWatcher);
+		}
+
+		@Override
+		public void onStartTrackingTouch(SeekBar seekBar) {
+		}
+
+		@Override
+		public void onStopTrackingTouch(SeekBar seekBar) {
+
+		}
+	};
 
 	@Nullable
 	@Override
@@ -76,29 +126,11 @@ public class CourseAiCreateFragment extends Fragment {
 
 		// custom schedule edit should start off gone
 		customScheduleEdit.setVisibility(View.GONE);
+		customScheduleEdit.addTextChangedListener(customScheduleTextWatcher);
 
 		// set up sentencesPerDay EditText and SeekBar
-		String textBefore;
-		String textAfter;
-		sentencesPerDayEdit.addTextChangedListener(textWatcher);
-		sentencesPerDaySeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				sentencesPerDayEdit.removeTextChangedListener(textWatcher);
-				sentencesPerDayEdit.setText("" + (progress + 1));
-				sentencesPerDayEdit.setSelection(sentencesPerDayEdit.getText().length());
-				sentencesPerDayEdit.addTextChangedListener(textWatcher);
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-			}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-
-			}
-		});
+		sentencesPerDayEdit.addTextChangedListener(sentencesPerDayTextWatcher);
+		sentencesPerDaySeek.setOnSeekBarChangeListener(seekBarChangeListener);
 		sentencesPerDaySeek.setProgress(9);
 
 		// set up radio listeners
