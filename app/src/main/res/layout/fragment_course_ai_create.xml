@@ -86,11 +86,13 @@
 							android:orientation="horizontal">
 
 							<SeekBar
+								android:id="@+id/sentencesPerDaySeek"
 								android:layout_width="0dp"
 								android:layout_height="wrap_content"
 								android:layout_gravity="center"
 								android:layout_weight="1"
-								android:max="100"/>
+								android:max="99"
+								android:padding="3dp"/>
 
 							<EditText
 								android:id="@+id/sentencesPerDayEdit"
@@ -184,7 +186,9 @@
 								android:id="@+id/customScheduleEdit"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:hint="5 4 3 2 1"/>
+								android:digits="0123456789,/. "
+								android:hint="5 4 3 2 1"
+								android:inputType="numberDecimal"/>
 						</RadioGroup>
 					</LinearLayout>
 				</LinearLayout>

@@ -10,4 +10,14 @@ public class Utils {
 		dialog.setMessage(message);
 		dialog.show();
 	}
+
+	public static boolean isNumeric(String string) {
+		if (string == null || string.equals(""))
+			return false;
+		for (char c : string.toCharArray()) {
+			if (!Character.isDigit(c))
+				return false;
+		}
+		return true;
+	}
 }
