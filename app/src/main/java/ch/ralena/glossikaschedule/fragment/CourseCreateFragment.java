@@ -118,7 +118,10 @@ public class CourseCreateFragment extends Fragment {
 		if (!checkLanguagesSet())
 			return;
 		CourseAiCreateFragment fragment = new CourseAiCreateFragment();
-		// TODO: add languages into bundle
+		Bundle bundle = new Bundle();
+		bundle.putString(CourseAiCreateFragment.TAG_BASE_LANGUAGE, baseLanguage.getLanguageId());
+		bundle.putString(CourseAiCreateFragment.TAG_TARGET_LANGUAGE, targetLanguage.getLanguageId());
+		fragment.setArguments(bundle);
 		getFragmentManager().beginTransaction()
 				.replace(R.id.fragmentPlaceHolder, fragment)
 				.addToBackStack(null)

@@ -14,16 +14,21 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import ch.ralena.glossikaschedule.R;
+import ch.ralena.glossikaschedule.object.Language;
 import ch.ralena.glossikaschedule.utils.Utils;
 import io.realm.Realm;
 
 public class CourseAiCreateFragment extends Fragment {
 	private static final String TAG = CourseAiCreateFragment.class.getSimpleName();
-	public static final String TAG_COURSE_ID = "language_id";
+	public static final String TAG_BASE_LANGUAGE = "tag_base_language";
+	public static final String TAG_TARGET_LANGUAGE = "tag_target_language";
 
 	private Realm realm;
+	Language baseLanguage;
+	Language targetLanguage;
 
 	// Views
 	EditText sentencesPerDayEdit;
@@ -115,7 +120,15 @@ public class CourseAiCreateFragment extends Fragment {
 
 		realm = Realm.getDefaultInstance();
 
+		String baseId = getArguments().getString(TAG_BASE_LANGUAGE);
+		String targetId = getArguments().getString(TAG_TARGET_LANGUAGE);
+
+		baseLanguage = realm.where(Language.class).equalTo("languageId", baseId).findFirst();
+		targetLanguage = realm.where(Language.class).equalTo("languageId", targetId).findFirst();
+
 		// get views
+		TextView baseLanguageLabel = view.findViewById(R.id.baseLanguageLabel);
+		TextView targetLanguageLabel = view.findViewById(R.id.targetLanguageLabel);
 		sentencesPerDayEdit = view.findViewById(R.id.sentencesPerDayEdit);
 		sentencesPerDaySeek = view.findViewById(R.id.sentencesPerDaySeek);
 		customScheduleEdit = view.findViewById(R.id.customScheduleEdit);
@@ -123,6 +136,10 @@ public class CourseAiCreateFragment extends Fragment {
 		fourDayRadio = view.findViewById(R.id.fourDayRadio);
 		fiveDayRadio = view.findViewById(R.id.fiveDayRadio);
 		customDayRadio = view.findViewById(R.id.customDayRadio);
+
+		// display base and target language
+		baseLanguageLabel.setText(baseLanguage.getLongName());
+		targetLanguageLabel.setText(targetLanguage.getLongName());
 
 		// custom schedule edit should start off gone
 		customScheduleEdit.setVisibility(View.GONE);
