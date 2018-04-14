@@ -30,4 +30,5 @@
 	<string name="byoc_button">Build Your Own Course</string>
 	<string name="target_language">Target Language</string>
 	<string name="base_language">Base Language</string>
+	<string name="create">Create</string>
 </resources>

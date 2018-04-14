@@ -42,6 +42,6 @@ public class NewScheduleViewScheduleFragment extends Fragment {
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.schedule_toolbar, menu);
+		inflater.inflate(R.menu.create_schedule_toolbar, menu);
 	}
 }

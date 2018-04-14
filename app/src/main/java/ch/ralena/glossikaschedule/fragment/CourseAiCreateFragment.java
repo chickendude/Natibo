@@ -8,6 +8,8 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -16,6 +18,7 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.object.Language;
 import ch.ralena.glossikaschedule.utils.Utils;
@@ -118,6 +121,13 @@ public class CourseAiCreateFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_course_ai_create, container, false);
 
+		// switch to back button
+		MainActivity activity = (MainActivity) getActivity();
+		activity.enableBackButton();
+		activity.setTitle("Create an AI Course");
+
+		setHasOptionsMenu(true);
+
 		realm = Realm.getDefaultInstance();
 
 		String baseId = getArguments().getString(TAG_BASE_LANGUAGE);
@@ -165,5 +175,11 @@ public class CourseAiCreateFragment extends Fragment {
 		});
 
 		return view;
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.create_schedule_toolbar, menu);
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 }

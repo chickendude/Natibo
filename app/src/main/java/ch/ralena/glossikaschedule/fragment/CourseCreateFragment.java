@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 
+import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.object.Language;
 import io.realm.Realm;
@@ -34,6 +35,11 @@ public class CourseCreateFragment extends Fragment {
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_course_create, container, false);
+
+		// switch to back button
+		MainActivity activity = (MainActivity) getActivity();
+		activity.enableBackButton();
+		activity.setTitle("Create a Course");
 
 		realm = Realm.getDefaultInstance();
 

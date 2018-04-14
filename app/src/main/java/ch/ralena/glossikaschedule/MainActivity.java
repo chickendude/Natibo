@@ -21,12 +21,15 @@ import io.realm.Realm;
 public class MainActivity extends AppCompatActivity {
 	private static final String TAG = MainActivity.class.getSimpleName();
 	private static final String TAG_SCHEDULE_INDEX = "save_schedule_index";
+	private static final int ACTION_OPEN_DRAWER = 0;
+	private static final int ACTION_BACK = 1;
 	private static final int REQUEST_PICK_GLS = 1;
 
 	DrawerLayout drawerLayout;
 	NavigationView navigationView;
 	private FragmentManager fragmentManager;
 	ActionBarDrawerToggle drawerToggle;
+	int homeAction;
 
 	private Realm realm;
 
@@ -34,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		homeAction = ACTION_OPEN_DRAWER;
 
 		drawerLayout = findViewById(R.id.drawerLayout);
 		navigationView = findViewById(R.id.navigationView);
@@ -66,8 +71,8 @@ public class MainActivity extends AppCompatActivity {
 			}
 
 			public void onDrawerOpened(View drawerView) {
-				super.onDrawerOpened(drawerView);
-				invalidateOptionsMenu();
+//				super.onDrawerOpened(drawerView);
+//				invalidateOptionsMenu();
 			}
 		};
 		drawerToggle.syncState();
@@ -149,13 +154,36 @@ public class MainActivity extends AppCompatActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				drawerLayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
+				homeButtonPressed();
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
+	private void homeButtonPressed() {
+		switch (homeAction) {
+			case ACTION_OPEN_DRAWER:
+				drawerLayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
+				break;
+			case ACTION_BACK:
+				onBackPressed();
+				break;
+		}
+	}
+
 	public void setNavigationDrawerItemChecked(int itemNum) {
 		navigationView.setCheckedItem(itemNum);
+	}
+
+	public void enableBackButton() {
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		drawerToggle.setDrawerIndicatorEnabled(false);
+		homeAction = ACTION_BACK;
+	}
+
+	public void enableHomeButton() {
+		drawerToggle.setDrawerIndicatorEnabled(true);
+		homeAction = ACTION_OPEN_DRAWER;
 	}
 }
