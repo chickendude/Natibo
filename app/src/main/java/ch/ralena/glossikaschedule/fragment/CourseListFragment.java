@@ -16,6 +16,7 @@ import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.adapter.CourseListAdapter;
 import ch.ralena.glossikaschedule.object.Course;
+import ch.ralena.glossikaschedule.object.Language;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
@@ -26,12 +27,15 @@ public class CourseListFragment extends Fragment {
 
 	private Realm realm;
 
+	private MainActivity activity;
+
 	@Nullable
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_course_list, container, false);
 
-		((MainActivity)getActivity()).enableHomeButton();
+		activity = (MainActivity) getActivity();
+		activity.enableHomeButton();
 
 		// load schedules from database
 		realm = Realm.getDefaultInstance();
@@ -86,13 +90,16 @@ public class CourseListFragment extends Fragment {
 	}
 
 	private void loadCourseCreateFragment() {
-		// load new fragment
-		CourseCreateFragment fragment = new CourseCreateFragment();
-		getFragmentManager()
-				.beginTransaction()
-				.replace(R.id.fragmentPlaceHolder, fragment)
-				.addToBackStack(null)
-				.commit();
+		if (realm.where(Language.class).count() == 0) {
+			activity.snackBar(R.string.no_languages);
+		} else {
+			// load new fragment
+			CourseCreateFragment fragment = new CourseCreateFragment();
+			getFragmentManager()
+					.beginTransaction()
+					.replace(R.id.fragmentPlaceHolder, fragment)
+					.addToBackStack(null)
+					.commit();
+		}
 	}
-
 }

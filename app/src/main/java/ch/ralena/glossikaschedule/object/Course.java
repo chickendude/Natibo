@@ -45,10 +45,13 @@ public class Course extends RealmObject {
 	@Index
 	private String id = UUID.randomUUID().toString();
 
-	String title;
-	String language;
-	RealmList<Day> pastDays;
-	Day currentDay;
+	private String title;
+	private Language baseLanguage;
+	private Language targetLanguage;
+	private Day currentDay;
+	private int numReps;
+	private RealmList<Day> pastDays = new RealmList<>();
+	private RealmList<Schedule> schedules = new RealmList<>();
 
 	public String getId() {
 		return id;
@@ -62,12 +65,28 @@ public class Course extends RealmObject {
 		this.title = title;
 	}
 
-	public String getLanguage() {
-		return language;
+	public Language getBaseLanguage() {
+		return baseLanguage;
 	}
 
-	public void setLanguage(String language) {
-		this.language = language;
+	public void setBaseLanguage(Language baseLanguage) {
+		this.baseLanguage = baseLanguage;
+	}
+
+	public Language getTargetLanguage() {
+		return targetLanguage;
+	}
+
+	public void setTargetLanguage(Language targetLanguage) {
+		this.targetLanguage = targetLanguage;
+	}
+
+	public int getNumReps() {
+		return numReps;
+	}
+
+	public void setNumReps(int numReps) {
+		this.numReps = numReps;
 	}
 
 	public RealmList<Day> getPastDays() {
@@ -84,5 +103,9 @@ public class Course extends RealmObject {
 
 	public void setCurrentDay(Day currentDay) {
 		this.currentDay = currentDay;
+	}
+
+	public RealmList<Schedule> getSchedules() {
+		return schedules;
 	}
 }

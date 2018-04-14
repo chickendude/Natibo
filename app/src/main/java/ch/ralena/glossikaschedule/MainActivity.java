@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -129,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 	/**
 	 * Loads the CourseListFragment fragment.
 	 */
-	private void loadCourseListFragment() {
+	public void loadCourseListFragment() {
 		clearBackStack();
 		CourseListFragment fragment = new CourseListFragment();
 		fragmentManager
@@ -195,5 +196,15 @@ public class MainActivity extends AppCompatActivity {
 	public void enableHomeButton() {
 		drawerToggle.setDrawerIndicatorEnabled(true);
 		homeAction = ACTION_OPEN_DRAWER;
+	}
+
+	public void snackBar(int stringId) {
+		snackBar(getString(stringId));
+	}
+
+	public void snackBar(String message) {
+		Snackbar snackbar = Snackbar.make(findViewById(R.id.fragmentPlaceHolder), message, Snackbar.LENGTH_INDEFINITE);
+		snackbar.setAction(R.string.ok, v -> snackbar.dismiss());
+		snackbar.show();
 	}
 }

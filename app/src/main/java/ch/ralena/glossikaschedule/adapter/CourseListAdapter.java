@@ -31,7 +31,7 @@ public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.Vi
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 		View view;
-		view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_language_list, parent, false);
+		view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_course_list, parent, false);
 		return new ViewHolder(view);
 	}
 
@@ -49,27 +49,27 @@ public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.Vi
 	class ViewHolder extends RecyclerView.ViewHolder {
 		private View view;
 		private TextView languageName;
-		private TextView numPacks;
-		private TextView numSentences;
+		private TextView courseTitle;
+		private TextView numReps;
 		private ImageView flagImage;
 		private Course course;
 
 		ViewHolder(View view) {
 			super(view);
 			this.view = view;
-//			languageName = view.findViewById(R.id.languageLabel);
-//			numPacks = view.findViewById(R.id.numPacksLabel);
-//			numSentences = view.findViewById(R.id.numSentencesLabel);
-//			flagImage = view.findViewById(R.id.flagImageView);
+			languageName = view.findViewById(R.id.languageLabel);
+			courseTitle = view.findViewById(R.id.courseTitleLabel);
+			numReps= view.findViewById(R.id.numRepsLabel);
+			flagImage = view.findViewById(R.id.flagImageView);
 			this.view.setOnClickListener(v -> courseSubject.onNext(course));
 		}
 
 		void bindView(Course course) {
 			this.course = course;
-//			languageName.setText(language.getLongName());
-//			numPacks.setText("" + language.getPacks().size());
-//			numSentences.setText("" + language.getSentenceCount());
-//			flagImage.setImageResource(language.getCourseType().getDrawable());
+			languageName.setText(course.getTargetLanguage().getLongName());
+			courseTitle.setText(course.getTitle());
+			numReps.setText(String.format("%d reps", course.getNumReps()));
+			flagImage.setImageResource(course.getTargetLanguage().getLanguageType().getDrawable());
 		}
 	}
 }

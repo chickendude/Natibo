@@ -10,6 +10,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -18,12 +19,17 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.util.UUID;
+
 import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
+import ch.ralena.glossikaschedule.object.Course;
 import ch.ralena.glossikaschedule.object.Language;
+import ch.ralena.glossikaschedule.object.Schedule;
 import ch.ralena.glossikaschedule.utils.Utils;
 import io.realm.Realm;
 
+// TODO: 13/04/18 move to course detail page
 public class CourseAiCreateFragment extends Fragment {
 	private static final String TAG = CourseAiCreateFragment.class.getSimpleName();
 	public static final String TAG_BASE_LANGUAGE = "tag_base_language";
@@ -41,6 +47,8 @@ public class CourseAiCreateFragment extends Fragment {
 	RadioButton fourDayRadio;
 	RadioButton fiveDayRadio;
 	RadioButton customDayRadio;
+
+	MainActivity activity;
 
 	// text watchers
 	TextWatcher sentencesPerDayTextWatcher = new TextWatcher() {
@@ -122,17 +130,20 @@ public class CourseAiCreateFragment extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_course_ai_create, container, false);
 
 		// switch to back button
-		MainActivity activity = (MainActivity) getActivity();
+		activity = (MainActivity) getActivity();
 		activity.enableBackButton();
 		activity.setTitle("Create an AI Course");
 
+		// we have a check button
 		setHasOptionsMenu(true);
 
 		realm = Realm.getDefaultInstance();
 
+		// load arguments
 		String baseId = getArguments().getString(TAG_BASE_LANGUAGE);
 		String targetId = getArguments().getString(TAG_TARGET_LANGUAGE);
 
+		// load languages passed in from create course fragment
 		baseLanguage = realm.where(Language.class).equalTo("languageId", baseId).findFirst();
 		targetLanguage = realm.where(Language.class).equalTo("languageId", targetId).findFirst();
 
@@ -161,7 +172,7 @@ public class CourseAiCreateFragment extends Fragment {
 		sentencesPerDaySeek.setProgress(9);
 
 		// set up radio listeners
-		reviewScheduleRadioGroup.clearCheck();
+		reviewScheduleRadioGroup.check(R.id.fourDayRadio);
 		reviewScheduleRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
 			switch (checkedId) {
 				case R.id.customDayRadio:
@@ -181,5 +192,41 @@ public class CourseAiCreateFragment extends Fragment {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.create_schedule_toolbar, menu);
 		super.onCreateOptionsMenu(menu, inflater);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.action_confirm:
+				createCourse();
+				activity.loadCourseListFragment();
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	private void createCourse() {
+		int checkedRadioId = reviewScheduleRadioGroup.getCheckedRadioButtonId();
+		RadioButton checkedButton = getActivity().findViewById(checkedRadioId);
+		String[] dailyReviews = checkedButton.getText().toString().split(" / ");
+		int numSentencesPerDay = Integer.parseInt(sentencesPerDayEdit.getText().toString());
+		realm.executeTransaction(new Realm.Transaction() {
+			@Override
+			public void execute(Realm realm) {
+				// create sentence schedule
+				Schedule schedule = realm.createObject(Schedule.class, UUID.randomUUID().toString());
+				schedule.setNumSentences(numSentencesPerDay);
+				for (String review : dailyReviews) {
+					schedule.getReviewPattern().add(Integer.parseInt(review));
+				}
+
+				// build course
+				Course course = realm.createObject(Course.class, UUID.randomUUID().toString());
+				course.setTitle(String.format("%s > %s", baseLanguage.getLanguageId(), targetLanguage.getLanguageId()));
+				course.setBaseLanguage(baseLanguage);
+				course.setTargetLanguage(targetLanguage);
+				course.getSchedules().add(schedule);
+			}
+		});
 	}
 }
