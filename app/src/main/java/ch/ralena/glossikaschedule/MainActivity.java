@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
 	 * Opens a file browser to search for a language pack to import into the app.
 	 */
 	public void importLanguagPack() {
+		clearBackStack();
 		Intent mediaIntent = new Intent(Intent.ACTION_GET_CONTENT);
 		mediaIntent.setType("application/*");
 		startActivityForResult(mediaIntent, REQUEST_PICK_GLS);
@@ -117,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
 	 * Loads the LanguageListFragment fragment.
 	 */
 	private void loadLanguageListFragment() {
+		clearBackStack();
 		LanguageListFragment fragment = new LanguageListFragment();
 		fragmentManager
 				.beginTransaction()
@@ -128,11 +130,19 @@ public class MainActivity extends AppCompatActivity {
 	 * Loads the CourseListFragment fragment.
 	 */
 	private void loadCourseListFragment() {
+		clearBackStack();
 		CourseListFragment fragment = new CourseListFragment();
 		fragmentManager
 				.beginTransaction()
 				.replace(R.id.fragmentPlaceHolder, fragment)
 				.commit();
+	}
+
+	private void clearBackStack() {
+		if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+			int entryId = getSupportFragmentManager().getBackStackEntryAt(0).getId();
+			getSupportFragmentManager().popBackStackImmediate(entryId, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+		}
 	}
 
 	@Override
