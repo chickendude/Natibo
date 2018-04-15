@@ -22,6 +22,7 @@ import io.realm.RealmResults;
 
 public class CourseListFragment extends Fragment {
 	private static final String TAG = CourseListFragment.class.getSimpleName();
+	public static final String TAG_COURSE_ID = "tag_course_id";
 
 	RealmResults<Course> courses;
 
@@ -40,6 +41,17 @@ public class CourseListFragment extends Fragment {
 		// load schedules from database
 		realm = Realm.getDefaultInstance();
 		courses = realm.where(Course.class).findAll();
+
+		// check if a course id was passed in, if so move to CourseDetailFragment and add to back stack
+		if (getArguments() != null) {
+			String courseId = getArguments().getString(TAG_COURSE_ID);
+			setArguments(null);
+			if (courseId != null) {
+				Course course = realm.where(Course.class).equalTo("id", courseId).findFirst();
+				if (course != null)
+					loadCourseDetailFragment(course);
+			}
+		}
 
 		// load views
 		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);

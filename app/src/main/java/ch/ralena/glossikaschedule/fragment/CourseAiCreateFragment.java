@@ -198,35 +198,36 @@ public class CourseAiCreateFragment extends Fragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.action_confirm:
-				createCourse();
-				activity.loadCourseListFragment();
+				String id = createCourse();
+				activity.loadCourseListFragment(id);
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
-	private void createCourse() {
+	private String createCourse() {
 		int checkedRadioId = reviewScheduleRadioGroup.getCheckedRadioButtonId();
 		RadioButton checkedButton = getActivity().findViewById(checkedRadioId);
 		String[] dailyReviews = checkedButton.getText().toString().split(" / ");
 		int numSentencesPerDay = Integer.parseInt(sentencesPerDayEdit.getText().toString());
-		realm.executeTransaction(new Realm.Transaction() {
-			@Override
-			public void execute(Realm realm) {
-				// create sentence schedule
-				Schedule schedule = realm.createObject(Schedule.class, UUID.randomUUID().toString());
-				schedule.setNumSentences(numSentencesPerDay);
-				for (String review : dailyReviews) {
-					schedule.getReviewPattern().add(Integer.parseInt(review));
-				}
 
-				// build course
-				Course course = realm.createObject(Course.class, UUID.randomUUID().toString());
-				course.setTitle(String.format("%s > %s", baseLanguage.getLanguageId(), targetLanguage.getLanguageId()));
-				course.setBaseLanguage(baseLanguage);
-				course.setTargetLanguage(targetLanguage);
-				course.getSchedules().add(schedule);
-			}
-		});
+		// --- begin transaction
+		realm.beginTransaction();
+		// create sentence schedule
+		Schedule schedule = realm.createObject(Schedule.class, UUID.randomUUID().toString());
+		schedule.setNumSentences(numSentencesPerDay);
+		for (String review : dailyReviews) {
+			schedule.getReviewPattern().add(Integer.parseInt(review));
+		}
+
+		// build course
+		Course course = realm.createObject(Course.class, UUID.randomUUID().toString());
+		course.setTitle(String.format("%s > %s", baseLanguage.getLanguageId(), targetLanguage.getLanguageId()));
+		course.setBaseLanguage(baseLanguage);
+		course.setTargetLanguage(targetLanguage);
+		course.getSchedules().add(schedule);
+		realm.commitTransaction();
+		// --- end transaction
+		return course.getId();
 	}
 }

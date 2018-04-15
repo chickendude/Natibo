@@ -131,8 +131,17 @@ public class MainActivity extends AppCompatActivity {
 	 * Loads the CourseListFragment fragment.
 	 */
 	public void loadCourseListFragment() {
+		loadCourseListFragment(null);
+	}
+
+	public void loadCourseListFragment(String courseId) {
 		clearBackStack();
 		CourseListFragment fragment = new CourseListFragment();
+		if (courseId != null) {
+			Bundle bundle = new Bundle();
+			bundle.putString(CourseListFragment.TAG_COURSE_ID, courseId);
+			fragment.setArguments(bundle);
+		}
 		fragmentManager
 				.beginTransaction()
 				.replace(R.id.fragmentPlaceHolder, fragment)
