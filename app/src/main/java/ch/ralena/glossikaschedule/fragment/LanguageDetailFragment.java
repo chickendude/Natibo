@@ -50,7 +50,7 @@ public class LanguageDetailFragment extends Fragment {
 
 		// set up recyclerlist and adapter
 		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-		LanguageDetailAdapter adapter = new LanguageDetailAdapter(getContext(), packs);
+		LanguageDetailAdapter adapter = new LanguageDetailAdapter(packs);
 		recyclerView.setAdapter(adapter);
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
 		recyclerView.setLayoutManager(layoutManager);

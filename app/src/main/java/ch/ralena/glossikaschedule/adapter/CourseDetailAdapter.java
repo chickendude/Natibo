@@ -12,7 +12,7 @@ import ch.ralena.glossikaschedule.object.Pack;
 import io.reactivex.subjects.PublishSubject;
 import io.realm.RealmList;
 
-public class LanguageDetailAdapter extends RecyclerView.Adapter<LanguageDetailAdapter.ViewHolder> {
+public class CourseDetailAdapter extends RecyclerView.Adapter<CourseDetailAdapter.ViewHolder> {
 
 	PublishSubject<Pack> packSubject = PublishSubject.create();
 
@@ -22,7 +22,7 @@ public class LanguageDetailAdapter extends RecyclerView.Adapter<LanguageDetailAd
 
 	private RealmList<Pack> packs;
 
-	public LanguageDetailAdapter(RealmList<Pack> packs) {
+	public CourseDetailAdapter(RealmList<Pack> packs) {
 		this.packs = packs;
 	}
 
@@ -30,7 +30,7 @@ public class LanguageDetailAdapter extends RecyclerView.Adapter<LanguageDetailAd
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 		View view;
-		view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_language_detail, parent, false);
+		view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_course_detail, parent, false);
 		return new ViewHolder(view);
 	}
 
@@ -46,23 +46,18 @@ public class LanguageDetailAdapter extends RecyclerView.Adapter<LanguageDetailAd
 	}
 
 	class ViewHolder extends RecyclerView.ViewHolder {
-		private View view;
 		private TextView book;
-		private TextView numSentences;
 		private Pack pack;
 
 		ViewHolder(View view) {
 			super(view);
-			this.view = view;
 			book = view.findViewById(R.id.bookLabel);
-			numSentences = view.findViewById(R.id.numSentencesLabel);
-			this.view.setOnClickListener(v -> packSubject.onNext(pack));
+			view.setOnClickListener(v -> packSubject.onNext(pack));
 		}
 
 		void bindView(Pack pack) {
 			this.pack = pack;
 			book.setText(pack.getBook());
-			numSentences.setText("" + pack.getSentences().size());
 		}
 	}
 }

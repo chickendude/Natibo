@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +13,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import ch.ralena.glossikaschedule.R;
+import ch.ralena.glossikaschedule.adapter.CourseDetailAdapter;
 import ch.ralena.glossikaschedule.object.Course;
+import ch.ralena.glossikaschedule.object.Pack;
 import io.realm.Realm;
+import io.realm.RealmList;
 
 // TODO: 13/04/18 if no sentence sets have been chosen, prompt to select sentence packs.
 public class CourseDetailFragment extends Fragment {
@@ -26,7 +31,7 @@ public class CourseDetailFragment extends Fragment {
 	@Nullable
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_language_detail, container, false);
+		View view = inflater.inflate(R.layout.fragment_course_detail, container, false);
 
 		// load schedules from database
 		String id = getArguments().getString(TAG_COURSE_ID);
@@ -41,13 +46,27 @@ public class CourseDetailFragment extends Fragment {
 		TextView languageLabel = view.findViewById(R.id.languageLabel);
 		languageLabel.setText(course.getTargetLanguage().getLanguageType().getName());
 
+		RealmList<Pack> targetPacks = course.getTargetLanguage().getPacks();
+		RealmList<Pack> basePacks = course.getBaseLanguage().getPacks();
+
+		RealmList<Pack> matchingPacks = new RealmList<>();
+
+		for (Pack targetPack : targetPacks) {
+			for (Pack basePack : basePacks) {
+				if (targetPack.getBook().equals(basePack.getBook())) {
+					matchingPacks.add(targetPack);
+					break;
+				}
+			}
+		}
+
 		// set up recyclerlist and adapter
-//		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-//		LanguageDetailAdapter adapter = new LanguageDetailAdapter(getContext(), packs);
-//		recyclerView.setAdapter(adapter);
-//		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-//		recyclerView.setLayoutManager(layoutManager);
-//
+		RecyclerView recyclerView = view.findViewById(R.id.booksRecyclerView);
+		CourseDetailAdapter adapter = new CourseDetailAdapter(matchingPacks);
+		recyclerView.setAdapter(adapter);
+		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+		recyclerView.setLayoutManager(layoutManager);
+
 //		adapter.asObservable().subscribe(this::loadSentenceListFragment);
 
 		return view;

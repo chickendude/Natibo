@@ -32,4 +32,6 @@
 	<string name="base_language">Base Language</string>
 	<string name="create">Create</string>
 	<string name="ok">OK</string>
+	<string name="total_reps">Total Reps</string>
+	<string name="sentences_seen">Sentences Seen</string>
 </resources>
