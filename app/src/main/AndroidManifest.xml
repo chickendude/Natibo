@@ -2,11 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		  package="ch.ralena.glossikaschedule">
 
+	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 	<application
+		android:name=".MainApplication"
 		android:allowBackup="true"
 		android:icon="@mipmap/ic_launcher"
 		android:label="@string/app_name"
-		android:name=".MainApplication"
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
 		<activity android:name=".MainActivity">
@@ -16,7 +17,7 @@
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
 		</activity>
-		<activity android:name=".NewScheduleActivity"/>
+		<service android:name=".service.StudySessionService"/>
 	</application>
 
 </manifest>

@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.adapter.CourseDetailAdapter;
 import ch.ralena.glossikaschedule.object.Course;
@@ -22,9 +21,8 @@ import ch.ralena.glossikaschedule.object.Pack;
 import io.realm.Realm;
 import io.realm.RealmList;
 
-// TODO: 13/04/18 if no sentence sets have been chosen, prompt to select sentence packs.
-public class CourseDetailFragment extends Fragment {
-	private static final String TAG = CourseDetailFragment.class.getSimpleName();
+public class StudySessionFragment extends Fragment {
+	private static final String TAG = StudySessionFragment.class.getSimpleName();
 	public static final String TAG_COURSE_ID = "language_id";
 
 	Course course;
@@ -65,7 +63,7 @@ public class CourseDetailFragment extends Fragment {
 		startSessionButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				((MainActivity) getActivity()).playSentence(targetLanguage.getPacks().get(0).getSentences().get(0));
+
 			}
 		});
 

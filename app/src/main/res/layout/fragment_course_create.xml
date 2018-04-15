@@ -101,6 +101,7 @@
 						style="@style/buttonStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
+						android:alpha="0.5"
 						android:background="@drawable/button_background"
 						android:foreground="?android:attr/selectableItemBackground"
 						android:text="@string/pre_packaged_button"/>
@@ -209,6 +210,7 @@
 						style="@style/buttonStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
+						android:alpha="0.5"
 						android:background="@drawable/button_background"
 						android:foreground="?android:attr/selectableItemBackground"
 						android:text="@string/byoc_button"/>

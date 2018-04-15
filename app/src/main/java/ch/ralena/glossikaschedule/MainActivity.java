@@ -1,8 +1,12 @@
 package ch.ralena.glossikaschedule;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
@@ -17,22 +21,43 @@ import android.view.View;
 import ch.ralena.glossikaschedule.fragment.CourseListFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageImportFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageListFragment;
+import ch.ralena.glossikaschedule.object.Sentence;
+import ch.ralena.glossikaschedule.service.StudySessionService;
 import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity {
 	private static final String TAG = MainActivity.class.getSimpleName();
-	private static final String TAG_SCHEDULE_INDEX = "save_schedule_index";
+	private static final String KEY_SERVICE_BOUND = "key_service_bound";
 	private static final int ACTION_OPEN_DRAWER = 0;
 	private static final int ACTION_BACK = 1;
 	private static final int REQUEST_PICK_GLS = 1;
 
+	// views
 	DrawerLayout drawerLayout;
 	NavigationView navigationView;
 	private FragmentManager fragmentManager;
 	ActionBarDrawerToggle drawerToggle;
+
+	// fields
 	int homeAction;
+	private StudySessionService studySessionService;
+	private boolean isServiceBound = false;
 
 	private Realm realm;
+
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			StudySessionService.StudyBinder binder = (StudySessionService.StudyBinder) service;
+			studySessionService = ((StudySessionService.StudyBinder) service).getService();
+			isServiceBound = true;
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			isServiceBound = false;
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +81,27 @@ public class MainActivity extends AppCompatActivity {
 		// set up nav drawer
 		setupNavigationDrawer();
 		loadCourseListFragment();
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean(KEY_SERVICE_BOUND, isServiceBound);
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		isServiceBound = savedInstanceState.getBoolean(KEY_SERVICE_BOUND, false);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (isServiceBound) {
+			unbindService(serviceConnection);
+			studySessionService.stopSelf();
+		}
 	}
 
 	/**
@@ -191,6 +237,8 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
+	// public methods
+
 	public void setNavigationDrawerItemChecked(int itemNum) {
 		navigationView.setCheckedItem(itemNum);
 	}
@@ -215,5 +263,15 @@ public class MainActivity extends AppCompatActivity {
 		Snackbar snackbar = Snackbar.make(findViewById(R.id.fragmentPlaceHolder), message, Snackbar.LENGTH_INDEFINITE);
 		snackbar.setAction(R.string.ok, v -> snackbar.dismiss());
 		snackbar.show();
+	}
+
+	// --- study session service methods ---
+	public void playSentence(Sentence sentence) {
+		if (!isServiceBound) {
+			Intent intent = new Intent(this, StudySessionService.class);
+			intent.putExtra(StudySessionService.KEY_SENTENCE_PATH, sentence.getUri());
+			startService(intent);
+			bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+		}
 	}
 }

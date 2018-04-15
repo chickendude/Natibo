@@ -52,4 +52,24 @@ public class Language extends RealmObject {
 		}
 		return numSentences;
 	}
+
+
+	/**
+	 * Looks for matching sentence packs in another language set.
+	 *
+	 * @param targetLanguage language to check for matching packs
+	 * @return RealmList containing packs shared between both languages
+	 */
+	public RealmList<Pack> getMatchingPacks(Language targetLanguage) {
+		RealmList<Pack> matchingPacks = new RealmList<>();
+		for (Pack targetPack : packs) {
+			for (Pack basePack : targetLanguage.getPacks()) {
+				if (targetPack.getBook().equals(basePack.getBook())) {
+					matchingPacks.add(targetPack);
+					break;
+				}
+			}
+		}
+		return matchingPacks;
+	}
 }
