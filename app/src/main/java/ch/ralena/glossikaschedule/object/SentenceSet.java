@@ -12,8 +12,8 @@ public class SentenceSet extends RealmObject {
 	@Index
 	private String id = UUID.randomUUID().toString();
 
-	private Sentence base;
-	private Sentence target;
+	private RealmList<Sentence> baseSentences;
+	private RealmList<Sentence> targetSentences;
 	private RealmList<Integer> reviews;    // number of reviews per sentence per day, eg. [6, 4, 3, 2]
 	private String order;          // order to play sentences, eg. base + target + target, base + target, etc.
 
@@ -21,20 +21,20 @@ public class SentenceSet extends RealmObject {
 		return id;
 	}
 
-	public Sentence getBase() {
-		return base;
+	public RealmList<Sentence> getBaseSentences() {
+		return baseSentences;
 	}
 
-	public void setBase(Sentence base) {
-		this.base = base;
+	public void setBaseSentences(RealmList<Sentence> baseSentences) {
+		this.baseSentences = baseSentences;
 	}
 
-	public Sentence getTarget() {
-		return target;
+	public RealmList<Sentence> getTargetSentences() {
+		return targetSentences;
 	}
 
-	public void setTarget(Sentence target) {
-		this.target = target;
+	public void setTargetSentences(RealmList<Sentence> targetSentences) {
+		this.targetSentences = targetSentences;
 	}
 
 	public RealmList<Integer> getReviews() {

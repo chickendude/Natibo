@@ -20,9 +20,11 @@ public class CourseDetailAdapter extends RecyclerView.Adapter<CourseDetailAdapte
 		return packSubject;
 	}
 
+	private RealmList<Pack> targetPacks;
 	private RealmList<Pack> packs;
 
-	public CourseDetailAdapter(RealmList<Pack> packs) {
+	public CourseDetailAdapter(RealmList<Pack> targetPacks, RealmList<Pack> packs) {
+		this.targetPacks = targetPacks;
 		this.packs = packs;
 	}
 
@@ -58,6 +60,8 @@ public class CourseDetailAdapter extends RecyclerView.Adapter<CourseDetailAdapte
 		void bindView(Pack pack) {
 			this.pack = pack;
 			book.setText(pack.getBook());
+			if (targetPacks.contains(pack))
+				book.setText(pack.getBook() + "-");
 		}
 	}
 }

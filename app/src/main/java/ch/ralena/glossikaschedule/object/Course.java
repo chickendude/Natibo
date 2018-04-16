@@ -2,6 +2,7 @@ package ch.ralena.glossikaschedule.object;
 
 import java.util.UUID;
 
+import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.Index;
@@ -48,10 +49,12 @@ public class Course extends RealmObject {
 	private String title;
 	private Language baseLanguage;
 	private Language targetLanguage;
+	private RealmList<Pack> basePacks;
+	private RealmList<Pack> targetPacks;
 	private Day currentDay;
 	private int numReps;
 	private RealmList<Day> pastDays = new RealmList<>();
-	private RealmList<Schedule> schedules = new RealmList<>();
+	private RealmList<Schedule> schedules = new RealmList<>();    // the different pieces that make up the study routine for each day
 
 	public String getId() {
 		return id;
@@ -81,6 +84,26 @@ public class Course extends RealmObject {
 		this.targetLanguage = targetLanguage;
 	}
 
+	public RealmList<Pack> getBasePacks() {
+		return basePacks;
+	}
+
+	public void setBasePacks(RealmList<Pack> basePacks) {
+		this.basePacks = basePacks;
+	}
+
+	public RealmList<Pack> getTargetPacks() {
+		return targetPacks;
+	}
+
+	public void setTargetPacks(RealmList<Pack> targetPacks) {
+		this.targetPacks = targetPacks;
+	}
+
+	public void setSchedules(RealmList<Schedule> schedules) {
+		this.schedules = schedules;
+	}
+
 	public int getNumReps() {
 		return numReps;
 	}
@@ -107,5 +130,46 @@ public class Course extends RealmObject {
 
 	public RealmList<Schedule> getSchedules() {
 		return schedules;
+	}
+
+	public Day getNextDay(Realm realm) {
+//		if (currentDay == null || currentDay.isCompleted) {
+		realm.executeTransaction(r -> {
+			Day day = r.createObject(Day.class, UUID.randomUUID().toString());
+			for (Schedule schedule : schedules) {
+				RealmList<Integer> reviewPattern = schedule.getReviewPattern();
+				int numSentences = schedule.getNumSentences();
+				int sentenceIndex = schedule.getSentenceIndex();
+
+				SentenceSet sentenceSet = new SentenceSet();
+				sentenceSet.setBaseSentences(getSentences(sentenceIndex, numSentences, basePacks));
+				sentenceSet.setTargetSentences(getSentences(sentenceIndex, numSentences, targetPacks));
+				day.getSentenceSets().add(sentenceSet);
+			}
+			day.setCompleted(false);
+			currentDay = day;
+		});
+//		}
+		return currentDay;
+	}
+
+	private RealmList<Sentence> getSentences(int index, int numSentences, RealmList<Pack> packs) {
+		RealmList<Sentence> sentences = new RealmList<>();
+
+		for (Pack pack : packs) {
+			RealmList<Sentence> packSentences = pack.getSentences();
+			if (index >= pack.getSentences().size())
+				index -= packSentences.size();
+			else {
+				while (numSentences > 0) {
+					if (index >= pack.getSentences().size())
+						break;
+					numSentences--;
+					Sentence sentence = packSentences.get(index++);
+					sentences.add(sentence);
+				}
+			}
+		}
+		return sentences;
 	}
 }

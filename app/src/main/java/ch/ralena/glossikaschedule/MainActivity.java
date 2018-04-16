@@ -272,6 +272,8 @@ public class MainActivity extends AppCompatActivity {
 			intent.putExtra(StudySessionService.KEY_SENTENCE_PATH, sentence.getUri());
 			startService(intent);
 			bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+		} else {
+
 		}
 	}
 }

@@ -13,6 +13,8 @@ public class Schedule extends RealmObject {
 	private String id = UUID.randomUUID().toString();
 
 	private int numSentences;
+	private int sentenceIndex;		// which sentence we are at, e.g. sentence 1, sentence 51, sentence 2,041, etc.
+	private String order;			// order in which to play sentences (e.g. base, target, target)
 	private RealmList<Integer> reviewPattern = new RealmList<>();
 
 	public int getNumSentences() {
@@ -21,6 +23,14 @@ public class Schedule extends RealmObject {
 
 	public void setNumSentences(int numSentences) {
 		this.numSentences = numSentences;
+	}
+
+	public int getSentenceIndex() {
+		return sentenceIndex;
+	}
+
+	public void setSentenceIndex(int sentenceIndex) {
+		this.sentenceIndex = sentenceIndex;
 	}
 
 	public RealmList<Integer> getReviewPattern() {

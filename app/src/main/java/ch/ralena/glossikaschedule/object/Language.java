@@ -62,14 +62,23 @@ public class Language extends RealmObject {
 	 */
 	public RealmList<Pack> getMatchingPacks(Language targetLanguage) {
 		RealmList<Pack> matchingPacks = new RealmList<>();
-		for (Pack targetPack : packs) {
-			for (Pack basePack : targetLanguage.getPacks()) {
-				if (targetPack.getBook().equals(basePack.getBook())) {
-					matchingPacks.add(targetPack);
+		for (Pack basePack : packs) {
+			for (Pack targetPack : targetLanguage.getPacks()) {
+				if (basePack.getBook().equals(targetPack.getBook())) {
+					matchingPacks.add(basePack);
 					break;
 				}
 			}
 		}
 		return matchingPacks;
+	}
+
+	public Pack getMatchingPack(Pack pack) {
+		for (Pack p : packs) {
+			if (p.getBook().equals(pack.getBook())) {
+				return p;
+			}
+		}
+		return null;
 	}
 }

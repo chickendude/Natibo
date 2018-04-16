@@ -18,6 +18,10 @@ import java.io.IOException;
 public class StudySessionService extends Service implements MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
 	public static final String KEY_SENTENCE_PATH = "tag_sentence_path";
 
+	public enum PlaybackStatus {
+		PLAYING, PAUSED
+	}
+
 	private MediaPlayer mediaPlayer;
 	private String sentencePath;
 	private int stopPosition;
@@ -213,6 +217,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		public void onReceive(Context context, Intent intent) {
 			if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
 				pause();
+//				buildNotification(PlaybackStatus.PAUSED);
 			}
 		}
 	}

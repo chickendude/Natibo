@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.adapter.CourseDetailAdapter;
 import ch.ralena.glossikaschedule.object.Course;
@@ -30,6 +29,8 @@ public class CourseDetailFragment extends Fragment {
 	Course course;
 
 	private Realm realm;
+
+	CourseDetailAdapter adapter;
 
 	@Nullable
 	@Override
@@ -54,21 +55,55 @@ public class CourseDetailFragment extends Fragment {
 
 		// set up recyclerlist and adapter
 		RecyclerView recyclerView = view.findViewById(R.id.booksRecyclerView);
-		CourseDetailAdapter adapter = new CourseDetailAdapter(matchingPacks);
+		adapter = new CourseDetailAdapter(course.getTargetPacks(), matchingPacks);
 		recyclerView.setAdapter(adapter);
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 		recyclerView.setLayoutManager(layoutManager);
 
-//		adapter.asObservable().subscribe(this::loadSentenceListFragment);
+		adapter.asObservable().subscribe(this::addRemovePack);
 
 		Button startSessionButton = view.findViewById(R.id.startSessionButton);
 		startSessionButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				((MainActivity) getActivity()).playSentence(targetLanguage.getPacks().get(0).getSentences().get(0));
+				StudySessionFragment fragment = new StudySessionFragment();
+				Bundle bundle = new Bundle();
+				bundle.putString(StudySessionFragment.TAG_COURSE_ID, course.getId());
+				fragment.setArguments(bundle);
+
+				getFragmentManager().beginTransaction()
+						.replace(R.id.fragmentPlaceHolder, fragment)
+						.addToBackStack(null)
+						.commit();
 			}
 		});
 
 		return view;
+	}
+
+	private void addRemovePack(Pack pack) {
+		Pack basePack = course.getBaseLanguage().getMatchingPack(pack);
+		if (course.getTargetPacks().contains(pack)) {
+			realm.executeTransaction(r -> {
+				course.getBasePacks().remove(pack);
+				course.getBasePacks().remove(pack);
+				course.getBasePacks().remove(pack);
+				course.getBasePacks().remove(basePack);
+				course.getBasePacks().remove(basePack);
+				course.getBasePacks().remove(basePack);
+				course.getTargetPacks().remove(pack);
+				course.getTargetPacks().remove(pack);
+				course.getTargetPacks().remove(pack);
+				course.getTargetPacks().remove(basePack);
+				course.getTargetPacks().remove(basePack);
+				course.getTargetPacks().remove(basePack);
+			});
+		} else {
+			realm.executeTransaction(r -> {
+				course.getBasePacks().add(basePack);
+				course.getTargetPacks().add(pack);
+			});
+		}
+		adapter.notifyDataSetChanged();
 	}
 }
