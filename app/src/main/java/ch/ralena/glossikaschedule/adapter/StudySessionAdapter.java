@@ -10,8 +10,9 @@ import android.widget.TextView;
 
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.object.Sentence;
-import ch.ralena.glossikaschedule.object.SentenceSet;
+import ch.ralena.glossikaschedule.object.SentencePair;
 import io.reactivex.subjects.PublishSubject;
+import io.realm.RealmList;
 
 public class StudySessionAdapter extends RecyclerView.Adapter<StudySessionAdapter.ViewHolder> {
 
@@ -21,12 +22,12 @@ public class StudySessionAdapter extends RecyclerView.Adapter<StudySessionAdapte
 		return languageSubject;
 	}
 
-	private SentenceSet sentenceSet;
+	private RealmList<SentencePair> sentences;
 	private String language;
 
-	public StudySessionAdapter(String languageId, SentenceSet sentenceSet) {
+	public StudySessionAdapter(String languageId, RealmList<SentencePair> sentences) {
 		this.language = languageId;
-		this.sentenceSet = sentenceSet;
+		this.sentences = sentences;
 	}
 
 	@NonNull
@@ -40,12 +41,12 @@ public class StudySessionAdapter extends RecyclerView.Adapter<StudySessionAdapte
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 		if (position < getItemCount())
-			holder.bindView(position);
+			holder.bindView(sentences.get(position));
 	}
 
 	@Override
 	public int getItemCount() {
-		return sentenceSet.getTargetSentences().size();
+		return sentences.size();
 	}
 
 	class ViewHolder extends RecyclerView.ViewHolder {
@@ -92,9 +93,9 @@ public class StudySessionAdapter extends RecyclerView.Adapter<StudySessionAdapte
 			targetIpaLayout = view.findViewById(R.id.targetIpaLayout);
 		}
 
-		void bindView(int sentenceNumber) {
-			Sentence targetSentence = sentenceSet.getTargetSentences().get(sentenceNumber);
-			Sentence baseSentence = sentenceSet.getBaseSentences().get(sentenceNumber);
+		void bindView(SentencePair sentencePair) {
+			Sentence targetSentence = sentencePair.getTargetSentence();
+			Sentence baseSentence = sentencePair.getBaseSentence();
 			index.setText("" + targetSentence.getIndex());
 			// base
 			baseSentenceText.setText(baseSentence.getText());
