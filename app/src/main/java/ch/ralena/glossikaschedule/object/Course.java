@@ -133,23 +133,23 @@ public class Course extends RealmObject {
 	}
 
 	public Day getNextDay(Realm realm) {
-//		if (currentDay == null || currentDay.isCompleted) {
-		realm.executeTransaction(r -> {
-			Day day = r.createObject(Day.class, UUID.randomUUID().toString());
-			for (Schedule schedule : schedules) {
-				RealmList<Integer> reviewPattern = schedule.getReviewPattern();
-				int numSentences = schedule.getNumSentences();
-				int sentenceIndex = schedule.getSentenceIndex();
+		if (currentDay == null || currentDay.isCompleted) {
+			realm.executeTransaction(r -> {
+				Day day = r.createObject(Day.class, UUID.randomUUID().toString());
+				for (Schedule schedule : schedules) {
+					RealmList<Integer> reviewPattern = schedule.getReviewPattern();
+					int numSentences = schedule.getNumSentences();
+					int sentenceIndex = schedule.getSentenceIndex();
 
-				SentenceSet sentenceSet = new SentenceSet();
-				sentenceSet.setBaseSentences(getSentences(sentenceIndex, numSentences, basePacks));
-				sentenceSet.setTargetSentences(getSentences(sentenceIndex, numSentences, targetPacks));
-				day.getSentenceSets().add(sentenceSet);
-			}
-			day.setCompleted(false);
-			currentDay = day;
-		});
-//		}
+					SentenceSet sentenceSet = new SentenceSet();
+					sentenceSet.setBaseSentences(getSentences(sentenceIndex, numSentences, basePacks));
+					sentenceSet.setTargetSentences(getSentences(sentenceIndex, numSentences, targetPacks));
+					day.getSentenceSets().add(sentenceSet);
+				}
+				day.setCompleted(false);
+				currentDay = day;
+			});
+		}
 		return currentDay;
 	}
 
