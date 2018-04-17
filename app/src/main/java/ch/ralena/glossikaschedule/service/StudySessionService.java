@@ -15,26 +15,36 @@ import android.telephony.TelephonyManager;
 
 import java.io.IOException;
 
+import ch.ralena.glossikaschedule.object.Day;
+import ch.ralena.glossikaschedule.object.SentencePair;
+import ch.ralena.glossikaschedule.utils.Utils;
+import io.realm.Realm;
+
 public class StudySessionService extends Service implements MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
 	public static final String KEY_SENTENCE_PATH = "tag_sentence_path";
+	public static final String KEY_DAY_ID = "key_day_id";
+	public static final String BROADCAST_START_SESSION = "broadcast_start_session";
 
 	public enum PlaybackStatus {
 		PLAYING, PAUSED
 	}
 
 	private MediaPlayer mediaPlayer;
-	private String sentencePath;
+	private Day day;
 	private int stopPosition;
 	private AudioManager audioManager;
 	private boolean inCall = false;
 	private PhoneStateListener phoneStateListener;
 	private TelephonyManager telephonyManager;
+	private Realm realm;
+	private SentencePair sentencePair;
 
 	// given to clients that connect to the service
 	StudyBinder binder = new StudyBinder();
 
 	// Broadcast Receivers
 	private BroadcastReceiver becomingNoisyReceiver = new BecomingNoisyReceiver();
+	private BroadcastReceiver startSessionReceiver = new StartSessionReceiver();
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -42,28 +52,51 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		if (intent.getExtras() == null)
 			stopSelf();
 
-		// load the sentence path
-		sentencePath = intent.getExtras().getString(KEY_SENTENCE_PATH);
-		if (sentencePath == null || sentencePath.equals(""))
+		realm = Realm.getDefaultInstance();
+
+		String id = new Utils.Storage(getApplicationContext()).getDayId();
+		day = realm.where(Day.class).equalTo("id", id).findFirst();
+		if (day == null)
 			stopSelf();
+		day.resetReviews(realm);
 
 		if (!requestAudioFocus())
 			stopSelf();
 
-		initialize();
+		playSentence();
 
 		return super.onStartCommand(intent, flags, startId);
 	}
 
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		callStateListener();
+		registerBecomingNoisyReceiver();
+		registerStartSessionReceiver();
+	}
+
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if (mediaPlayer != null) {
+			stop();
+			mediaPlayer.release();
+		}
+		removeAudioFocus();
+	}
+
 	// --- setup ---
-	private void initialize() {
+	private void playSentence() {
+		sentencePair = day.getNextSentencePair(realm);
 		mediaPlayer = new MediaPlayer();
 		mediaPlayer.setOnCompletionListener(this);
 		mediaPlayer.reset();
 		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 		try {
 			// load sentence path into mediaplayer to be played
-			mediaPlayer.setDataSource(sentencePath);
+			mediaPlayer.setDataSource(sentencePair.getTargetSentence().getUri());
 			mediaPlayer.prepare();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -110,6 +143,11 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	private void registerBecomingNoisyReceiver() {
 		IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 		registerReceiver(becomingNoisyReceiver, intentFilter);
+	}
+
+	private void registerStartSessionReceiver() {
+		IntentFilter intentFilter = new IntentFilter(BROADCAST_START_SESSION);
+		registerReceiver(startSessionReceiver, intentFilter);
 	}
 
 	private void callStateListener() {
@@ -187,7 +225,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	private void restartPlaying() {
 		if (mediaPlayer == null) {
-			initialize();
+			playSentence();
 		} else {
 			play();
 		}
@@ -202,15 +240,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		}
 	}
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		if (mediaPlayer != null) {
-			stop();
-			mediaPlayer.release();
-		}
-		removeAudioFocus();
-	}
+	// --- Broadcast Receivers ---
 
 	private class BecomingNoisyReceiver extends BroadcastReceiver {
 		@Override
@@ -222,4 +252,21 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		}
 	}
 
+	private class StartSessionReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String id = new Utils.Storage(getApplicationContext()).getDayId();
+			day = realm.where(Day.class).equalTo("id", id).findFirst();
+			if (day == null)
+				stopSelf();
+			day.resetReviews(realm);
+			stop();
+			mediaPlayer.reset();
+			if (!requestAudioFocus())
+				stopSelf();
+
+			playSentence();
+		}
+	}
 }

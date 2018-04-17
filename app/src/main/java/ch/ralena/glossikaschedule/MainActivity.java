@@ -21,8 +21,10 @@ import android.view.View;
 import ch.ralena.glossikaschedule.fragment.CourseListFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageImportFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageListFragment;
+import ch.ralena.glossikaschedule.object.Day;
 import ch.ralena.glossikaschedule.object.Sentence;
 import ch.ralena.glossikaschedule.service.StudySessionService;
+import ch.ralena.glossikaschedule.utils.Utils;
 import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity {
@@ -274,6 +276,20 @@ public class MainActivity extends AppCompatActivity {
 			bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
 		} else {
 
+		}
+	}
+
+	public void startSession(Day day) {
+		Utils.Storage storage = new Utils.Storage(this);
+		storage.putDayId(day.getId());
+
+		if (!isServiceBound) {
+			Intent intent = new Intent(this, StudySessionService.class);
+			startService(intent);
+			bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+		} else {
+			Intent intent = new Intent(StudySessionService.BROADCAST_START_SESSION);
+			sendBroadcast(intent);
 		}
 	}
 }

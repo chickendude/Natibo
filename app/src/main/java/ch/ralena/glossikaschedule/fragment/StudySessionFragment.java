@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.adapter.StudySessionAdapter;
 import ch.ralena.glossikaschedule.object.Course;
@@ -26,10 +27,14 @@ public class StudySessionFragment extends Fragment {
 
 	private Realm realm;
 
+	private MainActivity activity;
+
 	@Nullable
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_study_session, container, false);
+
+		activity = (MainActivity) getActivity();
 
 		// load schedules from database
 		String id = getArguments().getString(TAG_COURSE_ID);
@@ -49,6 +54,8 @@ public class StudySessionFragment extends Fragment {
 		recyclerView.setAdapter(adapter);
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
 		recyclerView.setLayoutManager(layoutManager);
+
+		activity.startSession(course.getCurrentDay());
 
 //		adapter.asObservable().subscribe(this::loadSentenceListFragment);
 

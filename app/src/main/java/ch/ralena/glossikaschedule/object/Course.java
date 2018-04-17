@@ -1,5 +1,7 @@
 package ch.ralena.glossikaschedule.object;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import io.realm.Realm;
@@ -165,12 +167,15 @@ public class Course extends RealmObject {
 				currentDay = day;
 			});
 //		}
+		List<SentenceSet> emptySentenceSets = new ArrayList<>();
 		for (SentenceSet set : currentDay.getSentenceSets()) {
-			// create sentence set and delete it if there are no more reviews left
+			// create sentence set and mark it to be deleted if it is empty
 			if (!set.buildSentences(realm)) {
-				realm.executeTransaction(r -> currentDay.getSentenceSets().remove(set));
+				emptySentenceSets.add(set);
 			}
 		}
+
+		realm.executeTransaction(r -> currentDay.getSentenceSets().removeAll(emptySentenceSets));
 		return currentDay;
 	}
 
