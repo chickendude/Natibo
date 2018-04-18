@@ -1,5 +1,9 @@
 package ch.ralena.glossikaschedule.service;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,23 +11,44 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.session.MediaSessionManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
 import java.io.IOException;
 
+import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.object.Day;
 import ch.ralena.glossikaschedule.object.SentencePair;
 import ch.ralena.glossikaschedule.utils.Utils;
 import io.realm.Realm;
 
 public class StudySessionService extends Service implements MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
-	public static final String KEY_SENTENCE_PATH = "tag_sentence_path";
-	public static final String KEY_DAY_ID = "key_day_id";
 	public static final String BROADCAST_START_SESSION = "broadcast_start_session";
+	public static final String ACTION_PLAY = "action_play";
+	public static final int ACTION_ID_PLAY = 0;
+	public static final String ACTION_PAUSE = "action_pause";
+	public static final int ACTION_ID_PAUSE = 1;
+	public static final String ACTION_PREVIOUS = "action_previous";
+	public static final int ACTION_ID_PREVIOUS = 2;
+	public static final String ACTION_NEXT = "action_next";
+	public static final int ACTION_ID_NEXT = 3;
+
+	private static final int NOTIFICATION_ID = 1337;
+	private static final String CHANNEL_ID = "GLOSSIKA_1337";
+
+	// Media Session
+	private MediaSessionManager mediaSessionManager;
+	private MediaSessionCompat mediaSession;
+	private MediaControllerCompat.TransportControls transportControls;
 
 	public enum PlaybackStatus {
 		PLAYING, PAUSED
@@ -65,6 +90,13 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 		playSentence();
 
+		if (mediaSessionManager == null) {
+			initMediaSession();
+			buildNotification(PlaybackStatus.PLAYING);
+		}
+
+		handleIncomingActions(intent);
+
 		return super.onStartCommand(intent, flags, startId);
 	}
 
@@ -80,14 +112,27 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+
+		// stop media from playing
 		if (mediaPlayer != null) {
 			stop();
 			mediaPlayer.release();
 		}
 		removeAudioFocus();
+
+		// cancel the phone state listener
+		if (phoneStateListener != null) {
+			telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
+		}
+//		removeNotification();
+
+		// unregister broadcast receivers
+		unregisterReceiver(becomingNoisyReceiver);
+		unregisterReceiver(startSessionReceiver);
 	}
 
 	// --- setup ---
+
 	private void playSentence() {
 		sentencePair = day.getNextSentencePair(realm);
 		mediaPlayer = new MediaPlayer();
@@ -106,6 +151,58 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	}
 
 	// --- managing media ---
+
+	private void initMediaSession() {
+		if (mediaSessionManager != null)
+			return;
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			mediaSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
+		}
+		mediaSession = new MediaSessionCompat(getApplicationContext(), "GlossikaNative");
+		transportControls = mediaSession.getController().getTransportControls();
+		mediaSession.setActive(true);
+		mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+		updateMetaData();
+		mediaSession.setCallback(new MediaSessionCompat.Callback() {
+			@Override
+			public void onPlay() {
+				super.onPlay();
+				resume();
+				buildNotification(PlaybackStatus.PLAYING);
+			}
+
+			@Override
+			public void onPause() {
+				super.onPause();
+				pause();
+				buildNotification(PlaybackStatus.PAUSED);
+			}
+
+			@Override
+			public void onSkipToNext() {
+				super.onSkipToNext();
+				nextSentence();
+				buildNotification(PlaybackStatus.PLAYING);
+			}
+
+			@Override
+			public void onSkipToPrevious() {
+				super.onSkipToPrevious();
+				previousSentence();
+				buildNotification(PlaybackStatus.PLAYING);
+			}
+		});
+	}
+
+	private void updateMetaData() {
+		mediaSession.setMetadata(
+				new MediaMetadataCompat.Builder()
+						.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, sentencePair.getBaseSentence().getText())
+						.putString(MediaMetadataCompat.METADATA_KEY_TITLE, sentencePair.getTargetSentence().getText())
+						.build()
+		);
+	}
 
 	private void play() {
 		if (!mediaPlayer.isPlaying()) {
@@ -133,22 +230,107 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		}
 	}
 
+	private void nextSentence() {
+
+	}
+
+	private void previousSentence() {
+
+	}
+
 	private void setVolume(float volume) {
 		if (mediaPlayer.isPlaying()) {
 			mediaPlayer.setVolume(volume, volume);
 		}
 	}
 
+	// --- notification ---
 
-	private void registerBecomingNoisyReceiver() {
-		IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-		registerReceiver(becomingNoisyReceiver, intentFilter);
+	private void buildNotification(PlaybackStatus playbackStatus) {
+		int playPauseDrawable = android.R.drawable.ic_media_pause;
+		PendingIntent playPauseAction = null;
+
+		if (playbackStatus == PlaybackStatus.PLAYING) {
+			playPauseDrawable = android.R.drawable.ic_media_pause;
+			playPauseAction = iconAction(ACTION_ID_PAUSE);
+		} else if (playbackStatus == PlaybackStatus.PAUSED) {
+			playPauseDrawable = android.R.drawable.ic_media_play;
+			playPauseAction = iconAction(ACTION_ID_PLAY);
+		}
+
+		// create the notification channel
+		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			// Create the NotificationChannel, but only on API 26+ because
+			// the NotificationChannel class is new and not in the support library
+			CharSequence name = "GlossikaNativeChannel";
+			String description = "Glossika stuff";
+			int importance = NotificationManager.IMPORTANCE_DEFAULT;
+			NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+			channel.setDescription(description);
+			// Register the channel with the system
+			notificationManager.createNotificationChannel(channel);
+		}
+
+
+		// create the notification
+		Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+				.setShowWhen(false)
+				.setOngoing(true)
+				.setSmallIcon(R.drawable.clock)
+				.setStyle(
+						new android.support.v4.media.app.NotificationCompat.MediaStyle()
+								.setMediaSession(mediaSession.getSessionToken())
+								.setShowActionsInCompactView(0, 1, 2)
+				).setColor(getResources().getColor(R.color.colorPrimary))
+				.setContentText(sentencePair.getBaseSentence().getText())
+				.setContentTitle(sentencePair.getTargetSentence().getText())
+				.addAction(android.R.drawable.ic_media_previous, "prev sentence", iconAction(ACTION_ID_PREVIOUS))
+				.addAction(playPauseDrawable, "pause", playPauseAction)
+				.addAction(android.R.drawable.ic_media_next, "next sentence", iconAction(ACTION_ID_NEXT))
+				.build();
+		notificationManager.notify(NOTIFICATION_ID, notification);
+
 	}
 
-	private void registerStartSessionReceiver() {
-		IntentFilter intentFilter = new IntentFilter(BROADCAST_START_SESSION);
-		registerReceiver(startSessionReceiver, intentFilter);
+	private PendingIntent iconAction(int actionId) {
+		Intent iconIntent = new Intent(this, StudySessionService.class);
+		switch (actionId) {
+			case ACTION_ID_PLAY:
+				iconIntent.setAction(ACTION_PLAY);
+				break;
+			case ACTION_ID_PAUSE:
+				iconIntent.setAction(ACTION_PAUSE);
+				break;
+			case ACTION_ID_NEXT:
+				iconIntent.setAction(ACTION_NEXT);
+				break;
+			case ACTION_ID_PREVIOUS:
+				iconIntent.setAction(ACTION_PREVIOUS);
+				break;
+			default:
+				return null;
+		}
+		return PendingIntent.getService(this, actionId, iconIntent, 0);
 	}
+
+	private void handleIncomingActions(Intent playbackAction) {
+		if (playbackAction == null || playbackAction.getAction() == null) return;
+
+		String actionString = playbackAction.getAction();
+		if (actionString.equalsIgnoreCase(ACTION_PLAY)) {
+			transportControls.play();
+		} else if (actionString.equalsIgnoreCase(ACTION_PAUSE)) {
+			transportControls.pause();
+		} else if (actionString.equalsIgnoreCase(ACTION_NEXT)) {
+			transportControls.skipToNext();
+		} else if (actionString.equalsIgnoreCase(ACTION_PREVIOUS)) {
+			transportControls.skipToPrevious();
+		}
+	}
+
+
+	// --- call state listener
 
 	private void callStateListener() {
 		telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
@@ -172,7 +354,6 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		};
 		telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 	}
-
 
 	@Nullable
 	@Override
@@ -242,12 +423,22 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	// --- Broadcast Receivers ---
 
+	private void registerBecomingNoisyReceiver() {
+		IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+		registerReceiver(becomingNoisyReceiver, intentFilter);
+	}
+
+	private void registerStartSessionReceiver() {
+		IntentFilter intentFilter = new IntentFilter(BROADCAST_START_SESSION);
+		registerReceiver(startSessionReceiver, intentFilter);
+	}
+
 	private class BecomingNoisyReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
 				pause();
-//				buildNotification(PlaybackStatus.PAUSED);
+				buildNotification(PlaybackStatus.PAUSED);
 			}
 		}
 	}
@@ -267,6 +458,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 				stopSelf();
 
 			playSentence();
+			buildNotification(PlaybackStatus.PLAYING);
 		}
 	}
 }

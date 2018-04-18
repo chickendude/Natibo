@@ -22,7 +22,6 @@ import ch.ralena.glossikaschedule.fragment.CourseListFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageImportFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageListFragment;
 import ch.ralena.glossikaschedule.object.Day;
-import ch.ralena.glossikaschedule.object.Sentence;
 import ch.ralena.glossikaschedule.service.StudySessionService;
 import ch.ralena.glossikaschedule.utils.Utils;
 import io.realm.Realm;
@@ -268,16 +267,16 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	// --- study session service methods ---
-	public void playSentence(Sentence sentence) {
-		if (!isServiceBound) {
-			Intent intent = new Intent(this, StudySessionService.class);
-			intent.putExtra(StudySessionService.KEY_SENTENCE_PATH, sentence.getUri());
-			startService(intent);
-			bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-		} else {
-
-		}
-	}
+//	public void playSentence(Sentence sentence) {
+//		if (!isServiceBound) {
+//			Intent intent = new Intent(this, StudySessionService.class);
+//			intent.putExtra(StudySessionService.KEY_SENTENCE_PATH, sentence.getUri());
+//			startService(intent);
+//			bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+//		} else {
+//
+//		}
+//	}
 
 	public void startSession(Day day) {
 		Utils.Storage storage = new Utils.Storage(this);
