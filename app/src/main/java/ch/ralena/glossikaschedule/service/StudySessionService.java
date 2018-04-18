@@ -265,7 +265,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 			// the NotificationChannel class is new and not in the support library
 			CharSequence name = "GlossikaNativeChannel";
 			String description = "Glossika stuff";
-			int importance = NotificationManager.IMPORTANCE_DEFAULT;
+			int importance = NotificationManager.IMPORTANCE_LOW;
 			NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
 			channel.setDescription(description);
 			// Register the channel with the system
@@ -277,6 +277,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
 				.setShowWhen(false)
 				.setOngoing(true)
+				.setOnlyAlertOnce(true)
 				.setSmallIcon(R.drawable.clock)
 				.setStyle(
 						new android.support.v4.media.app.NotificationCompat.MediaStyle()
