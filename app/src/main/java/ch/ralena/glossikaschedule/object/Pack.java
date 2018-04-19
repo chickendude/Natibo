@@ -41,23 +41,21 @@ public class Pack extends RealmObject {
 		return null;
 	}
 
-	public void createSentenceOrUpdate(Realm realm, int index, String sentence, String ipa, String romanization, String uri) {
-		realm.executeTransaction(r -> {
-			Sentence newSentence = getSentenceWithIndex(index);
-			if (newSentence == null) {
-				newSentence = r.createObject(Sentence.class, UUID.randomUUID().toString());
-				sentences.add(newSentence);
-			}
-			newSentence.setIndex(index);
-			if (sentence != null)
-				newSentence.setText(sentence);
-			if (ipa != null)
-				newSentence.setIpa(ipa);
-			if (romanization != null)
-				newSentence.setRomanization(romanization);
-			if (uri != null)
-				newSentence.setUri(uri);
-		});
+	public void createSentenceOrUpdate(Realm r, int index, String sentence, String ipa, String romanization, String uri) {
+		Sentence newSentence = getSentenceWithIndex(index);
+		if (newSentence == null) {
+			newSentence = r.createObject(Sentence.class, UUID.randomUUID().toString());
+			sentences.add(newSentence);
+		}
+		newSentence.setIndex(index);
+		if (sentence != null)
+			newSentence.setText(sentence);
+		if (ipa != null)
+			newSentence.setIpa(ipa);
+		if (romanization != null)
+			newSentence.setRomanization(romanization);
+		if (uri != null)
+			newSentence.setUri(uri);
 	}
 }
 

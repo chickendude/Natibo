@@ -9,7 +9,11 @@
 	<string name="settings">Settings</string>
 	<string name="languages">Languages</string>
 	<string name="courses">Courses</string>
-	<string name="extracting_sentence">Extracting sentence</string>
+	<string name="opening_file">Opening file…</string>
+	<string name="counting_sentences">Counting sentences</string>
+	<string name="reading_sentences">Reading sentences from text file</string>
+	<string name="extracting_sentence_text">Extracting sentence texts</string>
+	<string name="extracting_sentence_audio">Extracting sentence audio</string>
 	<string name="packs">Packs:</string>
 	<string name="sentences">Sentences:</string>
 	<string name="language_flag">Language Flag</string>

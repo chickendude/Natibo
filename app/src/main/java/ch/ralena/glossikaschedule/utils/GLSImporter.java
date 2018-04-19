@@ -6,12 +6,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,13 +23,14 @@ import java.util.zip.ZipInputStream;
 
 import ch.ralena.glossikaschedule.data.LanguageData;
 import ch.ralena.glossikaschedule.data.LanguageType;
+import ch.ralena.glossikaschedule.fragment.LanguageImportFragment;
 import ch.ralena.glossikaschedule.object.Language;
 import ch.ralena.glossikaschedule.object.Pack;
 import io.reactivex.subjects.PublishSubject;
 import io.realm.Realm;
 
 /**
- * Methods for importing a .gsl file into the database.
+ * Methods for importing a .gls file into the database.
  */
 public class GLSImporter {
 	public static final String TAG = GLSImporter.class.getSimpleName();
@@ -37,12 +38,16 @@ public class GLSImporter {
 	private static int BUFFER_SIZE = 1024;
 	private static List<String> ACCEPTED_LANGUAGES = Arrays.asList("EN", "ES", "ZS");
 
-	PublishSubject<Integer> progressSubject;
-	PublishSubject<Integer> totalSentencesSubject;
+	private PublishSubject<Integer> progressSubject;
+	private PublishSubject<Integer> totalSubject;
+	private PublishSubject<Integer> actionSubject;
+	private PublishSubject<String> fileNameSubject;
 
 	public GLSImporter() {
 		progressSubject = PublishSubject.create();
-		totalSentencesSubject = PublishSubject.create();
+		totalSubject = PublishSubject.create();
+		actionSubject = PublishSubject.create();
+		fileNameSubject = PublishSubject.create();
 	}
 
 	public PublishSubject<Integer> progressObservable() {
@@ -50,14 +55,22 @@ public class GLSImporter {
 	}
 
 	public PublishSubject<Integer> totalObservable() {
-		return totalSentencesSubject;
+		return totalSubject;
+	}
+
+	public PublishSubject<Integer> actionSubject() {
+		return actionSubject;
+	}
+
+	public PublishSubject<String> fileNameSubject() {
+		return fileNameSubject;
 	}
 
 	public void importPack(Context ctx, Uri uri) {
 		// TODO: 18/03/18 1. Do some file verification to make sure all files are indeed there
-		// TODO: 18/03/18 2. Add into database
-		// TODO: 18/03/18 3. Verify file names/strip the 'EN - ' bit out
-		// TODO: 18/03/18 4. Create fragment where you can view all of your audio files
+		// TODO: 18/03/18 2. Verify file names/strip the 'EN - ' bit out
+
+		actionSubject.onNext(LanguageImportFragment.ACTION_OPENING_FILE);
 
 		Thread thread = new Thread(() -> {
 			Realm realm = Realm.getDefaultInstance();
@@ -71,7 +84,13 @@ public class GLSImporter {
 				cursor.moveToFirst();
 				packFileName = cursor.getString(nameIndex);
 				cursor.close();
+			} else {
+				Toast.makeText(ctx, "Error opening file...", Toast.LENGTH_SHORT).show();
+				return;
 			}
+
+			// pass the filename back to the fragment
+			fileNameSubject.onNext(packFileName);
 
 			if (packFileName.toLowerCase().endsWith(".gls")) {
 
@@ -137,11 +156,13 @@ public class GLSImporter {
 
 					is.close();
 					zis.close();
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+			} else {
+				Toast.makeText(ctx, "Sorry, this filetype is not supported!", Toast.LENGTH_SHORT).show();
+				actionSubject.onNext(LanguageImportFragment.ACTION_EXIT);
+				return;
 			}
 
 		});
@@ -154,6 +175,9 @@ public class GLSImporter {
 	 * in order.
 	 **/
 	private boolean countFiles(ZipInputStream zis, Realm realm) throws IOException {
+		// update action in fragment
+		actionSubject.onNext(LanguageImportFragment.ACTION_COUNTING_SENTENCES);
+
 		final byte[] buffer = new byte[BUFFER_SIZE];
 		ZipEntry zipEntry;
 		int numFiles = 0;
@@ -170,8 +194,10 @@ public class GLSImporter {
 			if (zipEntry.getName().endsWith("mp3")) {
 				packName = zipEntry.getName().split(" - ")[1];
 				numFiles++;
-				totalSentencesSubject.onNext(numFiles);
+				actionSubject.onNext(LanguageImportFragment.ACTION_COUNTING_SENTENCES);
+				totalSubject.onNext(numFiles);
 			} else if (zipEntry.getName().endsWith(".gsp")) {
+				actionSubject.onNext(LanguageImportFragment.ACTION_READING_SENTENCES);
 				// extract base language and target language from file name
 				String[] nameParts = zipEntry.getName().split("-");
 				baseLanguage = nameParts[0].trim();
@@ -222,10 +248,19 @@ public class GLSImporter {
 		realm.commitTransaction();
 		// --- end transaction
 
+
+		// update action in fragment
+		actionSubject.onNext(LanguageImportFragment.ACTION_EXTRACTING_TEXT);
+
+		progressSubject.onNext(0);
+		totalSubject.onNext(numFiles / 2);
+
 		String[] sentenceList = baos.toString("UTF-8").split("\n");
 		String[] sections = sentenceList[0].split("\t");
 
+		realm.beginTransaction();
 		for (int i = 1; i < sentenceList.length; i++) {
+			progressSubject.onNext(i);
 			String[] sentenceParts = sentenceList[i].split("\t");
 			int index = Integer.parseInt(sentenceParts[0]);
 
@@ -257,6 +292,11 @@ public class GLSImporter {
 			targetPack.createSentenceOrUpdate(realm, index, translation, ipa, romanization, null);
 			basePack.createSentenceOrUpdate(realm, index, sentence, null, null, null);
 		}
+		realm.commitTransaction();
+
+		actionSubject.onNext(LanguageImportFragment.ACTION_EXTRACTING_AUDIO);
+		progressSubject.onNext(0);
+		totalSubject.onNext(numFiles);
 
 		return true;
 	}
