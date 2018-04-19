@@ -258,7 +258,6 @@ public class GLSImporter {
 		String[] sentenceList = baos.toString("UTF-8").split("\n");
 		String[] sections = sentenceList[0].split("\t");
 
-		realm.beginTransaction();
 		for (int i = 1; i < sentenceList.length; i++) {
 			progressSubject.onNext(i);
 			String[] sentenceParts = sentenceList[i].split("\t");
@@ -292,7 +291,6 @@ public class GLSImporter {
 			targetPack.createSentenceOrUpdate(realm, index, translation, ipa, romanization, null);
 			basePack.createSentenceOrUpdate(realm, index, sentence, null, null, null);
 		}
-		realm.commitTransaction();
 
 		actionSubject.onNext(LanguageImportFragment.ACTION_EXTRACTING_AUDIO);
 		progressSubject.onNext(0);

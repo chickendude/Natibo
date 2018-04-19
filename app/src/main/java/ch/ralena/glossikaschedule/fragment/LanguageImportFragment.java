@@ -85,8 +85,11 @@ public class LanguageImportFragment extends Fragment {
 		// load filename
 		importer.fileNameSubject().subscribe(
 				filename -> {
-					fileNameText.setVisibility(View.VISIBLE);
-					fileNameText.setText(filename);
+					if (getActivity() != null)
+						getActivity().runOnUiThread(() -> {
+							fileNameText.setVisibility(View.VISIBLE);
+							fileNameText.setText(filename);
+						});
 				});
 
 		// the currently happening action
@@ -122,11 +125,12 @@ public class LanguageImportFragment extends Fragment {
 	}
 
 	private void extractAudio() {
-		actionText.getResources().getString(R.string.extracting_sentence_audio);
+		actionText.setText(getResources().getString(R.string.extracting_sentence_audio));
 	}
 
 	private void readSentences() {
-		actionText.getResources().getString(R.string.reading_sentences);
+		actionText.setText(getResources().getString(R.string.reading_sentences));
+
 		counterText.setVisibility(View.GONE);
 		dividerBarLabel.setVisibility(View.GONE);
 		totalText.setVisibility(View.GONE);
