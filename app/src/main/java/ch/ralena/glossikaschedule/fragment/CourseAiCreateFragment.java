@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -47,6 +48,7 @@ public class CourseAiCreateFragment extends Fragment {
 	RadioButton fourDayRadio;
 	RadioButton fiveDayRadio;
 	RadioButton customDayRadio;
+	CheckBox chorusCheckBox;
 
 	MainActivity activity;
 
@@ -157,6 +159,7 @@ public class CourseAiCreateFragment extends Fragment {
 		fourDayRadio = view.findViewById(R.id.fourDayRadio);
 		fiveDayRadio = view.findViewById(R.id.fiveDayRadio);
 		customDayRadio = view.findViewById(R.id.customDayRadio);
+		chorusCheckBox = view.findViewById(R.id.chorusCheckBox);
 
 		// display base and target language
 		baseLanguageLabel.setText(baseLanguage.getLongName());
@@ -211,10 +214,14 @@ public class CourseAiCreateFragment extends Fragment {
 		String[] dailyReviews = checkedButton.getText().toString().split(" / ");
 		int numSentencesPerDay = Integer.parseInt(sentencesPerDayEdit.getText().toString());
 
+		// "base-target-target" if chorus enabled, otherwise "base-target"
+		String order = chorusCheckBox.isChecked() ? "BTT" : "BT";
+
 		// --- begin transaction
 		realm.beginTransaction();
 		// create sentence schedule
 		Schedule schedule = realm.createObject(Schedule.class, UUID.randomUUID().toString());
+		schedule.setOrder(order);
 		schedule.setNumSentences(numSentencesPerDay);
 		for (String review : dailyReviews) {
 			schedule.getReviewPattern().add(Integer.parseInt(review));

@@ -156,6 +156,7 @@ public class Course extends RealmObject {
 					sentenceSet.setTargetSentences(getSentences(sentenceIndex, numSentences, targetPacks));
 					sentenceSet.setReviews(reviewPattern);
 					sentenceSet.setFirstDay(true);
+					sentenceSet.setOrder(schedule.getOrder());
 
 					// add sentence set to list of sentencesets for the next day's studies
 					day.getSentenceSets().add(sentenceSet);

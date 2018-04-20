@@ -209,6 +209,60 @@
 					</LinearLayout>
 				</LinearLayout>
 			</android.support.v7.widget.CardView>
+
+			<android.support.v7.widget.CardView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_margin="4dp">
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical">
+
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:gravity="center"
+						android:orientation="horizontal">
+
+						<ImageView
+							android:layout_width="60dp"
+							android:layout_height="match_parent"
+							android:src="@drawable/ic_chorus"
+							android:tint="@color/colorPrimaryDark"/>
+
+						<LinearLayout
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_margin="8dp"
+							android:orientation="vertical">
+
+							<TextView
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:text="Chorus"
+								android:textAlignment="center"
+								android:textSize="20sp"
+								android:textStyle="bold"/>
+
+							<CheckBox
+								android:id="@+id/chorusCheckBox"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:text="Enable Chorus?"
+								android:textSize="14sp"/>
+
+							<TextView
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:text="If enabled, you will hear the target language twice instead of once. This can be changed later, however sentences that have already been studied one way will remain like that for all reviews."
+								android:textSize="12sp"/>
+						</LinearLayout>
+					</LinearLayout>
+				</LinearLayout>
+			</android.support.v7.widget.CardView>
+
 		</LinearLayout>
 	</ScrollView>
 </LinearLayout>

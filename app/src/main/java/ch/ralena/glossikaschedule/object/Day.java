@@ -19,6 +19,7 @@ public class Day extends RealmObject {
 	// internal fields
 	private int curSentenceSetId;
 	private int curSentenceId;
+	private int patternIndex;
 
 	public String getId() {
 		return id;
@@ -44,6 +45,7 @@ public class Day extends RealmObject {
 		realm.executeTransaction(r -> {
 			curSentenceId = 0;
 			curSentenceSetId = 0;
+			patternIndex = 0;
 		});
 	}
 
@@ -55,7 +57,20 @@ public class Day extends RealmObject {
 		return sentencePair;
 	}
 
-	public void goToNextSentence(Realm realm) {
+	public Sentence getCurrentSentence() {
+		if (curSentenceSetId >= sentenceSets.size())
+			return null;
+		SentenceSet sentenceSet = sentenceSets.get(curSentenceSetId);
+		SentencePair sentencePair = sentenceSet.getSentences().get(curSentenceId);
+		Sentence sentence;
+		if (sentenceSet.getOrder().charAt(patternIndex) == 'B')
+			sentence = sentencePair.getBaseSentence();
+		else
+			sentence = sentencePair.getTargetSentence();
+		return sentence;
+	}
+
+	public void goToNextSentencePair(Realm realm) {
 		realm.executeTransaction(r -> {
 			curSentenceId++;
 			curSentenceId %= sentenceSets.get(curSentenceSetId).getSentences().size() - 1;
@@ -65,7 +80,7 @@ public class Day extends RealmObject {
 		});
 	}
 
-	public void goToPreviousSentence(Realm realm) {
+	public void goToPreviousSentencePair(Realm realm) {
 		realm.executeTransaction(r -> {
 			curSentenceId--;
 			if (curSentenceId < 0) {

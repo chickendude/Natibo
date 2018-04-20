@@ -40,4 +40,12 @@ public class Schedule extends RealmObject {
 	public void setReviewPattern(RealmList<Integer> reviewPattern) {
 		this.reviewPattern = reviewPattern;
 	}
+
+	public String getOrder() {
+		return order;
+	}
+
+	public void setOrder(String order) {
+		this.order = order;
+	}
 }

@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.object.Day;
+import ch.ralena.glossikaschedule.object.Sentence;
 import ch.ralena.glossikaschedule.object.SentencePair;
 import ch.ralena.glossikaschedule.utils.Utils;
 import io.realm.Realm;
@@ -63,6 +64,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	private TelephonyManager telephonyManager;
 	private Realm realm;
 	private SentencePair sentencePair;
+	private Sentence sentence;
 
 	// given to clients that connect to the service
 	StudyBinder binder = new StudyBinder();
@@ -91,9 +93,11 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		if (!requestAudioFocus())
 			stopSelf();
 
-		mediaPlayer = new MediaPlayer();
-		mediaPlayer.setOnCompletionListener(this);
-		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+		if (mediaPlayer == null) {
+			mediaPlayer = new MediaPlayer();
+			mediaPlayer.setOnCompletionListener(this);
+			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+		}
 
 		loadSentence();
 
@@ -143,11 +147,12 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	private void loadSentence() {
 		sentencePair = day.getCurrentSentencePair();
+		sentence = day.getCurrentSentence();
 		mediaPlayer.stop();
 		mediaPlayer.reset();
 		try {
 			// load sentence path into mediaplayer to be played
-			mediaPlayer.setDataSource(sentencePair.getTargetSentence().getUri());
+			mediaPlayer.setDataSource(sentence.getUri());
 			mediaPlayer.prepare();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -237,12 +242,12 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	}
 
 	private void nextSentence() {
-		day.goToNextSentence(realm);
+		day.goToNextSentencePair(realm);
 		loadSentence();
 	}
 
 	private void previousSentence() {
-		day.goToPreviousSentence(realm);
+		day.goToPreviousSentencePair(realm);
 		loadSentence();
 	}
 
