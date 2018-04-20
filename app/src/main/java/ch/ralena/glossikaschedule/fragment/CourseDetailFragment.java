@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.adapter.CourseDetailAdapter;
@@ -66,6 +67,10 @@ public class CourseDetailFragment extends Fragment {
 		startSessionButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if (course.getTargetPacks().size() == 0) {
+					Toast.makeText(getContext(), "Please add a book to your course first by clicking on it!", Toast.LENGTH_SHORT).show();
+					return;
+				}
 				StudySessionFragment fragment = new StudySessionFragment();
 				Bundle bundle = new Bundle();
 				bundle.putString(StudySessionFragment.TAG_COURSE_ID, course.getId());
