@@ -70,10 +70,21 @@ public class Day extends RealmObject {
 		return sentence;
 	}
 
+	public void nextSentence(Realm realm) {
+		realm.executeTransaction(r -> {
+			patternIndex++;
+			patternIndex %= sentenceSets.get(curSentenceSetId).getOrder().length();
+		});
+		if (patternIndex == 0) {
+			goToNextSentencePair(realm);
+		}
+	}
+
 	public void goToNextSentencePair(Realm realm) {
 		realm.executeTransaction(r -> {
+			patternIndex = 0;
 			curSentenceId++;
-			curSentenceId %= sentenceSets.get(curSentenceSetId).getSentences().size() - 1;
+			curSentenceId %= sentenceSets.get(curSentenceSetId).getSentences().size();
 			if (curSentenceId == 0) {
 				curSentenceSetId++;
 			}
@@ -82,10 +93,11 @@ public class Day extends RealmObject {
 
 	public void goToPreviousSentencePair(Realm realm) {
 		realm.executeTransaction(r -> {
+			patternIndex = 0;
 			curSentenceId--;
 			if (curSentenceId < 0) {
 				if (curSentenceSetId > 0) {
-					curSentenceId = sentenceSets.get(--curSentenceSetId).getSentences().size() - 1;
+					curSentenceId = sentenceSets.get(--curSentenceSetId).getSentences().size();
 				} else {
 					curSentenceId = 0;
 				}

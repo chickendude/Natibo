@@ -136,7 +136,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		if (phoneStateListener != null) {
 			telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
 		}
-//		removeNotification();
+		removeNotification();
 
 		// unregister broadcast receivers
 		unregisterReceiver(becomingNoisyReceiver);
@@ -307,6 +307,11 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	}
 
+	private void removeNotification() {
+		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.cancel(NOTIFICATION_ID);
+	}
+
 	private PendingIntent iconAction(int actionId) {
 		Intent iconIntent = new Intent(this, StudySessionService.class);
 		switch (actionId) {
@@ -379,7 +384,10 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	public void onCompletion(MediaPlayer mp) {
 		// when file has completed playing
 		stop();
-		stopSelf();
+		day.nextSentence(realm);
+		loadSentence();
+		play();
+//		stopSelf();
 	}
 
 	@Override
