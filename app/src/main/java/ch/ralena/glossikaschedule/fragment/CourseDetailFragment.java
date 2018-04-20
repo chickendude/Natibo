@@ -67,10 +67,13 @@ public class CourseDetailFragment extends Fragment {
 		startSessionButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				// make sure we have books added before starting, otherwise it'll crash!
 				if (course.getTargetPacks().size() == 0) {
 					Toast.makeText(getContext(), "Please add a book to your course first by clicking on it!", Toast.LENGTH_SHORT).show();
 					return;
 				}
+
+				// now we can load the fragment
 				StudySessionFragment fragment = new StudySessionFragment();
 				Bundle bundle = new Bundle();
 				bundle.putString(StudySessionFragment.TAG_COURSE_ID, course.getId());
@@ -90,18 +93,8 @@ public class CourseDetailFragment extends Fragment {
 		Pack basePack = course.getBaseLanguage().getMatchingPack(pack);
 		if (course.getTargetPacks().contains(pack)) {
 			realm.executeTransaction(r -> {
-				course.getBasePacks().remove(pack);
-				course.getBasePacks().remove(pack);
-				course.getBasePacks().remove(pack);
-				course.getBasePacks().remove(basePack);
-				course.getBasePacks().remove(basePack);
 				course.getBasePacks().remove(basePack);
 				course.getTargetPacks().remove(pack);
-				course.getTargetPacks().remove(pack);
-				course.getTargetPacks().remove(pack);
-				course.getTargetPacks().remove(basePack);
-				course.getTargetPacks().remove(basePack);
-				course.getTargetPacks().remove(basePack);
 			});
 		} else {
 			realm.executeTransaction(r -> {

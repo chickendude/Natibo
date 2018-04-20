@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.CheckedTextView;
 
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.object.Pack;
@@ -48,7 +48,7 @@ public class CourseDetailAdapter extends RecyclerView.Adapter<CourseDetailAdapte
 	}
 
 	class ViewHolder extends RecyclerView.ViewHolder {
-		private TextView book;
+		private CheckedTextView book;
 		private Pack pack;
 
 		ViewHolder(View view) {
@@ -60,8 +60,7 @@ public class CourseDetailAdapter extends RecyclerView.Adapter<CourseDetailAdapte
 		void bindView(Pack pack) {
 			this.pack = pack;
 			book.setText(pack.getBook());
-			if (targetPacks.contains(pack))
-				book.setText(pack.getBook() + "-");
+			book.setChecked(targetPacks.contains(pack));
 		}
 	}
 }

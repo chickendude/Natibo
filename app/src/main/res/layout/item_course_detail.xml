@@ -12,7 +12,7 @@
 	android:layout_margin="8dp"
 	tools:background="@color/colorPrimary">
 
-	<TextView
+	<CheckedTextView
 		android:id="@+id/bookLabel"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
