@@ -80,15 +80,23 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		realm = Realm.getDefaultInstance();
 
 		String id = new Utils.Storage(getApplicationContext()).getDayId();
-		day = realm.where(Day.class).equalTo("id", id).findFirst();
-		if (day == null)
-			stopSelf();
-		day.resetReviews(realm);
+		if (day == null) {
+			day = realm.where(Day.class).equalTo("id", id).findFirst();
+			if (day == null)
+				stopSelf();
+			day.resetReviews(realm);
+		}
+
 
 		if (!requestAudioFocus())
 			stopSelf();
 
-		playSentence();
+		mediaPlayer = new MediaPlayer();
+		mediaPlayer.setOnCompletionListener(this);
+		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+		loadSentence();
+
 
 		if (mediaSessionManager == null) {
 			initMediaSession();
@@ -133,12 +141,10 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	// --- setup ---
 
-	private void playSentence() {
-		sentencePair = day.getNextSentencePair(realm);
-		mediaPlayer = new MediaPlayer();
-		mediaPlayer.setOnCompletionListener(this);
+	private void loadSentence() {
+		sentencePair = day.getCurrentSentencePair();
+		mediaPlayer.stop();
 		mediaPlayer.reset();
-		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 		try {
 			// load sentence path into mediaplayer to be played
 			mediaPlayer.setDataSource(sentencePair.getTargetSentence().getUri());
@@ -231,11 +237,13 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	}
 
 	private void nextSentence() {
-
+		day.goToNextSentence(realm);
+		loadSentence();
 	}
 
 	private void previousSentence() {
-
+		day.goToPreviousSentence(realm);
+		loadSentence();
 	}
 
 	private void setVolume(float volume) {
@@ -407,10 +415,10 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	private void restartPlaying() {
 		if (mediaPlayer == null) {
-			playSentence();
-		} else {
-			play();
+			loadSentence();
 		}
+		play();
+
 		// restore full volume levels
 		setVolume(1.0f);
 	}
@@ -458,7 +466,8 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 			if (!requestAudioFocus())
 				stopSelf();
 
-			playSentence();
+			loadSentence();
+			play();
 			buildNotification(PlaybackStatus.PLAYING);
 		}
 	}

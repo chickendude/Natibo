@@ -47,18 +47,34 @@ public class Day extends RealmObject {
 		});
 	}
 
-	public SentencePair getNextSentencePair(Realm realm) {
+	public SentencePair getCurrentSentencePair() {
 		if (curSentenceSetId >= sentenceSets.size())
 			return null;
 		SentenceSet sentenceSet = sentenceSets.get(curSentenceSetId);
 		SentencePair sentencePair = sentenceSet.getSentences().get(curSentenceId);
+		return sentencePair;
+	}
+
+	public void goToNextSentence(Realm realm) {
 		realm.executeTransaction(r -> {
 			curSentenceId++;
-			curSentenceId %= sentenceSet.getSentences().size() - 1;
+			curSentenceId %= sentenceSets.get(curSentenceSetId).getSentences().size() - 1;
 			if (curSentenceId == 0) {
 				curSentenceSetId++;
 			}
 		});
-		return sentencePair;
+	}
+
+	public void goToPreviousSentence(Realm realm) {
+		realm.executeTransaction(r -> {
+			curSentenceId--;
+			if (curSentenceId < 0) {
+				if (curSentenceSetId > 0) {
+					curSentenceId = sentenceSets.get(--curSentenceSetId).getSentences().size() - 1;
+				} else {
+					curSentenceId = 0;
+				}
+			}
+		});
 	}
 }
