@@ -104,4 +104,14 @@ public class Day extends RealmObject {
 			}
 		});
 	}
+
+	public int getNumReviewsLeft() {
+		int numReviews  = 0;
+		for (int i = curSentenceSetId; i < sentenceSets.size(); i++) {
+			numReviews += sentenceSets.get(i).getSentences().size();
+			if (i == curSentenceSetId)
+				numReviews -= curSentenceId;
+		}
+		return numReviews;
+	}
 }

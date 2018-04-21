@@ -30,9 +30,12 @@ public class StudySessionFragment extends Fragment {
 
 	private StudySessionService studySessionService;
 
+	// views
+	private TextView remainingRepsText;
+
 	// base language views
-	TextView baseLanguageCodeText;
-	TextView baseSentenceText;
+	private TextView baseLanguageCodeText;
+	private TextView baseSentenceText;
 	private TextView baseAlternateSentenceText;
 	private LinearLayout baseAlternateSentenceLayout;
 	private TextView baseRomanizationText;
@@ -41,8 +44,8 @@ public class StudySessionFragment extends Fragment {
 	private LinearLayout baseIpaLayout;
 
 	// target language views
-	TextView targetLanguageCodeText;
-	TextView targetSentenceText;
+	private TextView targetLanguageCodeText;
+	private TextView targetSentenceText;
 	private TextView targetAlternateSentenceText;
 	private LinearLayout targetAlternateSentenceLayout;
 	private TextView targetRomanizationText;
@@ -61,6 +64,9 @@ public class StudySessionFragment extends Fragment {
 		String id = getArguments().getString(TAG_COURSE_ID);
 		realm = Realm.getDefaultInstance();
 		course = realm.where(Course.class).equalTo("id", id).findFirst();
+
+		// load views
+		remainingRepsText = view.findViewById(R.id.remainingRepsText);
 
 		// load base language views
 		baseLanguageCodeText = view.findViewById(R.id.baseLanguageCodeText);
@@ -90,6 +96,7 @@ public class StudySessionFragment extends Fragment {
 		courseTitleLabel.setText(course.getTitle());
 
 		activity.getSessionPublish().subscribe(service -> {
+			nextSentence(course.getCurrentDay().getCurrentSentencePair());
 			studySessionService = service;
 			studySessionService.sentenceObservable().subscribe(this::nextSentence);
 		});
@@ -100,6 +107,7 @@ public class StudySessionFragment extends Fragment {
 	private void nextSentence(SentencePair sentencePair) {
 		Sentence baseSentence = sentencePair.getBaseSentence();
 		Sentence targetSentence = sentencePair.getTargetSentence();
+		remainingRepsText.setText("" + course.getCurrentDay().getNumReviewsLeft());
 		// update base sentence views
 		baseSentenceText.setText(baseSentence.getText());
 		updateSentencePart(baseAlternateSentenceLayout, baseAlternateSentenceText, baseSentence.getAlternate());
@@ -120,7 +128,7 @@ public class StudySessionFragment extends Fragment {
 			layout.setVisibility(View.GONE);
 		}
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
