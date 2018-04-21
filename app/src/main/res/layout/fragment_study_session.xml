@@ -11,260 +11,299 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:textAlignment="center"
-		android:textSize="20sp"
+		android:textColor="@color/colorPrimary"
+		android:textSize="24sp"
+		android:textStyle="bold"
 		tools:text="Armenian"/>
 
-
-	<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="Sentence Set:"/>
-
-	<RelativeLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-		xmlns:tools="http://schemas.android.com/tools"
+	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_margin="4dp">
+		android:layout_margin="8dp"
+		android:gravity="center"
+		android:orientation="horizontal">
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:orientation="vertical">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/remaining_reps"/>
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="@color/colorTextDark"
+				tools:text="225"/>
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Estimated Time"/>
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="@color/colorTextDark"
+				tools:text="24:30"/>
+		</LinearLayout>
+
+		<ImageView
+			android:layout_width="0dp"
+			android:layout_height="60dp"
+			android:layout_weight="1"
+			android:src="@drawable/ic_play"/>
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:gravity="end"
+			android:orientation="vertical">
+
+			<ImageView
+				android:layout_width="30dp"
+				android:layout_height="30dp"
+				android:scaleType="fitCenter"
+				android:src="@drawable/ic_settings"/>
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/total_reps"/>
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="@color/colorTextDark"
+				tools:text="22055"/>
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_margin="8dp"
+		android:background="@drawable/sentence_list_border"
+		android:orientation="vertical">
 
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginEnd="8dp"
-			android:layout_marginStart="30dp"
-			android:background="@drawable/sentence_list_border"
-			android:orientation="vertical">
+			android:gravity="center"
+			android:orientation="vertical"
+			android:padding="8dp">
 
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:gravity="center"
-				android:orientation="vertical"
-				android:padding="8dp">
+				android:orientation="horizontal">
 
-				<LinearLayout
-					android:layout_width="match_parent"
+				<TextView
+					android:id="@+id/baseLanguageCodeText"
+					android:layout_width="40dp"
 					android:layout_height="wrap_content"
-					android:orientation="horizontal">
+					android:textAlignment="textEnd"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"
+					tools:text="EN"/>
 
-					<TextView
-						android:id="@+id/baseLanguageCodeText"
-						android:layout_width="40dp"
-						android:layout_height="wrap_content"
-						android:textAlignment="textEnd"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"
-						tools:text="EN"/>
-
-					<TextView
-						android:id="@+id/baseSentenceText"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:padding="4dp"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"
-						tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
-				</LinearLayout>
-
-				<LinearLayout
-					android:id="@+id/baseAlternateSentenceLayout"
-					android:layout_width="match_parent"
+				<TextView
+					android:id="@+id/baseSentenceText"
+					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:orientation="horizontal">
-
-					<TextView
-						android:layout_width="40dp"
-						android:layout_height="wrap_content"
-						android:text="@string/alt"
-						android:textAlignment="textEnd"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"/>
-
-					<TextView
-						android:id="@+id/baseAlternateSentenceText"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:padding="4dp"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"
-						tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
-				</LinearLayout>
-
-				<LinearLayout
-					android:id="@+id/baseRomanizationLayout"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal">
-
-					<TextView
-						android:layout_width="40dp"
-						android:layout_height="wrap_content"
-						android:text="@string/rom"
-						android:textAlignment="textEnd"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"/>
-
-					<TextView
-						android:id="@+id/baseRomanizationText"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:padding="4dp"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"
-						tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
-				</LinearLayout>
-
-				<LinearLayout
-					android:id="@+id/baseIpaLayout"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal">
-
-					<TextView
-						android:layout_width="40dp"
-						android:layout_height="wrap_content"
-						android:text="@string/ipa"
-						android:textAlignment="textEnd"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"/>
-
-					<TextView
-						android:id="@+id/baseIpaText"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:padding="4dp"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"
-						tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
-				</LinearLayout>
+					android:padding="4dp"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"
+					tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
 			</LinearLayout>
 
-			<View
-				android:layout_width="match_parent"
-				android:layout_height="1dp"
-				android:layout_margin="4dp"
-				android:background="@color/colorTextLight"/>
-
 			<LinearLayout
+				android:id="@+id/baseAlternateSentenceLayout"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:gravity="center"
-				android:orientation="vertical"
-				android:padding="8dp">
+				android:orientation="horizontal">
 
-				<LinearLayout
-					android:layout_width="match_parent"
+				<TextView
+					android:layout_width="40dp"
 					android:layout_height="wrap_content"
-					android:orientation="horizontal">
+					android:text="@string/alt"
+					android:textAlignment="textEnd"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"/>
 
-					<TextView
-						android:id="@+id/targetLanguageCodeText"
-						android:layout_width="40dp"
-						android:layout_height="wrap_content"
-						android:textAlignment="textEnd"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"
-						tools:text="EN"/>
-
-					<TextView
-						android:id="@+id/targetSentenceText"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:padding="4dp"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"
-						tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
-				</LinearLayout>
-
-				<LinearLayout
-					android:id="@+id/targetAlternateSentenceLayout"
-					android:layout_width="match_parent"
+				<TextView
+					android:id="@+id/baseAlternateSentenceText"
+					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:orientation="horizontal">
+					android:padding="4dp"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"
+					tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
+			</LinearLayout>
 
-					<TextView
-						android:layout_width="40dp"
-						android:layout_height="wrap_content"
-						android:text="@string/alt"
-						android:textAlignment="textEnd"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"/>
+			<LinearLayout
+				android:id="@+id/baseRomanizationLayout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal">
 
-					<TextView
-						android:id="@+id/targetAlternateSentenceText"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:padding="4dp"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"
-						tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
-				</LinearLayout>
-
-				<LinearLayout
-					android:id="@+id/targetRomanizationLayout"
-					android:layout_width="match_parent"
+				<TextView
+					android:layout_width="40dp"
 					android:layout_height="wrap_content"
-					android:orientation="horizontal">
+					android:text="@string/rom"
+					android:textAlignment="textEnd"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"/>
 
-					<TextView
-						android:layout_width="40dp"
-						android:layout_height="wrap_content"
-						android:text="@string/rom"
-						android:textAlignment="textEnd"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"/>
-
-					<TextView
-						android:id="@+id/targetRomanizationText"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:padding="4dp"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"
-						tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
-				</LinearLayout>
-
-				<LinearLayout
-					android:id="@+id/targetIpaLayout"
-					android:layout_width="match_parent"
+				<TextView
+					android:id="@+id/baseRomanizationText"
+					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:orientation="horizontal">
+					android:padding="4dp"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"
+					tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
+			</LinearLayout>
 
-					<TextView
-						android:layout_width="40dp"
-						android:layout_height="wrap_content"
-						android:text="@string/ipa"
-						android:textAlignment="textEnd"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"/>
+			<LinearLayout
+				android:id="@+id/baseIpaLayout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal">
 
-					<TextView
-						android:id="@+id/targetIpaText"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:padding="4dp"
-						android:textColor="@color/colorTextDark"
-						android:textSize="12sp"
-						tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
-				</LinearLayout>
+				<TextView
+					android:layout_width="40dp"
+					android:layout_height="wrap_content"
+					android:text="@string/ipa"
+					android:textAlignment="textEnd"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"/>
+
+				<TextView
+					android:id="@+id/baseIpaText"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:padding="4dp"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"
+					tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
 			</LinearLayout>
 		</LinearLayout>
 
-		<TextView
-			android:id="@+id/indexText"
-			android:layout_width="50dp"
+		<View
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:layout_margin="8dp"
+			android:background="@color/colorTextLight"/>
+
+		<LinearLayout
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:background="@drawable/sentence_number_background"
-			android:padding="2dp"
-			android:textAlignment="center"
-			android:textColor="@color/colorTextWhite"
-			android:textStyle="bold"
-			tools:text="2999"/>
+			android:gravity="center"
+			android:orientation="vertical"
+			android:padding="8dp">
 
-	</RelativeLayout>
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal">
 
-	<android.support.v7.widget.RecyclerView
-		android:id="@+id/recyclerView"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"/>
+				<TextView
+					android:id="@+id/targetLanguageCodeText"
+					android:layout_width="40dp"
+					android:layout_height="wrap_content"
+					android:textAlignment="textEnd"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"
+					tools:text="EN"/>
+
+				<TextView
+					android:id="@+id/targetSentenceText"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:padding="4dp"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"
+					tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/targetAlternateSentenceLayout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal">
+
+				<TextView
+					android:layout_width="40dp"
+					android:layout_height="wrap_content"
+					android:text="@string/alt"
+					android:textAlignment="textEnd"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"/>
+
+				<TextView
+					android:id="@+id/targetAlternateSentenceText"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:padding="4dp"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"
+					tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/targetRomanizationLayout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal">
+
+				<TextView
+					android:layout_width="40dp"
+					android:layout_height="wrap_content"
+					android:text="@string/rom"
+					android:textAlignment="textEnd"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"/>
+
+				<TextView
+					android:id="@+id/targetRomanizationText"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:padding="4dp"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"
+					tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
+			</LinearLayout>
+
+			<LinearLayout
+				android:id="@+id/targetIpaLayout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal">
+
+				<TextView
+					android:layout_width="40dp"
+					android:layout_height="wrap_content"
+					android:text="@string/ipa"
+					android:textAlignment="textEnd"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"/>
+
+				<TextView
+					android:id="@+id/targetIpaText"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:padding="4dp"
+					android:textColor="@color/colorTextDark"
+					android:textSize="12sp"
+					tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
+			</LinearLayout>
+		</LinearLayout>
+	</LinearLayout>
 </LinearLayout>

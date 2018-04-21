@@ -4,21 +4,17 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
-import ch.ralena.glossikaschedule.adapter.StudySessionAdapter;
 import ch.ralena.glossikaschedule.object.Course;
-import ch.ralena.glossikaschedule.object.Day;
 import ch.ralena.glossikaschedule.object.Sentence;
 import ch.ralena.glossikaschedule.object.SentencePair;
-import ch.ralena.glossikaschedule.object.SentenceSet;
 import ch.ralena.glossikaschedule.service.StudySessionService;
 import io.realm.Realm;
 
@@ -34,10 +30,25 @@ public class StudySessionFragment extends Fragment {
 
 	private StudySessionService studySessionService;
 
+	// base language views
 	TextView baseLanguageCodeText;
 	TextView baseSentenceText;
+	private TextView baseAlternateSentenceText;
+	private LinearLayout baseAlternateSentenceLayout;
+	private TextView baseRomanizationText;
+	private LinearLayout baseRomanizationLayout;
+	private TextView baseIpaText;
+	private LinearLayout baseIpaLayout;
+
+	// target language views
 	TextView targetLanguageCodeText;
 	TextView targetSentenceText;
+	private TextView targetAlternateSentenceText;
+	private LinearLayout targetAlternateSentenceLayout;
+	private TextView targetRomanizationText;
+	private LinearLayout targetRomanizationLayout;
+	private TextView targetIpaText;
+	private LinearLayout targetIpaLayout;
 
 	@Nullable
 	@Override
@@ -51,26 +62,32 @@ public class StudySessionFragment extends Fragment {
 		realm = Realm.getDefaultInstance();
 		course = realm.where(Course.class).equalTo("id", id).findFirst();
 
+		// load base language views
 		baseLanguageCodeText = view.findViewById(R.id.baseLanguageCodeText);
 		baseSentenceText = view.findViewById(R.id.baseSentenceText);
+		baseAlternateSentenceText = view.findViewById(R.id.baseAlternateSentenceText);
+		baseAlternateSentenceLayout = view.findViewById(R.id.baseAlternateSentenceLayout);
+		baseRomanizationText = view.findViewById(R.id.baseRomanizationText);
+		baseRomanizationLayout = view.findViewById(R.id.baseRomanizationLayout);
+		baseIpaText = view.findViewById(R.id.baseIpaText);
+		baseIpaLayout = view.findViewById(R.id.baseIpaLayout);
+
+		// load target language views
 		targetLanguageCodeText = view.findViewById(R.id.targetLanguageCodeText);
 		targetSentenceText = view.findViewById(R.id.targetSentenceText);
+		targetAlternateSentenceText = view.findViewById(R.id.targetAlternateSentenceText);
+		targetAlternateSentenceLayout = view.findViewById(R.id.targetAlternateSentenceLayout);
+		targetRomanizationText = view.findViewById(R.id.targetRomanizationText);
+		targetRomanizationLayout = view.findViewById(R.id.targetRomanizationLayout);
+		targetIpaText = view.findViewById(R.id.targetIpaText);
+		targetIpaLayout = view.findViewById(R.id.targetIpaLayout);
+
+		baseLanguageCodeText.setText(course.getBaseLanguage().getLanguageId());
+		targetLanguageCodeText.setText(course.getTargetLanguage().getLanguageId());
 
 		// load language name
 		TextView courseTitleLabel = view.findViewById(R.id.courseTitleText);
 		courseTitleLabel.setText(course.getTitle());
-
-		Day day = course.getNextDay(realm);
-		SentenceSet sentenceSet = day.getSentenceSets().get(0);
-
-		// set up recyclerlist and adapter
-		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-		StudySessionAdapter adapter = new StudySessionAdapter(course.getTargetLanguage().getLanguageId(), sentenceSet.getSentences());
-		recyclerView.setAdapter(adapter);
-		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-		recyclerView.setLayoutManager(layoutManager);
-
-//		adapter.asObservable().subscribe(this::loadSentenceListFragment);
 
 		activity.getSessionPublish().subscribe(service -> {
 			studySessionService = service;
@@ -83,10 +100,27 @@ public class StudySessionFragment extends Fragment {
 	private void nextSentence(SentencePair sentencePair) {
 		Sentence baseSentence = sentencePair.getBaseSentence();
 		Sentence targetSentence = sentencePair.getTargetSentence();
+		// update base sentence views
 		baseSentenceText.setText(baseSentence.getText());
+		updateSentencePart(baseAlternateSentenceLayout, baseAlternateSentenceText, baseSentence.getAlternate());
+		updateSentencePart(baseRomanizationLayout, baseRomanizationText, baseSentence.getRomanization());
+		updateSentencePart(baseIpaLayout, baseIpaText, baseSentence.getIpa());
+		// update target sentence views
 		targetSentenceText.setText(targetSentence.getText());
+		updateSentencePart(targetAlternateSentenceLayout, targetAlternateSentenceText, targetSentence.getAlternate());
+		updateSentencePart(targetRomanizationLayout, targetRomanizationText, targetSentence.getRomanization());
+		updateSentencePart(targetIpaLayout, targetIpaText, targetSentence.getIpa());
 	}
 
+	private void updateSentencePart(ViewGroup layout, TextView textView, String text) {
+		if (text != null) {
+			layout.setVisibility(View.VISIBLE);
+			textView.setText(text);
+		} else {
+			layout.setVisibility(View.GONE);
+		}
+	}
+	
 	@Override
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
