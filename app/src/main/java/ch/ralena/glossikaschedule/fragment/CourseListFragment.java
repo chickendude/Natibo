@@ -23,6 +23,7 @@ import io.realm.RealmResults;
 public class CourseListFragment extends Fragment {
 	private static final String TAG = CourseListFragment.class.getSimpleName();
 	public static final String TAG_COURSE_ID = "tag_course_id";
+	public static final String TAG_START_SESSION = "tag_start_session";
 
 	RealmResults<Course> courses;
 

@@ -21,6 +21,7 @@ import android.view.View;
 import ch.ralena.glossikaschedule.fragment.CourseListFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageImportFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageListFragment;
+import ch.ralena.glossikaschedule.fragment.StudySessionFragment;
 import ch.ralena.glossikaschedule.object.Day;
 import ch.ralena.glossikaschedule.service.StudySessionService;
 import ch.ralena.glossikaschedule.utils.Utils;
@@ -30,9 +31,11 @@ import io.realm.Realm;
 public class MainActivity extends AppCompatActivity {
 	private static final String TAG = MainActivity.class.getSimpleName();
 	private static final String KEY_SERVICE_BOUND = "key_service_bound";
+	public static final String ACTION_START_SESSION = "action_start_session";
 	private static final int ACTION_OPEN_DRAWER = 0;
 	private static final int ACTION_BACK = 1;
 	private static final int REQUEST_PICK_GLS = 1;
+	public static final int REQUEST_LOAD_SESSION = 2;
 
 	// views
 	DrawerLayout drawerLayout;
@@ -227,15 +230,23 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == REQUEST_PICK_GLS && resultCode == Activity.RESULT_OK) {
-			LanguageImportFragment fragment = new LanguageImportFragment();
-			Bundle bundle = new Bundle();
-			bundle.putParcelable(LanguageImportFragment.EXTRA_URI, data.getData());
-			fragment.setArguments(bundle);
+		if (resultCode == Activity.RESULT_OK) {
+			if (requestCode == REQUEST_PICK_GLS) {
+				LanguageImportFragment fragment = new LanguageImportFragment();
+				Bundle bundle = new Bundle();
+				bundle.putParcelable(LanguageImportFragment.EXTRA_URI, data.getData());
+				fragment.setArguments(bundle);
 
-			fragmentManager.beginTransaction()
-					.replace(R.id.fragmentPlaceHolder, fragment)
-					.commit();
+				fragmentManager.beginTransaction()
+						.replace(R.id.fragmentPlaceHolder, fragment)
+						.commit();
+			} else if (requestCode == REQUEST_LOAD_SESSION) {
+				StudySessionFragment fragment = new StudySessionFragment();
+				fragmentManager
+						.beginTransaction()
+						.replace(R.id.fragmentPlaceHolder, fragment)
+						.commit();
+			}
 		}
 	}
 

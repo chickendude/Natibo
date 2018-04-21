@@ -73,10 +73,6 @@ public class StudySessionFragment extends Fragment {
 	@Override
 	public void onPause() {
 		super.onPause();
-		if (studySessionService != null) {
-			studySessionService.removeNotification();
-			studySessionService.stopSelf();
-		}
 	}
 
 	@Override
