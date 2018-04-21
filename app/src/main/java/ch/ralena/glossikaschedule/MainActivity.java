@@ -24,6 +24,7 @@ import ch.ralena.glossikaschedule.fragment.LanguageListFragment;
 import ch.ralena.glossikaschedule.object.Day;
 import ch.ralena.glossikaschedule.service.StudySessionService;
 import ch.ralena.glossikaschedule.utils.Utils;
+import io.reactivex.subjects.PublishSubject;
 import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,12 +47,16 @@ public class MainActivity extends AppCompatActivity {
 
 	private Realm realm;
 
+	private PublishSubject<StudySessionService> sessionPublish = PublishSubject.create();
+
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			StudySessionService.StudyBinder binder = (StudySessionService.StudyBinder) service;
 			studySessionService = ((StudySessionService.StudyBinder) service).getService();
 			isServiceBound = true;
+			// publish the service object
+			sessionPublish.onNext(studySessionService);
 		}
 
 		@Override
@@ -101,7 +106,24 @@ public class MainActivity extends AppCompatActivity {
 		super.onDestroy();
 		if (isServiceBound) {
 			unbindService(serviceConnection);
+			studySessionService.removeNotification();
 			studySessionService.stopSelf();
+		}
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (isServiceBound) {
+			studySessionService.removeNotification();
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (isServiceBound) {
+			studySessionService.buildNotification();
 		}
 	}
 
@@ -267,16 +289,6 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	// --- study session service methods ---
-//	public void playSentence(Sentence sentence) {
-//		if (!isServiceBound) {
-//			Intent intent = new Intent(this, StudySessionService.class);
-//			intent.putExtra(StudySessionService.KEY_SENTENCE_PATH, sentence.getUri());
-//			startService(intent);
-//			bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-//		} else {
-//
-//		}
-//	}
 
 	public void startSession(Day day) {
 		Utils.Storage storage = new Utils.Storage(this);
@@ -290,5 +302,9 @@ public class MainActivity extends AppCompatActivity {
 			Intent intent = new Intent(StudySessionService.BROADCAST_START_SESSION);
 			sendBroadcast(intent);
 		}
+	}
+
+	public PublishSubject<StudySessionService> getSessionPublish() {
+		return sessionPublish;
 	}
 }

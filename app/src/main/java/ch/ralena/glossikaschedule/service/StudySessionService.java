@@ -65,6 +65,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	private Realm realm;
 	private SentencePair sentencePair;
 	private Sentence sentence;
+	private PlaybackStatus playbackStatus;
 
 	// given to clients that connect to the service
 	StudyBinder binder = new StudyBinder();
@@ -80,6 +81,8 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 			stopSelf();
 
 		realm = Realm.getDefaultInstance();
+
+		playbackStatus = PlaybackStatus.PAUSED;
 
 		String id = new Utils.Storage(getApplicationContext()).getDayId();
 		if (day == null) {
@@ -104,7 +107,6 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 		if (mediaSessionManager == null) {
 			initMediaSession();
-			buildNotification(PlaybackStatus.PLAYING);
 		}
 
 		handleIncomingActions(intent);
@@ -180,28 +182,28 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 			public void onPlay() {
 				super.onPlay();
 				resume();
-				buildNotification(PlaybackStatus.PLAYING);
+				buildNotification();
 			}
 
 			@Override
 			public void onPause() {
 				super.onPause();
 				pause();
-				buildNotification(PlaybackStatus.PAUSED);
+				buildNotification();
 			}
 
 			@Override
 			public void onSkipToNext() {
 				super.onSkipToNext();
 				nextSentence();
-				buildNotification(PlaybackStatus.PLAYING);
+				buildNotification();
 			}
 
 			@Override
 			public void onSkipToPrevious() {
 				super.onSkipToPrevious();
 				previousSentence();
-				buildNotification(PlaybackStatus.PLAYING);
+				buildNotification();
 			}
 		});
 	}
@@ -216,18 +218,21 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	}
 
 	private void play() {
+		playbackStatus = PlaybackStatus.PLAYING;
 		if (!mediaPlayer.isPlaying()) {
 			mediaPlayer.start();
 		}
 	}
 
 	private void stop() {
+		playbackStatus = PlaybackStatus.PAUSED;
 		if (mediaPlayer != null && mediaPlayer.isPlaying()) {
 			mediaPlayer.stop();
 		}
 	}
 
 	private void pause() {
+		playbackStatus = PlaybackStatus.PAUSED;
 		if (mediaPlayer != null && mediaPlayer.isPlaying()) {
 			mediaPlayer.pause();
 			stopPosition = mediaPlayer.getCurrentPosition();
@@ -235,6 +240,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	}
 
 	private void resume() {
+		playbackStatus = PlaybackStatus.PLAYING;
 		if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
 			mediaPlayer.seekTo(stopPosition);
 			mediaPlayer.start();
@@ -259,7 +265,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	// --- notification ---
 
-	private void buildNotification(PlaybackStatus playbackStatus) {
+	public void buildNotification() {
 		int playPauseDrawable = android.R.drawable.ic_media_pause;
 		PendingIntent playPauseAction = null;
 
@@ -307,7 +313,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	}
 
-	private void removeNotification() {
+	public void removeNotification() {
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.cancel(NOTIFICATION_ID);
 	}
@@ -460,7 +466,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		public void onReceive(Context context, Intent intent) {
 			if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
 				pause();
-				buildNotification(PlaybackStatus.PAUSED);
+				buildNotification();
 			}
 		}
 	}
@@ -481,7 +487,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 			loadSentence();
 			play();
-			buildNotification(PlaybackStatus.PLAYING);
+			buildNotification();
 		}
 	}
 }

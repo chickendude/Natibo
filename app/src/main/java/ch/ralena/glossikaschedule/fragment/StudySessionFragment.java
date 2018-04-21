@@ -17,6 +17,7 @@ import ch.ralena.glossikaschedule.adapter.StudySessionAdapter;
 import ch.ralena.glossikaschedule.object.Course;
 import ch.ralena.glossikaschedule.object.Day;
 import ch.ralena.glossikaschedule.object.SentenceSet;
+import ch.ralena.glossikaschedule.service.StudySessionService;
 import io.realm.Realm;
 
 public class StudySessionFragment extends Fragment {
@@ -28,6 +29,8 @@ public class StudySessionFragment extends Fragment {
 	private Realm realm;
 
 	private MainActivity activity;
+
+	private StudySessionService studySessionService;
 
 	@Nullable
 	@Override
@@ -55,10 +58,30 @@ public class StudySessionFragment extends Fragment {
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
 		recyclerView.setLayoutManager(layoutManager);
 
-		activity.startSession(course.getCurrentDay());
-
 //		adapter.asObservable().subscribe(this::loadSentenceListFragment);
 
+		activity.getSessionPublish().subscribe(service -> studySessionService = service);
+
 		return view;
+	}
+
+	@Override
+	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		if (studySessionService != null) {
+			studySessionService.removeNotification();
+			studySessionService.stopSelf();
+		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		activity.startSession(course.getCurrentDay());
 	}
 }
