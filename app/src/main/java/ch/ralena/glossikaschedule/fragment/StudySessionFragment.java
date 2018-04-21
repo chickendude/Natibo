@@ -16,6 +16,8 @@ import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.adapter.StudySessionAdapter;
 import ch.ralena.glossikaschedule.object.Course;
 import ch.ralena.glossikaschedule.object.Day;
+import ch.ralena.glossikaschedule.object.Sentence;
+import ch.ralena.glossikaschedule.object.SentencePair;
 import ch.ralena.glossikaschedule.object.SentenceSet;
 import ch.ralena.glossikaschedule.service.StudySessionService;
 import io.realm.Realm;
@@ -32,6 +34,11 @@ public class StudySessionFragment extends Fragment {
 
 	private StudySessionService studySessionService;
 
+	TextView baseLanguageCodeText;
+	TextView baseSentenceText;
+	TextView targetLanguageCodeText;
+	TextView targetSentenceText;
+
 	@Nullable
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -44,8 +51,13 @@ public class StudySessionFragment extends Fragment {
 		realm = Realm.getDefaultInstance();
 		course = realm.where(Course.class).equalTo("id", id).findFirst();
 
+		baseLanguageCodeText = view.findViewById(R.id.baseLanguageCodeText);
+		baseSentenceText = view.findViewById(R.id.baseSentenceText);
+		targetLanguageCodeText = view.findViewById(R.id.targetLanguageCodeText);
+		targetSentenceText = view.findViewById(R.id.targetSentenceText);
+
 		// load language name
-		TextView courseTitleLabel = view.findViewById(R.id.courseTitleLabel);
+		TextView courseTitleLabel = view.findViewById(R.id.courseTitleText);
 		courseTitleLabel.setText(course.getTitle());
 
 		Day day = course.getNextDay(realm);
@@ -60,9 +72,19 @@ public class StudySessionFragment extends Fragment {
 
 //		adapter.asObservable().subscribe(this::loadSentenceListFragment);
 
-		activity.getSessionPublish().subscribe(service -> studySessionService = service);
+		activity.getSessionPublish().subscribe(service -> {
+			studySessionService = service;
+			studySessionService.sentenceObservable().subscribe(this::nextSentence);
+		});
 
 		return view;
+	}
+
+	private void nextSentence(SentencePair sentencePair) {
+		Sentence baseSentence = sentencePair.getBaseSentence();
+		Sentence targetSentence = sentencePair.getTargetSentence();
+		baseSentenceText.setText(baseSentence.getText());
+		targetSentenceText.setText(targetSentence.getText());
 	}
 
 	@Override

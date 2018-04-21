@@ -7,7 +7,7 @@
 	android:orientation="vertical">
 
 	<TextView
-		android:id="@+id/courseTitleLabel"
+		android:id="@+id/courseTitleText"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:textAlignment="center"
@@ -48,7 +48,7 @@
 					android:orientation="horizontal">
 
 					<TextView
-						android:id="@+id/baseLanguageCodeLabel"
+						android:id="@+id/baseLanguageCodeText"
 						android:layout_width="40dp"
 						android:layout_height="wrap_content"
 						android:textAlignment="textEnd"
@@ -57,7 +57,7 @@
 						tools:text="EN"/>
 
 					<TextView
-						android:id="@+id/baseSentenceLabel"
+						android:id="@+id/baseSentenceText"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:padding="4dp"
@@ -81,7 +81,7 @@
 						android:textSize="12sp"/>
 
 					<TextView
-						android:id="@+id/baseAlternateSentenceLabel"
+						android:id="@+id/baseAlternateSentenceText"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:padding="4dp"
@@ -105,7 +105,7 @@
 						android:textSize="12sp"/>
 
 					<TextView
-						android:id="@+id/baseRomanizationLabel"
+						android:id="@+id/baseRomanizationText"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:padding="4dp"
@@ -129,7 +129,7 @@
 						android:textSize="12sp"/>
 
 					<TextView
-						android:id="@+id/baseIpaLabel"
+						android:id="@+id/baseIpaText"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:padding="4dp"
@@ -158,7 +158,7 @@
 					android:orientation="horizontal">
 
 					<TextView
-						android:id="@+id/targetLanguageCodeLabel"
+						android:id="@+id/targetLanguageCodeText"
 						android:layout_width="40dp"
 						android:layout_height="wrap_content"
 						android:textAlignment="textEnd"
@@ -167,7 +167,7 @@
 						tools:text="EN"/>
 
 					<TextView
-						android:id="@+id/targetSentenceLabel"
+						android:id="@+id/targetSentenceText"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:padding="4dp"
@@ -191,7 +191,7 @@
 						android:textSize="12sp"/>
 
 					<TextView
-						android:id="@+id/targetAlternateSentenceLabel"
+						android:id="@+id/targetAlternateSentenceText"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:padding="4dp"
@@ -215,7 +215,7 @@
 						android:textSize="12sp"/>
 
 					<TextView
-						android:id="@+id/targetRomanizationLabel"
+						android:id="@+id/targetRomanizationText"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:padding="4dp"
@@ -239,7 +239,7 @@
 						android:textSize="12sp"/>
 
 					<TextView
-						android:id="@+id/targetIpaLabel"
+						android:id="@+id/targetIpaText"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:padding="4dp"
@@ -251,7 +251,7 @@
 		</LinearLayout>
 
 		<TextView
-			android:id="@+id/indexLabel"
+			android:id="@+id/indexText"
 			android:layout_width="50dp"
 			android:layout_height="wrap_content"
 			android:background="@drawable/sentence_number_background"

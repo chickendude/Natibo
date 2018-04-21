@@ -13,6 +13,7 @@ import android.media.MediaPlayer;
 import android.media.session.MediaSessionManager;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -29,6 +30,7 @@ import ch.ralena.glossikaschedule.object.Day;
 import ch.ralena.glossikaschedule.object.Sentence;
 import ch.ralena.glossikaschedule.object.SentencePair;
 import ch.ralena.glossikaschedule.utils.Utils;
+import io.reactivex.subjects.PublishSubject;
 import io.realm.Realm;
 
 public class StudySessionService extends Service implements MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
@@ -66,6 +68,8 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	private Sentence sentence;
 	private PlaybackStatus playbackStatus;
 	private NotificationCompat.Builder notificationBuilder;
+
+	PublishSubject<SentencePair> sentencePublish = PublishSubject.create();
 
 	// given to clients that connect to the service
 	StudyBinder binder = new StudyBinder();
@@ -145,6 +149,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	private void loadSentence() {
 		sentencePair = day.getCurrentSentencePair();
+		sentencePublish.onNext(sentencePair);
 		sentence = day.getCurrentSentence();
 		mediaPlayer.stop();
 		mediaPlayer.reset();
@@ -401,9 +406,13 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		// when file has completed playing
 		stop();
 		day.nextSentence(realm);
-		loadSentence();
-		if (playbackStatus == PlaybackStatus.PLAYING)
-			play();
+		Handler handler = new Handler();
+		Runnable runnable = () -> {
+			loadSentence();
+			if (playbackStatus == PlaybackStatus.PLAYING)
+				play();
+		};
+		handler.postDelayed(runnable, 1000);
 //		stopSelf();
 	}
 
@@ -499,5 +508,9 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 			loadSentence();
 			play();
 		}
+	}
+
+	public PublishSubject<SentencePair> sentenceObservable() {
+		return sentencePublish;
 	}
 }
