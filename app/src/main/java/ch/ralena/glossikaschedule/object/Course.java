@@ -147,40 +147,44 @@ public class Course extends RealmObject {
 
 	// --- helper methods ---
 
+	public void addReps(int reps) {
+		numReps += reps;
+	}
+
 	public Day prepareNextDay(Realm realm) {
 //		if (currentDay == null || currentDay.isCompleted()) {
-			// add current day to past days
-			if (currentDay != null && currentDay.isCompleted()) {
-				pastDays.add(currentDay);
+		// add current day to past days
+		if (currentDay != null && currentDay.isCompleted()) {
+			realm.executeTransaction(r -> pastDays.add(currentDay));
+		}
+
+		// create a new day
+		realm.executeTransaction(r -> {
+			Day day = r.createObject(Day.class, UUID.randomUUID().toString());
+			for (Schedule schedule : schedules) {
+				RealmList<Integer> reviewPattern = schedule.getReviewPattern();
+				int numSentences = schedule.getNumSentences();
+				int sentenceIndex = schedule.getSentenceIndex();
+				schedule.setSentenceIndex(sentenceIndex + numSentences);
+
+				// create sentence set
+				SentenceSet sentenceSet = new SentenceSet();
+				sentenceSet.setBaseSentences(getSentences(sentenceIndex, numSentences, basePacks));
+				sentenceSet.setTargetSentences(getSentences(sentenceIndex, numSentences, targetPacks));
+				sentenceSet.setReviews(reviewPattern);
+				sentenceSet.setFirstDay(true);
+				sentenceSet.setOrder(schedule.getOrder());
+
+				// add sentence set to list of sentencesets for the next day's studies
+				day.getSentenceSets().add(sentenceSet);
 			}
-
-			// create a new day
-			realm.executeTransaction(r -> {
-				Day day = r.createObject(Day.class, UUID.randomUUID().toString());
-				for (Schedule schedule : schedules) {
-					RealmList<Integer> reviewPattern = schedule.getReviewPattern();
-					int numSentences = schedule.getNumSentences();
-					int sentenceIndex = schedule.getSentenceIndex();
-					schedule.setSentenceIndex(sentenceIndex + numSentences);
-
-					// create sentence set
-					SentenceSet sentenceSet = new SentenceSet();
-					sentenceSet.setBaseSentences(getSentences(sentenceIndex, numSentences, basePacks));
-					sentenceSet.setTargetSentences(getSentences(sentenceIndex, numSentences, targetPacks));
-					sentenceSet.setReviews(reviewPattern);
-					sentenceSet.setFirstDay(true);
-					sentenceSet.setOrder(schedule.getOrder());
-
-					// add sentence set to list of sentencesets for the next day's studies
-					day.getSentenceSets().add(sentenceSet);
-				}
-				day.setCompleted(false);
-				day.setPauseMillis(pauseMillis);
-				// add the sentence sets from the current day to the next day
-				if (currentDay != null)
-					day.getSentenceSets().addAll(currentDay.getSentenceSets());
-				currentDay = day;
-			});
+			day.setCompleted(false);
+			day.setPauseMillis(pauseMillis);
+			// add the sentence sets from the current day to the next day
+			if (currentDay != null)
+				day.getSentenceSets().addAll(currentDay.getSentenceSets());
+			currentDay = day;
+		});
 //		}
 		List<SentenceSet> emptySentenceSets = new ArrayList<>();
 		for (SentenceSet set : currentDay.getSentenceSets()) {

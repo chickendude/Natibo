@@ -87,7 +87,15 @@ public class Day extends RealmObject {
 		return sentence;
 	}
 
-	public void nextSentence(Realm realm) {
+	/**
+	 * Moves to the next sentence.
+	 *
+	 * @param realm Realm object in case objects need to be updated.
+	 * @return True if there is a next sentence, false if there are no more sentences.
+	 */
+	public boolean nextSentence(Realm realm) {
+		if (curSentenceSetId >= sentenceSets.size())
+			return false;
 		realm.executeTransaction(r -> {
 			patternIndex++;
 			patternIndex %= sentenceSets.get(curSentenceSetId).getOrder().length();
@@ -95,6 +103,7 @@ public class Day extends RealmObject {
 		if (patternIndex == 0) {
 			goToNextSentencePair(realm);
 		}
+		return true;
 	}
 
 	public void goToNextSentencePair(Realm realm) {
@@ -120,6 +129,14 @@ public class Day extends RealmObject {
 				}
 			}
 		});
+	}
+
+	public int getNumReps() {
+		int numReps = 0;
+		for (SentenceSet sentenceSet : sentenceSets) {
+			numReps += sentenceSet.getTargetSentences().size();
+		}
+		return numReps;
 	}
 
 	private List<Sentence> getRemainingSentences() {

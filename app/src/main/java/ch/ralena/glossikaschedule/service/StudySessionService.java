@@ -69,7 +69,9 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	private PlaybackStatus playbackStatus;
 	private NotificationCompat.Builder notificationBuilder;
 
+
 	PublishSubject<SentencePair> sentencePublish = PublishSubject.create();
+	PublishSubject<Day> finishPublish = PublishSubject.create();
 
 	// given to clients that connect to the service
 	StudyBinder binder = new StudyBinder();
@@ -149,19 +151,27 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	private void loadSentence() {
 		sentencePair = day.getCurrentSentencePair();
-		sentencePublish.onNext(sentencePair);
-		sentence = day.getCurrentSentence();
-		mediaPlayer.stop();
-		mediaPlayer.reset();
-		try {
-			// load sentence path into mediaplayer to be played
-			mediaPlayer.setDataSource(sentence.getUri());
-			mediaPlayer.prepare();
-		} catch (IOException e) {
-			e.printStackTrace();
+
+		// if sentencePair is null, we're done studying for the day!
+		if (sentencePair == null) {
+			removeNotification();
+			finishPublish.onNext(day);
 			stopSelf();
+		} else {
+			sentencePublish.onNext(sentencePair);
+			sentence = day.getCurrentSentence();
+			mediaPlayer.stop();
+			mediaPlayer.reset();
+			try {
+				// load sentence path into mediaplayer to be played
+				mediaPlayer.setDataSource(sentence.getUri());
+				mediaPlayer.prepare();
+			} catch (IOException e) {
+				e.printStackTrace();
+				stopSelf();
+			}
+			updateNotificationText();
 		}
-		updateNotificationText();
 	}
 
 	// --- managing media ---
@@ -405,14 +415,15 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	public void onCompletion(MediaPlayer mp) {
 		// when file has completed playing
 		stop();
-		day.nextSentence(realm);
-		Handler handler = new Handler();
-		Runnable runnable = () -> {
-			loadSentence();
-			if (playbackStatus == PlaybackStatus.PLAYING)
-				play();
-		};
-		handler.postDelayed(runnable, 1000);
+		if (day.nextSentence(realm)) {
+			Handler handler = new Handler();
+			Runnable runnable = () -> {
+				loadSentence();
+				if (playbackStatus == PlaybackStatus.PLAYING)
+					play();
+			};
+			handler.postDelayed(runnable, 1000);
+		}
 //		stopSelf();
 	}
 
@@ -512,5 +523,9 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	public PublishSubject<SentencePair> sentenceObservable() {
 		return sentencePublish;
+	}
+
+	public PublishSubject<Day> finishObservable() {
+		return finishPublish;
 	}
 }

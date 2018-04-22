@@ -76,7 +76,7 @@ public class CourseDetailFragment extends Fragment {
 				// now we can load the fragment
 				StudySessionFragment fragment = new StudySessionFragment();
 				Bundle bundle = new Bundle();
-				bundle.putString(StudySessionFragment.TAG_COURSE_ID, course.getId());
+				bundle.putString(StudySessionFragment.KEY_COURSE_ID, course.getId());
 				fragment.setArguments(bundle);
 
 				getFragmentManager().beginTransaction()

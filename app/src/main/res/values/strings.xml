@@ -39,4 +39,5 @@
 	<string name="sentences_seen">Sentences Seen</string>
 	<string name="remaining_reps">Remaining Reps</string>
 	<string name="total_reps">Total Reps</string>
+	<string name="session_overview">Session Overview</string>
 </resources>

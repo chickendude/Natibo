@@ -17,6 +17,7 @@ import java.util.Locale;
 import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.object.Course;
+import ch.ralena.glossikaschedule.object.Day;
 import ch.ralena.glossikaschedule.object.Sentence;
 import ch.ralena.glossikaschedule.object.SentencePair;
 import ch.ralena.glossikaschedule.service.StudySessionService;
@@ -24,7 +25,7 @@ import io.realm.Realm;
 
 public class StudySessionFragment extends Fragment {
 	private static final String TAG = StudySessionFragment.class.getSimpleName();
-	public static final String TAG_COURSE_ID = "language_id";
+	public static final String KEY_COURSE_ID = "language_id";
 
 	Course course;
 
@@ -68,7 +69,7 @@ public class StudySessionFragment extends Fragment {
 		activity = (MainActivity) getActivity();
 
 		// load schedules from database
-		String id = getArguments().getString(TAG_COURSE_ID);
+		String id = getArguments().getString(KEY_COURSE_ID);
 		realm = Realm.getDefaultInstance();
 		course = realm.where(Course.class).equalTo("id", id).findFirst();
 
@@ -111,21 +112,45 @@ public class StudySessionFragment extends Fragment {
 			nextSentence(course.getCurrentDay().getCurrentSentencePair());
 			studySessionService = service;
 			studySessionService.sentenceObservable().subscribe(this::nextSentence);
+			studySessionService.finishObservable().subscribe(this::sessionFinished);
 		});
 
 		return view;
 	}
 
+	private void sessionFinished(Day day) {
+		// mark day as completed
+		realm.executeTransaction(r-> {
+			course.addReps(course.getCurrentDay().getNumReps());
+			day.setCompleted(true);
+		});
+
+		StudySessionOverviewFragment fragment = new StudySessionOverviewFragment();
+		Bundle bundle = new Bundle();
+		bundle.putString(StudySessionOverviewFragment.KEY_COURSE_ID, course.getId());
+		fragment.setArguments(bundle);
+
+		getFragmentManager().beginTransaction()
+				.replace(R.id.fragmentPlaceHolder, fragment)
+				.commit();
+	}
+
 	private void nextSentence(SentencePair sentencePair) {
 		Sentence baseSentence = sentencePair.getBaseSentence();
 		Sentence targetSentence = sentencePair.getTargetSentence();
+
+		// update number of reps remaining
 		remainingRepsText.setText(String.format(Locale.getDefault(), "%d", course.getCurrentDay().getNumReviewsLeft()));
+
+		// update countdown timer
 		millisLeft = course.getCurrentDay().getTimeLeft();
 		if (countDownTimer != null)
 			countDownTimer.cancel();
+
+		// there
 		Handler handler = new Handler();
 		handler.postDelayed(() -> {
-			millisLeft = millisLeft - millisLeft % 1000;
+			millisLeft = millisLeft - millisLeft % 1000 - 1;
 			updateTime();
 			countDownTimer = new CountDownTimer(millisLeft, 1000) {
 				@Override
@@ -141,11 +166,13 @@ public class StudySessionFragment extends Fragment {
 			}.start();
 		}, millisLeft % 1000);
 		updateTime();
+
 		// update base sentence views
 		baseSentenceText.setText(baseSentence.getText());
 		updateSentencePart(baseAlternateSentenceLayout, baseAlternateSentenceText, baseSentence.getAlternate());
 		updateSentencePart(baseRomanizationLayout, baseRomanizationText, baseSentence.getRomanization());
 		updateSentencePart(baseIpaLayout, baseIpaText, baseSentence.getIpa());
+
 		// update target sentence views
 		targetSentenceText.setText(targetSentence.getText());
 		updateSentencePart(targetAlternateSentenceLayout, targetAlternateSentenceText, targetSentence.getAlternate());
