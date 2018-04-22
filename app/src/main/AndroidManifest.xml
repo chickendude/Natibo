@@ -18,6 +18,12 @@
 			</intent-filter>
 		</activity>
 		<service android:name=".service.StudySessionService"/>
+
+		<receiver android:name="android.support.v4.media.session.MediaButtonReceiver">
+			<intent-filter>
+				<action android:name="android.intent.action.MEDIA_BUTTON"/>
+			</intent-filter>
+		</receiver>
 	</application>
 
 </manifest>

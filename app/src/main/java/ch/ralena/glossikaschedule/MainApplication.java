@@ -14,7 +14,7 @@ public class MainApplication extends Application {
 		RealmConfiguration config = new RealmConfiguration.Builder()
 				.name("glossikaschedule.realm")
 				.schemaVersion(1)
-//				.deleteRealmIfMigrationNeeded()
+				.deleteRealmIfMigrationNeeded()
 				.build();
 		Realm.setDefaultConfiguration(config);
 	}
