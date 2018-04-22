@@ -139,8 +139,10 @@ public class StudySessionFragment extends Fragment {
 		if (studySessionService != null) {
 			if (studySessionService.getPlaybackStatus() == StudySessionService.PlaybackStatus.PLAYING) {
 				studySessionService.pause();
+				countDownTimer.cancel();
 			} else {
 				studySessionService.resume();
+				startTimer();
 			}
 			updatePlayPauseImage();
 		}
@@ -184,23 +186,7 @@ public class StudySessionFragment extends Fragment {
 			countDownTimer.cancel();
 
 		// there
-		Handler handler = new Handler();
-		handler.postDelayed(() -> {
-			millisLeft = millisLeft - millisLeft % 1000 - 1;
-			updateTime();
-			countDownTimer = new CountDownTimer(millisLeft, 1000) {
-				@Override
-				public void onTick(long millisUntilFinished) {
-					millisLeft = millisUntilFinished;
-					updateTime();
-				}
-
-				@Override
-				public void onFinish() {
-
-				}
-			}.start();
-		}, millisLeft % 1000);
+		startTimer();
 		updateTime();
 
 		// update base sentence views
@@ -214,6 +200,26 @@ public class StudySessionFragment extends Fragment {
 		updateSentencePart(targetAlternateSentenceLayout, targetAlternateSentenceText, targetSentence.getAlternate());
 		updateSentencePart(targetRomanizationLayout, targetRomanizationText, targetSentence.getRomanization());
 		updateSentencePart(targetIpaLayout, targetIpaText, targetSentence.getIpa());
+	}
+
+	private void startTimer() {
+		Handler handler = new Handler();
+		handler.postDelayed(() -> {
+			millisLeft = millisLeft - millisLeft % 1000 - 1;
+			updateTime();
+			countDownTimer = new CountDownTimer(millisLeft, 100) {
+				@Override
+				public void onTick(long millisUntilFinished) {
+					millisLeft = millisUntilFinished;
+					updateTime();
+				}
+
+				@Override
+				public void onFinish() {
+
+				}
+			}.start();
+		}, millisLeft % 1000);
 	}
 
 	private void updateTime() {
