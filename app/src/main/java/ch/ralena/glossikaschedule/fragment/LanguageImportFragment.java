@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.utils.GLSImporter;
 
@@ -121,7 +122,7 @@ public class LanguageImportFragment extends Fragment {
 						});
 				});
 
-		importer.importPack(getContext(), uri);
+		importer.importPack((MainActivity) getActivity(), uri);
 	}
 
 	private void extractAudio() {

@@ -1,7 +1,6 @@
 package ch.ralena.glossikaschedule.utils;
 
 import android.content.ContentResolver;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
@@ -12,6 +11,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +22,7 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.data.LanguageData;
 import ch.ralena.glossikaschedule.data.LanguageType;
 import ch.ralena.glossikaschedule.fragment.LanguageImportFragment;
@@ -37,6 +39,8 @@ public class GLSImporter {
 
 	private static int BUFFER_SIZE = 1024;
 	private static List<String> ACCEPTED_LANGUAGES = Arrays.asList("EN", "ES", "ZS");
+
+	private ContentResolver contentResolver;
 
 	private PublishSubject<Integer> progressSubject;
 	private PublishSubject<Integer> totalSubject;
@@ -66,27 +70,32 @@ public class GLSImporter {
 		return fileNameSubject;
 	}
 
-	public void importPack(Context ctx, Uri uri) {
+	public void importPack(MainActivity activity, Uri uri) {
 		// TODO: 18/03/18 1. Do some file verification to make sure all files are indeed there
 		// TODO: 18/03/18 2. Verify file names/strip the 'EN - ' bit out
-
 		actionSubject.onNext(LanguageImportFragment.ACTION_OPENING_FILE);
 
 		Thread thread = new Thread(() -> {
 			Realm realm = Realm.getDefaultInstance();
-			ContentResolver contentResolver = ctx.getContentResolver();
+			contentResolver = activity.getContentResolver();
 			String packFileName = "";
 
-			Cursor cursor =
-					contentResolver.query(uri, null, null, null, null);
-			if (cursor != null) {
-				int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-				cursor.moveToFirst();
-				packFileName = cursor.getString(nameIndex);
-				cursor.close();
-			} else {
-				Toast.makeText(ctx, "Error opening file...", Toast.LENGTH_SHORT).show();
-				return;
+			if (uri.getScheme().equals("file")) {
+				int index = uri.toString().lastIndexOf("/");
+				packFileName = uri.toString().substring(index + 1);
+			} else if (uri.getScheme().equals("content")) {
+				Cursor cursor =
+						contentResolver.query(uri, null, null, null, null);
+				if (cursor != null) {
+					int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+					cursor.moveToFirst();
+					packFileName = cursor.getString(nameIndex);
+					cursor.close();
+				} else {
+					activity.runOnUiThread(() -> Toast.makeText(activity.getApplicationContext(), String.format("Error opening file: %s", uri), Toast.LENGTH_SHORT).show());
+					actionSubject.onNext(LanguageImportFragment.ACTION_EXIT);
+					return;
+				}
 			}
 
 			// pass the filename back to the fragment
@@ -99,14 +108,14 @@ public class GLSImporter {
 
 				try {
 					// first pass
-					is = contentResolver.openInputStream(uri);
+					is = getInputStream(uri);
 					ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is));
 
 					countFiles(zis, realm);
 
 					// second pass
 					ZipEntry zipEntry;
-					is = contentResolver.openInputStream(uri);
+					is = getInputStream(uri);
 					zis = new ZipInputStream(new BufferedInputStream(is));
 
 					// loop through files in the .gls zip
@@ -122,13 +131,13 @@ public class GLSImporter {
 							// make sure it's one of the accepted languages
 							if (ACCEPTED_LANGUAGES.contains(language) && entryName.contains(".mp3")) {
 								progressSubject.onNext(++fileNumber);
-								File folder = new File(ctx.getFilesDir() + "/" + language);
+								File folder = new File(activity.getFilesDir() + "/" + language);
 								if (!folder.isDirectory()) {
 									folder.mkdir();
 								}
 
 								// set up file path
-								File audioFile = new File(ctx.getFilesDir() + "/" + language + "/" + number);
+								File audioFile = new File(activity.getFilesDir() + "/" + language + "/" + number);
 
 								// actually write the file
 								byte buffer[] = new byte[BUFFER_SIZE];
@@ -160,7 +169,7 @@ public class GLSImporter {
 					e.printStackTrace();
 				}
 			} else {
-				Toast.makeText(ctx, "Sorry, this filetype is not supported!", Toast.LENGTH_SHORT).show();
+				activity.runOnUiThread(() -> Toast.makeText(activity.getApplicationContext(), "Sorry, this filetype is not supported!", Toast.LENGTH_SHORT).show());
 				actionSubject.onNext(LanguageImportFragment.ACTION_EXIT);
 				return;
 			}
@@ -168,6 +177,14 @@ public class GLSImporter {
 		});
 		thread.start();
 
+	}
+
+	private InputStream getInputStream(Uri uri) throws FileNotFoundException {
+		if (uri.getScheme().equals("file")) {
+			File file = new File(uri.getPath());
+			return new FileInputStream(file);
+		} else
+			return contentResolver.openInputStream(uri);
 	}
 
 	/**

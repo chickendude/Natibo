@@ -45,6 +45,8 @@ public class CourseDetailFragment extends Fragment {
 		realm = Realm.getDefaultInstance();
 		course = realm.where(Course.class).equalTo("id", id).findFirst();
 
+		getActivity().setTitle(course.getTitle());
+
 		// load total reps
 		TextView totalRepsText = view.findViewById(R.id.totalRepsText);
 		totalRepsText.setText(String.format(Locale.US, "%d", course.getNumReps()));
