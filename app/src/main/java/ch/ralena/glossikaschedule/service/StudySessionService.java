@@ -248,7 +248,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		}
 	}
 
-	private void pause() {
+	public void pause() {
 		playbackStatus = PlaybackStatus.PAUSED;
 		if (mediaPlayer != null && mediaPlayer.isPlaying()) {
 			stopPosition = mediaPlayer.getCurrentPosition();
@@ -256,7 +256,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		}
 	}
 
-	private void resume() {
+	public void resume() {
 		playbackStatus = PlaybackStatus.PLAYING;
 		if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
 			mediaPlayer.start();
@@ -527,5 +527,11 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	public PublishSubject<Day> finishObservable() {
 		return finishPublish;
+	}
+
+	// --- getters/setters ---
+
+	public PlaybackStatus getPlaybackStatus() {
+		return playbackStatus;
 	}
 }

@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -40,6 +41,7 @@ public class StudySessionFragment extends Fragment {
 	// views
 	private TextView remainingRepsText;
 	private TextView remainingTimeText;
+	private ImageView playPauseImage;
 
 	// base language views
 	private TextView baseLanguageCodeText;
@@ -80,6 +82,7 @@ public class StudySessionFragment extends Fragment {
 		// load views
 		remainingRepsText = view.findViewById(R.id.remainingRepsText);
 		remainingTimeText = view.findViewById(R.id.remainingTimeText);
+		playPauseImage = view.findViewById(R.id.playPauseImage);
 
 		// load base language views
 		baseLanguageCodeText = view.findViewById(R.id.baseLanguageCodeText);
@@ -108,14 +111,37 @@ public class StudySessionFragment extends Fragment {
 		TextView courseTitleLabel = view.findViewById(R.id.courseTitleText);
 		courseTitleLabel.setText(course.getTitle());
 
+		// handle playing/pausing
+		playPauseImage.setOnClickListener(this::playPause);
+
 		activity.getSessionPublish().subscribe(service -> {
 			nextSentence(course.getCurrentDay().getCurrentSentencePair());
 			studySessionService = service;
 			studySessionService.sentenceObservable().subscribe(this::nextSentence);
 			studySessionService.finishObservable().subscribe(this::sessionFinished);
+			updatePlayPauseImage();
 		});
 
 		return view;
+	}
+
+	private void playPause(View view) {
+		if (studySessionService != null) {
+			if (studySessionService.getPlaybackStatus() == StudySessionService.PlaybackStatus.PLAYING) {
+				studySessionService.pause();
+			} else {
+				studySessionService.resume();
+			}
+			updatePlayPauseImage();
+		}
+	}
+
+	private void updatePlayPauseImage() {
+		if (studySessionService.getPlaybackStatus() == StudySessionService.PlaybackStatus.PLAYING) {
+			playPauseImage.setImageResource(R.drawable.ic_pause);
+		} else {
+			playPauseImage.setImageResource(R.drawable.ic_play);
+		}
 	}
 
 	private void sessionFinished(Day day) {
