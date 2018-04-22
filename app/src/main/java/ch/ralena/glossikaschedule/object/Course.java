@@ -55,8 +55,11 @@ public class Course extends RealmObject {
 	private RealmList<Pack> targetPacks;
 	private Day currentDay;
 	private int numReps;
+	private int pauseMillis;
 	private RealmList<Day> pastDays = new RealmList<>();
 	private RealmList<Schedule> schedules = new RealmList<>();    // the different pieces that make up the study routine for each day
+
+	// --- getters and setters ---
 
 	public String getId() {
 		return id;
@@ -114,6 +117,14 @@ public class Course extends RealmObject {
 		this.numReps = numReps;
 	}
 
+	public int getPauseMillis() {
+		return pauseMillis;
+	}
+
+	public void setPauseMillis(int pauseMillis) {
+		this.pauseMillis = pauseMillis;
+	}
+
 	public RealmList<Day> getPastDays() {
 		return pastDays;
 	}
@@ -134,7 +145,9 @@ public class Course extends RealmObject {
 		return schedules;
 	}
 
-	public Day getNextDay(Realm realm) {
+	// --- helper methods ---
+
+	public Day prepareNextDay(Realm realm) {
 //		if (currentDay == null || currentDay.isCompleted()) {
 			// add current day to past days
 			if (currentDay != null && currentDay.isCompleted()) {
@@ -162,6 +175,7 @@ public class Course extends RealmObject {
 					day.getSentenceSets().add(sentenceSet);
 				}
 				day.setCompleted(false);
+				day.setPauseMillis(pauseMillis);
 				// add the sentence sets from the current day to the next day
 				if (currentDay != null)
 					day.getSentenceSets().addAll(currentDay.getSentenceSets());

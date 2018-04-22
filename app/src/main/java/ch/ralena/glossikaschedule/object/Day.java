@@ -1,5 +1,9 @@
 package ch.ralena.glossikaschedule.object;
 
+import android.media.MediaMetadataRetriever;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import io.realm.Realm;
@@ -15,11 +19,14 @@ public class Day extends RealmObject {
 
 	private RealmList<SentenceSet> sentenceSets;
 	private boolean isCompleted;
+	private int pauseMillis;
 
 	// internal fields
 	private int curSentenceSetId;
 	private int curSentenceId;
 	private int patternIndex;
+
+	// --- getters and setters ---
 
 	public String getId() {
 		return id;
@@ -41,6 +48,16 @@ public class Day extends RealmObject {
 		isCompleted = completed;
 	}
 
+	public int getPauseMillis() {
+		return pauseMillis;
+	}
+
+	public void setPauseMillis(int pauseMillis) {
+		this.pauseMillis = pauseMillis;
+	}
+
+	// --- helper methods ---
+
 	public void resetReviews(Realm realm) {
 		realm.executeTransaction(r -> {
 			curSentenceId = 0;
@@ -53,7 +70,7 @@ public class Day extends RealmObject {
 		if (curSentenceSetId >= sentenceSets.size())
 			return null;
 		SentenceSet sentenceSet = sentenceSets.get(curSentenceSetId);
-		SentencePair sentencePair = sentenceSet.getSentences().get(curSentenceId);
+		SentencePair sentencePair = sentenceSet.getSentencePairs().get(curSentenceId);
 		return sentencePair;
 	}
 
@@ -61,7 +78,7 @@ public class Day extends RealmObject {
 		if (curSentenceSetId >= sentenceSets.size())
 			return null;
 		SentenceSet sentenceSet = sentenceSets.get(curSentenceSetId);
-		SentencePair sentencePair = sentenceSet.getSentences().get(curSentenceId);
+		SentencePair sentencePair = sentenceSet.getSentencePairs().get(curSentenceId);
 		Sentence sentence;
 		if (sentenceSet.getOrder().charAt(patternIndex) == 'B')
 			sentence = sentencePair.getBaseSentence();
@@ -84,7 +101,7 @@ public class Day extends RealmObject {
 		realm.executeTransaction(r -> {
 			patternIndex = 0;
 			curSentenceId++;
-			curSentenceId %= sentenceSets.get(curSentenceSetId).getSentences().size();
+			curSentenceId %= sentenceSets.get(curSentenceSetId).getSentencePairs().size();
 			if (curSentenceId == 0) {
 				curSentenceSetId++;
 			}
@@ -97,7 +114,7 @@ public class Day extends RealmObject {
 			curSentenceId--;
 			if (curSentenceId < 0) {
 				if (curSentenceSetId > 0) {
-					curSentenceId = sentenceSets.get(--curSentenceSetId).getSentences().size();
+					curSentenceId = sentenceSets.get(--curSentenceSetId).getSentencePairs().size();
 				} else {
 					curSentenceId = 0;
 				}
@@ -105,13 +122,64 @@ public class Day extends RealmObject {
 		});
 	}
 
-	public int getNumReviewsLeft() {
-		int numReviews  = 0;
+	private List<Sentence> getRemainingSentences() {
+		List<Sentence> sentences = new ArrayList<>();
 		for (int i = curSentenceSetId; i < sentenceSets.size(); i++) {
-			numReviews += sentenceSets.get(i).getSentences().size();
+			SentenceSet sentenceSet = sentenceSets.get(i);
+
+			List<SentencePair> tempSentencePairs = new ArrayList<>();
+			RealmList<SentencePair> setSentencePairs = sentenceSet.getSentencePairs();
+
+			String order = sentenceSet.getOrder();
+
+			// only get subsection of SentencePairs if it's the first sentence set
+			if (i == curSentenceSetId) {
+				tempSentencePairs.addAll(setSentencePairs.subList(curSentenceId, setSentencePairs.size()));
+
+				// first sentence pair will possible have fewer sentences depending on whether the base sentence has been played or not
+				for (int j = patternIndex; j < order.length(); j++) {
+					if (order.charAt(j) == 'B')
+						sentences.add(tempSentencePairs.get(0).getBaseSentence());
+					else if (order.charAt(j) == 'T')
+						sentences.add(tempSentencePairs.get(0).getTargetSentence());
+				}
+				tempSentencePairs.remove(0);
+			} else {
+				tempSentencePairs.addAll(setSentencePairs);
+			}
+
+			// add all sentences according to the order to the list of sentences
+			for (SentencePair sentencePair : tempSentencePairs) {
+				for (char c : order.toCharArray()) {
+					if (c == 'B')
+						sentences.add(sentencePair.getBaseSentence());
+					else if (c == 'T')
+						sentences.add(sentencePair.getTargetSentence());
+				}
+			}
+		}
+		return sentences;
+	}
+
+	public int getNumReviewsLeft() {
+		int numReviews = 0;
+		for (int i = curSentenceSetId; i < sentenceSets.size(); i++) {
+			numReviews += sentenceSets.get(i).getSentencePairs().size();
 			if (i == curSentenceSetId)
 				numReviews -= curSentenceId;
 		}
 		return numReviews;
+	}
+
+	public int getTimeLeft() {
+		MediaMetadataRetriever metadataRetriever = new MediaMetadataRetriever();
+
+		int millisecondsLeft = 0;
+		for (Sentence sentence : getRemainingSentences()) {
+			metadataRetriever.setDataSource(sentence.getUri());
+			millisecondsLeft += Integer.parseInt(metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) + pauseMillis;
+		}
+
+		return millisecondsLeft;
 	}
 }

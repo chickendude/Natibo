@@ -1,6 +1,8 @@
 package ch.ralena.glossikaschedule.fragment;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.Locale;
 
 import ch.ralena.glossikaschedule.MainActivity;
 import ch.ralena.glossikaschedule.R;
@@ -29,9 +33,12 @@ public class StudySessionFragment extends Fragment {
 	private MainActivity activity;
 
 	private StudySessionService studySessionService;
+	private long millisLeft;
+	CountDownTimer countDownTimer;
 
 	// views
 	private TextView remainingRepsText;
+	private TextView remainingTimeText;
 
 	// base language views
 	private TextView baseLanguageCodeText;
@@ -65,8 +72,13 @@ public class StudySessionFragment extends Fragment {
 		realm = Realm.getDefaultInstance();
 		course = realm.where(Course.class).equalTo("id", id).findFirst();
 
+		// if the current day is done, start the next one
+		if (course.getCurrentDay() == null || course.getCurrentDay().isCompleted())
+			course.prepareNextDay(realm);
+
 		// load views
 		remainingRepsText = view.findViewById(R.id.remainingRepsText);
+		remainingTimeText = view.findViewById(R.id.remainingTimeText);
 
 		// load base language views
 		baseLanguageCodeText = view.findViewById(R.id.baseLanguageCodeText);
@@ -107,7 +119,28 @@ public class StudySessionFragment extends Fragment {
 	private void nextSentence(SentencePair sentencePair) {
 		Sentence baseSentence = sentencePair.getBaseSentence();
 		Sentence targetSentence = sentencePair.getTargetSentence();
-		remainingRepsText.setText("" + course.getCurrentDay().getNumReviewsLeft());
+		remainingRepsText.setText(String.format(Locale.getDefault(), "%d", course.getCurrentDay().getNumReviewsLeft()));
+		millisLeft = course.getCurrentDay().getTimeLeft();
+		if (countDownTimer != null)
+			countDownTimer.cancel();
+		Handler handler = new Handler();
+		handler.postDelayed(() -> {
+			millisLeft = millisLeft - millisLeft % 1000;
+			updateTime();
+			countDownTimer = new CountDownTimer(millisLeft, 1000) {
+				@Override
+				public void onTick(long millisUntilFinished) {
+					millisLeft = millisUntilFinished;
+					updateTime();
+				}
+
+				@Override
+				public void onFinish() {
+
+				}
+			}.start();
+		}, millisLeft % 1000);
+		updateTime();
 		// update base sentence views
 		baseSentenceText.setText(baseSentence.getText());
 		updateSentencePart(baseAlternateSentenceLayout, baseAlternateSentenceText, baseSentence.getAlternate());
@@ -118,6 +151,11 @@ public class StudySessionFragment extends Fragment {
 		updateSentencePart(targetAlternateSentenceLayout, targetAlternateSentenceText, targetSentence.getAlternate());
 		updateSentencePart(targetRomanizationLayout, targetRomanizationText, targetSentence.getRomanization());
 		updateSentencePart(targetIpaLayout, targetIpaText, targetSentence.getIpa());
+	}
+
+	private void updateTime() {
+		int secondsLeft = (int) (millisLeft / 1000);
+		remainingTimeText.setText(String.format(Locale.US, "%d:%02d", secondsLeft / 60, secondsLeft % 60));
 	}
 
 	private void updateSentencePart(ViewGroup layout, TextView textView, String text) {
@@ -143,5 +181,12 @@ public class StudySessionFragment extends Fragment {
 	public void onResume() {
 		super.onResume();
 		activity.startSession(course.getCurrentDay());
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if (countDownTimer != null)
+			countDownTimer.cancel();
 	}
 }

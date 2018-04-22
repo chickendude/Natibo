@@ -43,7 +43,7 @@ public class SentenceSet extends RealmObject {
 		this.targetSentences = targetSentences;
 	}
 
-	public RealmList<SentencePair> getSentences() {
+	public RealmList<SentencePair> getSentencePairs() {
 		return sentences;
 	}
 

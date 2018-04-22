@@ -232,6 +232,7 @@ public class CourseAiCreateFragment extends Fragment {
 		course.setTitle(String.format("%s > %s", baseLanguage.getLanguageId(), targetLanguage.getLanguageId()));
 		course.setBaseLanguage(baseLanguage);
 		course.setTargetLanguage(targetLanguage);
+		course.setPauseMillis(1000);
 		course.getSchedules().add(schedule);
 		realm.commitTransaction();
 		// --- end transaction

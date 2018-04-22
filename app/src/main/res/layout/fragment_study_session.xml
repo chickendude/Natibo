@@ -47,6 +47,7 @@
 				android:text="Estimated Time"/>
 
 			<TextView
+				android:id="@+id/remainingTimeText"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textColor="@color/colorTextDark"
