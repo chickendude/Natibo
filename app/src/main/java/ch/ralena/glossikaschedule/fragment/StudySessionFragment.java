@@ -2,7 +2,6 @@ package ch.ralena.glossikaschedule.fragment;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -43,6 +42,7 @@ public class StudySessionFragment extends Fragment {
 	private TextView remainingRepsText;
 	private TextView remainingTimeText;
 	private ImageView playPauseImage;
+	private LinearLayout sentencesLayout;
 
 	// base language views
 	private TextView baseLanguageCodeText;
@@ -89,6 +89,7 @@ public class StudySessionFragment extends Fragment {
 		remainingRepsText = view.findViewById(R.id.remainingRepsText);
 		remainingTimeText = view.findViewById(R.id.remainingTimeText);
 		playPauseImage = view.findViewById(R.id.playPauseImage);
+		sentencesLayout = view.findViewById(R.id.sentencesLayout);
 
 		// load base language views
 		baseLanguageCodeText = view.findViewById(R.id.baseLanguageCodeText);
@@ -116,6 +117,9 @@ public class StudySessionFragment extends Fragment {
 		// load language name
 		TextView courseTitleLabel = view.findViewById(R.id.courseTitleText);
 		courseTitleLabel.setText(course.getTitle());
+
+		// hide sentences layout until a sentence has been loaded
+		sentencesLayout.setVisibility(View.INVISIBLE);
 
 		// handle playing/pausing
 		playPauseImage.setOnClickListener(this::playPause);
@@ -174,6 +178,8 @@ public class StudySessionFragment extends Fragment {
 	}
 
 	private void nextSentence(SentencePair sentencePair) {
+		sentencesLayout.setVisibility(View.VISIBLE);
+
 		Sentence baseSentence = sentencePair.getBaseSentence();
 		Sentence targetSentence = sentencePair.getTargetSentence();
 
@@ -203,23 +209,20 @@ public class StudySessionFragment extends Fragment {
 	}
 
 	private void startTimer() {
-		Handler handler = new Handler();
-		handler.postDelayed(() -> {
-			millisLeft = millisLeft - millisLeft % 1000 - 1;
-			updateTime();
-			countDownTimer = new CountDownTimer(millisLeft, 100) {
-				@Override
-				public void onTick(long millisUntilFinished) {
-					millisLeft = millisUntilFinished;
-					updateTime();
-				}
+		millisLeft = millisLeft - millisLeft % 1000 - 1;
+		updateTime();
+		countDownTimer = new CountDownTimer(millisLeft, 100) {
+			@Override
+			public void onTick(long millisUntilFinished) {
+				millisLeft = millisUntilFinished;
+				updateTime();
+			}
 
-				@Override
-				public void onFinish() {
+			@Override
+			public void onFinish() {
 
-				}
-			}.start();
-		}, millisLeft % 1000);
+			}
+		}.start();
 	}
 
 	private void updateTime() {
@@ -250,6 +253,8 @@ public class StudySessionFragment extends Fragment {
 			sentenceDisposable.dispose();
 		if (finishDisposable != null)
 			finishDisposable.dispose();
+		if (countDownTimer != null)
+			countDownTimer.cancel();
 	}
 
 	@Override
