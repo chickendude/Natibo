@@ -217,4 +217,12 @@ public class Course extends RealmObject {
 		}
 		return sentences;
 	}
+
+	public int getNumSentencesSeen() {
+		int numSeen = 0;
+		for (Day day : pastDays) {
+			numSeen += day.getSentenceSets().get(0).getBaseSentences().size();
+		}
+		return numSeen;
+	}
 }

@@ -22,6 +22,7 @@ import ch.ralena.glossikaschedule.object.Day;
 import ch.ralena.glossikaschedule.object.Sentence;
 import ch.ralena.glossikaschedule.object.SentencePair;
 import ch.ralena.glossikaschedule.service.StudySessionService;
+import io.reactivex.disposables.Disposable;
 import io.realm.Realm;
 
 public class StudySessionFragment extends Fragment {
@@ -62,6 +63,11 @@ public class StudySessionFragment extends Fragment {
 	private LinearLayout targetRomanizationLayout;
 	private TextView targetIpaText;
 	private LinearLayout targetIpaLayout;
+
+
+	Disposable serviceDisposable;
+	Disposable sentenceDisposable;
+	Disposable finishDisposable;
 
 	@Nullable
 	@Override
@@ -114,15 +120,18 @@ public class StudySessionFragment extends Fragment {
 		// handle playing/pausing
 		playPauseImage.setOnClickListener(this::playPause);
 
-		activity.getSessionPublish().subscribe(service -> {
+		return view;
+	}
+
+	private void connectToService() {
+		activity.startSession(course.getCurrentDay());
+		serviceDisposable = activity.getSessionPublish().subscribe(service -> {
 			nextSentence(course.getCurrentDay().getCurrentSentencePair());
 			studySessionService = service;
-			studySessionService.sentenceObservable().subscribe(this::nextSentence);
-			studySessionService.finishObservable().subscribe(this::sessionFinished);
+			sentenceDisposable = studySessionService.sentenceObservable().subscribe(this::nextSentence);
+			finishDisposable = studySessionService.finishObservable().subscribe(this::sessionFinished);
 			updatePlayPauseImage();
 		});
-
-		return view;
 	}
 
 	private void playPause(View view) {
@@ -146,7 +155,7 @@ public class StudySessionFragment extends Fragment {
 
 	private void sessionFinished(Day day) {
 		// mark day as completed
-		realm.executeTransaction(r-> {
+		realm.executeTransaction(r -> {
 			course.addReps(course.getCurrentDay().getNumReps());
 			day.setCompleted(true);
 		});
@@ -228,12 +237,18 @@ public class StudySessionFragment extends Fragment {
 	@Override
 	public void onPause() {
 		super.onPause();
+		if (serviceDisposable != null)
+			serviceDisposable.dispose();
+		if (sentenceDisposable != null)
+			sentenceDisposable.dispose();
+		if (finishDisposable != null)
+			finishDisposable.dispose();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		activity.startSession(course.getCurrentDay());
+		connectToService();
 	}
 
 	@Override

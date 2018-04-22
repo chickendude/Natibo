@@ -57,7 +57,7 @@
 					android:textColor="@color/colorTextWhite"/>
 
 				<TextView
-					android:id="@+id/totalRepsLabel"
+					android:id="@+id/totalRepsText"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:textColor="@color/colorTextWhite"
@@ -80,7 +80,7 @@
 					android:textColor="@color/colorTextWhite"/>
 
 				<TextView
-					android:id="@+id/totalSentencesSeenLabel"
+					android:id="@+id/totalSentencesSeenText"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:textColor="@color/colorTextWhite"

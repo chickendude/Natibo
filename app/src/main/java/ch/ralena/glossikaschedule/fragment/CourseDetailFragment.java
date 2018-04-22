@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Locale;
+
 import ch.ralena.glossikaschedule.R;
 import ch.ralena.glossikaschedule.adapter.CourseDetailAdapter;
 import ch.ralena.glossikaschedule.object.Course;
@@ -42,6 +44,14 @@ public class CourseDetailFragment extends Fragment {
 		String id = getArguments().getString(TAG_COURSE_ID);
 		realm = Realm.getDefaultInstance();
 		course = realm.where(Course.class).equalTo("id", id).findFirst();
+
+		// load total reps
+		TextView totalRepsText = view.findViewById(R.id.totalRepsText);
+		totalRepsText.setText(String.format(Locale.US, "%d", course.getNumReps()));
+
+		// load total sentences seen
+		TextView totalSentencesSeenText = view.findViewById(R.id.totalSentencesSeenText);
+		totalSentencesSeenText.setText(String.format(Locale.US, "%d", course.getNumSentencesSeen()));
 
 		// load flag image
 		ImageView flagImage = view.findViewById(R.id.flagImageView);

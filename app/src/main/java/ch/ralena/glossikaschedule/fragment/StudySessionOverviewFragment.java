@@ -60,4 +60,6 @@ public class StudySessionOverviewFragment extends Fragment {
 
 		return view;
 	}
+
+
 }
