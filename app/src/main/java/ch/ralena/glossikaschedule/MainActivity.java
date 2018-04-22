@@ -312,6 +312,7 @@ public class MainActivity extends AppCompatActivity {
 		} else {
 			Intent intent = new Intent(StudySessionService.BROADCAST_START_SESSION);
 			sendBroadcast(intent);
+			sessionPublish.onNext(studySessionService);
 		}
 	}
 

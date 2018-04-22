@@ -93,7 +93,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 			day = realm.where(Day.class).equalTo("id", id).findFirst();
 			if (day == null)
 				stopSelf();
-			day.resetReviews(realm);
+//			day.resetReviews(realm);
 		}
 
 
@@ -510,7 +510,6 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 			day = realm.where(Day.class).equalTo("id", id).findFirst();
 			if (day == null)
 				stopSelf();
-			day.resetReviews(realm);
 			stop();
 			mediaPlayer.reset();
 			if (!requestAudioFocus())

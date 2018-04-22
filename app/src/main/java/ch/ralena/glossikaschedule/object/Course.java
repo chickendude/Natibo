@@ -151,8 +151,7 @@ public class Course extends RealmObject {
 		numReps += reps;
 	}
 
-	public Day prepareNextDay(Realm realm) {
-//		if (currentDay == null || currentDay.isCompleted()) {
+	public void prepareNextDay(Realm realm) {
 		// add current day to past days
 		if (currentDay != null && currentDay.isCompleted()) {
 			realm.executeTransaction(r -> pastDays.add(currentDay));
@@ -185,7 +184,6 @@ public class Course extends RealmObject {
 				day.getSentenceSets().addAll(currentDay.getSentenceSets());
 			currentDay = day;
 		});
-//		}
 		List<SentenceSet> emptySentenceSets = new ArrayList<>();
 		for (SentenceSet set : currentDay.getSentenceSets()) {
 			// create sentence set and mark it to be deleted if it is empty
@@ -195,7 +193,6 @@ public class Course extends RealmObject {
 		}
 
 		realm.executeTransaction(r -> currentDay.getSentenceSets().removeAll(emptySentenceSets));
-		return currentDay;
 	}
 
 	private RealmList<Sentence> getSentences(int index, int numSentences, RealmList<Pack> packs) {

@@ -124,14 +124,15 @@ public class StudySessionFragment extends Fragment {
 	}
 
 	private void connectToService() {
-		activity.startSession(course.getCurrentDay());
 		serviceDisposable = activity.getSessionPublish().subscribe(service -> {
-			nextSentence(course.getCurrentDay().getCurrentSentencePair());
+			if (course.getCurrentDay().getCurrentSentencePair() != null)
+				nextSentence(course.getCurrentDay().getCurrentSentencePair());
 			studySessionService = service;
 			sentenceDisposable = studySessionService.sentenceObservable().subscribe(this::nextSentence);
 			finishDisposable = studySessionService.finishObservable().subscribe(this::sessionFinished);
 			updatePlayPauseImage();
 		});
+		activity.startSession(course.getCurrentDay());
 	}
 
 	private void playPause(View view) {
