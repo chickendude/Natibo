@@ -77,8 +77,9 @@ public class CourseDetailFragment extends Fragment {
 
 		// set up button
 		Button startSessionButton = view.findViewById(R.id.startSessionButton);
+
 		startSessionButton.setText(
-				course.getCurrentDay().isCompleted() ? R.string.start_session : R.string.continue_session
+				course.getCurrentDay() == null || course.getCurrentDay().isCompleted() ? R.string.start_session : R.string.continue_session
 		);
 		startSessionButton.setOnClickListener(new View.OnClickListener() {
 			@Override
