@@ -23,10 +23,12 @@ public class StudySessionAdapter extends RecyclerView.Adapter<StudySessionAdapte
 	}
 
 	private RealmList<SentencePair> sentences;
-	private String language;
+	private String baseLanguageId;
+	private String targetLanguageId;
 
-	public StudySessionAdapter(String languageId, RealmList<SentencePair> sentences) {
-		this.language = languageId;
+	public StudySessionAdapter(String baseLanguageId, String targetLanguageId, RealmList<SentencePair> sentences) {
+		this.baseLanguageId = baseLanguageId;
+		this.targetLanguageId = targetLanguageId;
 		this.sentences = sentences;
 	}
 
@@ -73,7 +75,7 @@ public class StudySessionAdapter extends RecyclerView.Adapter<StudySessionAdapte
 			index = view.findViewById(R.id.indexLabel);
 			// base
 			baseLanguageCode = view.findViewById(R.id.baseLanguageCodeLabel);
-			baseLanguageCode.setText(language);
+			baseLanguageCode.setText(baseLanguageId);
 			baseSentenceText = view.findViewById(R.id.baseSentenceLabel);
 			baseAlternateSentence = view.findViewById(R.id.baseAlternateSentenceLabel);
 			baseAlternateSentenceLayout = view.findViewById(R.id.baseAlternateSentenceLayout);
@@ -83,7 +85,7 @@ public class StudySessionAdapter extends RecyclerView.Adapter<StudySessionAdapte
 			baseIpaLayout = view.findViewById(R.id.baseIpaLayout);
 			// target
 			targetLanguageCode = view.findViewById(R.id.targetLanguageCodeLabel);
-			targetLanguageCode.setText(language);
+			targetLanguageCode.setText(targetLanguageId);
 			targetSentenceText = view.findViewById(R.id.targetSentenceLabel);
 			targetAlternateSentence = view.findViewById(R.id.targetAlternateSentenceLabel);
 			targetAlternateSentenceLayout = view.findViewById(R.id.targetAlternateSentenceLayout);

@@ -166,7 +166,7 @@ public class Course extends RealmObject {
 				int sentenceIndex = schedule.getSentenceIndex();
 				schedule.setSentenceIndex(sentenceIndex + numSentences);
 
-				// create sentence set
+				// create new set of sentences based off the schedule
 				SentenceSet sentenceSet = new SentenceSet();
 				sentenceSet.setBaseSentences(getSentences(sentenceIndex, numSentences, basePacks));
 				sentenceSet.setTargetSentences(getSentences(sentenceIndex, numSentences, targetPacks));
