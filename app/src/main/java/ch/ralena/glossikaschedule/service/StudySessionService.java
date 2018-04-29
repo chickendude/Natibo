@@ -156,6 +156,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		if (sentencePair == null) {
 			removeNotification();
 			finishPublish.onNext(day);
+			stop();
 			stopSelf();
 		} else {
 			sentencePublish.onNext(sentencePair);
@@ -243,6 +244,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	}
 
 	private void stop() {
+		playbackStatus = PlaybackStatus.PAUSED;
 		if (mediaPlayer != null && mediaPlayer.isPlaying()) {
 			mediaPlayer.stop();
 		}
@@ -414,7 +416,6 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	@Override
 	public void onCompletion(MediaPlayer mp) {
 		// when file has completed playing
-		stop();
 		if (day.nextSentence(realm)) {
 			Handler handler = new Handler();
 			Runnable runnable = () -> {
@@ -424,7 +425,6 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 			};
 			handler.postDelayed(runnable, 1000);
 		}
-//		stopSelf();
 	}
 
 	@Override

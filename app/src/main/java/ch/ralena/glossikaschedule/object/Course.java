@@ -160,6 +160,16 @@ public class Course extends RealmObject {
 		// create a new day
 		realm.executeTransaction(r -> {
 			Day day = r.createObject(Day.class, UUID.randomUUID().toString());
+
+			// add the sentence sets from the current day to the next day
+			if (currentDay != null) {
+				day.getSentenceSets().addAll(currentDay.getSentenceSets());
+
+				// move yesterday's new words to the front of the reviews
+				SentenceSet lastSet = day.getSentenceSets().last();
+				day.getSentenceSets().remove(lastSet);
+				day.getSentenceSets().add(0, lastSet);
+			}
 			for (Schedule schedule : schedules) {
 				RealmList<Integer> reviewPattern = schedule.getReviewPattern();
 				int numSentences = schedule.getNumSentences();
@@ -179,9 +189,6 @@ public class Course extends RealmObject {
 			}
 			day.setCompleted(false);
 			day.setPauseMillis(pauseMillis);
-			// add the sentence sets from the current day to the next day
-			if (currentDay != null)
-				day.getSentenceSets().addAll(currentDay.getSentenceSets());
 			currentDay = day;
 		});
 		List<SentenceSet> emptySentenceSets = new ArrayList<>();
@@ -217,9 +224,15 @@ public class Course extends RealmObject {
 
 	public int getNumSentencesSeen() {
 		int numSeen = 0;
+
+		// count number of sentences we've studied in the past
 		for (Day day : pastDays) {
 			numSeen += day.getSentenceSets().get(0).getBaseSentences().size();
 		}
+
+		// if the current day has been completed, add those as well
+		if (currentDay != null && currentDay.isCompleted())
+			numSeen += currentDay.getSentenceSets().get(0).getBaseSentences().size();
 		return numSeen;
 	}
 }
