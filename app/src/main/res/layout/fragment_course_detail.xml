@@ -155,5 +155,5 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
 		android:layout_margin="16dp"
-		android:text="Start Session"/>
+		android:text="@string/start_session"/>
 </RelativeLayout>

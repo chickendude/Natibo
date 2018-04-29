@@ -40,4 +40,6 @@
 	<string name="remaining_reps">Remaining Reps</string>
 	<string name="total_reps">Total Reps</string>
 	<string name="session_overview">Session Overview</string>
+	<string name="start_session">Start Session</string>
+	<string name="continue_session">Continue Session</string>
 </resources>
