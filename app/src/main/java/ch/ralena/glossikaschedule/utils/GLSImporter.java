@@ -38,7 +38,7 @@ public class GLSImporter {
 	public static final String TAG = GLSImporter.class.getSimpleName();
 
 	private static int BUFFER_SIZE = 1024;
-	private static List<String> ACCEPTED_LANGUAGES = Arrays.asList("EN", "ES", "ZS");
+	private static List<String> ACCEPTED_LANGUAGES = Arrays.asList("EN", "ES", "ESM", "PB", "ZS");
 
 	private ContentResolver contentResolver;
 

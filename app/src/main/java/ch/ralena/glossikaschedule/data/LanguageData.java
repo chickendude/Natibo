@@ -53,11 +53,11 @@ public class LanguageData {
 		languages.add(new LanguageType("","Lithuanian", R.drawable.flag_lithuanian));
 		languages.add(new LanguageType("","Mongolian", R.drawable.flag_mongolian));
 		languages.add(new LanguageType("","Polish", R.drawable.flag_polish));
-		languages.add(new LanguageType("","Portuguese (Brazil)", R.drawable.flag_portuguese_brazil));
+		languages.add(new LanguageType("PB","Portuguese (Brazil)", R.drawable.flag_portuguese_brazil));
 		languages.add(new LanguageType("","Russian", R.drawable.flag_russian));
 		languages.add(new LanguageType("","Serbian", R.drawable.flag_serbian));
 		languages.add(new LanguageType("","Slovak", R.drawable.flag_slovak));
-		languages.add(new LanguageType("","Spanish (Mexico)", R.drawable.flag_spanish_mexico));
+		languages.add(new LanguageType("ESM","Spanish (Mexico)", R.drawable.flag_spanish_mexico));
 		languages.add(new LanguageType("ES","Spanish (Spain)", R.drawable.flag_spanish_spain));
 		languages.add(new LanguageType("","Swahili", R.drawable.flag_none));
 		languages.add(new LanguageType("","Swedish", R.drawable.flag_sweden));
