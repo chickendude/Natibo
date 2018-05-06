@@ -23,8 +23,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import ch.ralena.glossikaschedule.MainActivity;
-import ch.ralena.glossikaschedule.data.LanguageData;
-import ch.ralena.glossikaschedule.data.LanguageType;
 import ch.ralena.glossikaschedule.fragment.LanguageImportFragment;
 import ch.ralena.glossikaschedule.object.Language;
 import ch.ralena.glossikaschedule.object.Pack;
@@ -38,7 +36,7 @@ public class GLSImporter {
 	public static final String TAG = GLSImporter.class.getSimpleName();
 
 	private static int BUFFER_SIZE = 1024;
-	private static List<String> ACCEPTED_LANGUAGES = Arrays.asList("EN", "ES", "ESM", "PB", "ZS");
+	private static List<String> ACCEPTED_LANGUAGES = Arrays.asList("EN", "ES", "ESM", "FR", "PB", "ZS");
 
 	private ContentResolver contentResolver;
 
@@ -218,20 +216,14 @@ public class GLSImporter {
 				// extract base language and target language from file name
 				String[] nameParts = zipEntry.getName().split("-");
 				baseLanguage = nameParts[0].trim();
-				targetLanguage = nameParts[1].trim();
+				if (nameParts.length > 3)
+					targetLanguage = nameParts[1].trim();
 				// extract contents of file into the StringBuilder
 				while ((bytesRead = zis.read(buffer, 0, BUFFER_SIZE)) >= 0) {
 					baos.write(buffer, 0, bytesRead);
 				}
 			}
 		}
-
-		// these hold the language id and the full name for the language
-		LanguageType baseType = LanguageData.getLanguageById(baseLanguage);
-		LanguageType targetType = LanguageData.getLanguageById(targetLanguage);
-
-		if (baseLanguage.length() < 2 || targetLanguage.length() < 2 || baseType == null || targetType == null)
-			return false;
 
 		// --- begin transaction
 		realm.beginTransaction();
@@ -250,16 +242,20 @@ public class GLSImporter {
 		}
 
 		// create target language and pack if they don't exist
-		Language target = realm.where(Language.class).equalTo("languageId", targetLanguage).findFirst();
-		if (target == null) {
-			target = realm.createObject(Language.class, targetLanguage);
-		}
+		Language target;
+		Pack targetPack = null;
+		if (!targetLanguage.equals("")) {
+			target = realm.where(Language.class).equalTo("languageId", targetLanguage).findFirst();
+			if (target == null) {
+				target = realm.createObject(Language.class, targetLanguage);
+			}
 
-		Pack targetPack = target.getPack(packName);
-		if (targetPack == null) {
-			targetPack = realm.createObject(Pack.class, UUID.randomUUID().toString());
-			targetPack.setBook(packName);
-			target.getPacks().add(targetPack);
+			targetPack = target.getPack(packName);
+			if (targetPack == null) {
+				targetPack = realm.createObject(Pack.class, UUID.randomUUID().toString());
+				targetPack.setBook(packName);
+				target.getPacks().add(targetPack);
+			}
 		}
 
 		realm.commitTransaction();
@@ -305,8 +301,9 @@ public class GLSImporter {
 			}
 
 			// create or update target and base sentences
-			targetPack.createSentenceOrUpdate(realm, index, translation, ipa, romanization, null);
-			basePack.createSentenceOrUpdate(realm, index, sentence, null, null, null);
+			if (!targetLanguage.equals(""))
+				targetPack.createSentenceOrUpdate(realm, index, translation, ipa, romanization, null);
+			basePack.createSentenceOrUpdate(realm, index, sentence, ipa, romanization, null);
 		}
 
 		actionSubject.onNext(LanguageImportFragment.ACTION_EXTRACTING_AUDIO);
