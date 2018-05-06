@@ -266,7 +266,7 @@ public class GLSImporter {
 		actionSubject.onNext(LanguageImportFragment.ACTION_EXTRACTING_TEXT);
 
 		progressSubject.onNext(0);
-		totalSubject.onNext(numFiles / 2);
+		totalSubject.onNext(numFiles / (targetLanguage.equals("") ? 1 : 2));
 
 		String[] sentenceList = baos.toString("UTF-8").split("\n");
 		String[] sections = sentenceList[0].split("\t");

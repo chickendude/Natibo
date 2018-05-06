@@ -139,6 +139,10 @@ public class LanguageImportFragment extends Fragment {
 
 	private void extractText() {
 		actionText.setText(getResources().getString(R.string.extracting_sentence_text));
+
+		counterText.setVisibility(View.VISIBLE);
+		totalText.setVisibility(View.VISIBLE);
+		dividerBarLabel.setVisibility(View.VISIBLE);
 	}
 
 	private void countSentences() {
