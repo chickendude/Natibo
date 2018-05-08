@@ -109,7 +109,12 @@ public class GLSImporter {
 					is = getInputStream(uri);
 					ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is));
 
-					countFiles(zis, realm);
+					// check if there's anything missing in the file
+					if(!countFiles(zis, realm)) {
+						activity.runOnUiThread(() -> Toast.makeText(activity.getApplicationContext(), String.format("Error processing file: %s", uri), Toast.LENGTH_SHORT).show());
+						actionSubject.onNext(LanguageImportFragment.ACTION_EXIT);
+						return;
+					}
 
 					// second pass
 					ZipEntry zipEntry;
@@ -204,6 +209,7 @@ public class GLSImporter {
 		String baseLanguage = "";
 		String targetLanguage = "";
 		String packName = "";
+		boolean hasGspFile = false;
 		while ((zipEntry = zis.getNextEntry()) != null) {
 			// only count the sentence mp3 files
 			if (zipEntry.getName().endsWith("mp3")) {
@@ -212,6 +218,7 @@ public class GLSImporter {
 				actionSubject.onNext(LanguageImportFragment.ACTION_COUNTING_SENTENCES);
 				totalSubject.onNext(numFiles);
 			} else if (zipEntry.getName().endsWith(".gsp")) {
+				hasGspFile = true;
 				actionSubject.onNext(LanguageImportFragment.ACTION_READING_SENTENCES);
 				// extract base language and target language from file name
 				String[] nameParts = zipEntry.getName().split("-");
@@ -224,6 +231,9 @@ public class GLSImporter {
 				}
 			}
 		}
+
+		if (!hasGspFile)
+			return false;
 
 		// --- begin transaction
 		realm.beginTransaction();

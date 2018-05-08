@@ -18,6 +18,7 @@ import ch.ralena.glossikaschedule.adapter.LanguageListAdapter;
 import ch.ralena.glossikaschedule.object.Language;
 import io.reactivex.functions.Consumer;
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class LanguageListFragment extends Fragment {
@@ -45,6 +46,9 @@ public class LanguageListFragment extends Fragment {
 			noLanguagesText.setVisibility(View.VISIBLE);
 			recyclerView.setVisibility(View.GONE);
 		} else {
+			// check if there are any empty languages
+			deleteEmptyLanguages();
+
 			// hide "No Courses" text
 			noLanguagesText.setVisibility(View.GONE);
 			recyclerView.setVisibility(View.VISIBLE);
@@ -66,9 +70,26 @@ public class LanguageListFragment extends Fragment {
 		}
 
 		// set up FAB
-		fab.setOnClickListener(v -> ((MainActivity)getActivity()).importLanguagPack());
+		fab.setOnClickListener(v -> ((MainActivity) getActivity()).importLanguagPack());
 
 		return view;
+	}
+
+	private void deleteEmptyLanguages() {
+		// find all empty languages
+		RealmList<Language> emptyLanguages = new RealmList<>();
+		for (Language language : languages) {
+			if (language.getLanguageType() == null || language.getLanguageId().equals(""))
+				emptyLanguages.add(language);
+		}
+		// delete the packs and languages themselves
+		realm.executeTransaction(r -> {
+			for (Language language : emptyLanguages) {
+				if (language.getPacks() != null)
+					language.getPacks().deleteAllFromRealm();
+				language.deleteFromRealm();
+			}
+		});
 	}
 
 	@Override
