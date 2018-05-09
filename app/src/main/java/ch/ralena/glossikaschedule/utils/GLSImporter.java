@@ -23,6 +23,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import ch.ralena.glossikaschedule.MainActivity;
+import ch.ralena.glossikaschedule.R;
+import ch.ralena.glossikaschedule.data.LanguageData;
 import ch.ralena.glossikaschedule.fragment.LanguageImportFragment;
 import ch.ralena.glossikaschedule.object.Language;
 import ch.ralena.glossikaschedule.object.Pack;
@@ -34,6 +36,10 @@ import io.realm.Realm;
  */
 public class GLSImporter {
 	public static final String TAG = GLSImporter.class.getSimpleName();
+
+	private static final int STATUS_OK = 0;
+	private static final int STATUS_MISSING_GSP = 1;
+	private static final int STATUS_INVALID_LANGUAGE = 2;
 
 	private static int BUFFER_SIZE = 1024;
 	private static List<String> ACCEPTED_LANGUAGES = Arrays.asList("EN", "ES", "ESM", "FR", "PB", "ZS");
@@ -110,8 +116,21 @@ public class GLSImporter {
 					ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is));
 
 					// check if there's anything missing in the file
-					if(!countFiles(zis, realm)) {
-						activity.runOnUiThread(() -> Toast.makeText(activity.getApplicationContext(), String.format("Error processing file: %s", uri), Toast.LENGTH_SHORT).show());
+					int status = countFiles(zis, realm);
+					if(status > STATUS_OK) {
+						int stringResId;
+						switch (status) {
+							case STATUS_INVALID_LANGUAGE:
+								stringResId = R.string.language_not_supported;
+								break;
+							case STATUS_MISSING_GSP:
+								stringResId = R.string.missing_gsp;
+								break;
+							default:
+								stringResId = R.string.error_opening_file;
+								break;
+						}
+						activity.runOnUiThread(() -> Toast.makeText(activity.getApplicationContext(), activity.getString(stringResId), Toast.LENGTH_SHORT).show());
 						actionSubject.onNext(LanguageImportFragment.ACTION_EXIT);
 						return;
 					}
@@ -194,7 +213,7 @@ public class GLSImporter {
 	 * Counts the number of files in a pack and does some basic verification to ensure files are
 	 * in order.
 	 **/
-	private boolean countFiles(ZipInputStream zis, Realm realm) throws IOException {
+	private int countFiles(ZipInputStream zis, Realm realm) throws IOException {
 		// update action in fragment
 		actionSubject.onNext(LanguageImportFragment.ACTION_COUNTING_SENTENCES);
 
@@ -233,7 +252,10 @@ public class GLSImporter {
 		}
 
 		if (!hasGspFile)
-			return false;
+			return STATUS_MISSING_GSP;
+
+		if (LanguageData.getLanguageById(baseLanguage) == null)
+			return STATUS_INVALID_LANGUAGE;
 
 		// --- begin transaction
 		realm.beginTransaction();
@@ -320,6 +342,6 @@ public class GLSImporter {
 		progressSubject.onNext(0);
 		totalSubject.onNext(numFiles);
 
-		return true;
+		return STATUS_OK;
 	}
 }
