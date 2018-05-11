@@ -45,4 +45,5 @@
 	<string name="missing_gsp">The pack is incomplete, it\'s missing the sentence text file!</string>
 	<string name="language_not_supported">This language is not yet supported!</string>
 	<string name="error_opening_file">There was an error opening the file!</string>
+	<string name="shared_preferences_file">glossika_native_sp</string>
 </resources>

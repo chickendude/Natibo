@@ -1,10 +1,12 @@
 package ch.ralena.glossikaschedule.fragment;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,7 @@ import io.realm.Realm;
 public class StudySessionFragment extends Fragment {
 	private static final String TAG = StudySessionFragment.class.getSimpleName();
 	public static final String KEY_COURSE_ID = "language_id";
+	private static final String KEY_IS_PAUSED = "key_is_paused";
 
 	Course course;
 
@@ -34,9 +37,12 @@ public class StudySessionFragment extends Fragment {
 
 	private MainActivity activity;
 
+	// fields
+	private SharedPreferences prefs;
 	private StudySessionService studySessionService;
 	private long millisLeft;
-	CountDownTimer countDownTimer;
+	private CountDownTimer countDownTimer;
+	private boolean isPaused;
 
 	// views
 	private TextView remainingRepsText;
@@ -64,7 +70,6 @@ public class StudySessionFragment extends Fragment {
 	private TextView targetIpaText;
 	private LinearLayout targetIpaLayout;
 
-
 	Disposable serviceDisposable;
 	Disposable sentenceDisposable;
 	Disposable finishDisposable;
@@ -76,6 +81,13 @@ public class StudySessionFragment extends Fragment {
 
 		activity = (MainActivity) getActivity();
 
+//		prefs = activity.getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE);
+		if (savedInstanceState != null) {
+			isPaused = savedInstanceState.getBoolean(KEY_IS_PAUSED, true);
+		} else {
+			isPaused = true;
+		}
+
 		// load schedules from database
 		String id = getArguments().getString(KEY_COURSE_ID);
 		realm = Realm.getDefaultInstance();
@@ -85,6 +97,26 @@ public class StudySessionFragment extends Fragment {
 		if (course.getCurrentDay() == null || course.getCurrentDay().isCompleted())
 			course.prepareNextDay(realm);
 
+		// in a separate method since we have so many views!
+		loadViews(view);
+
+		baseLanguageCodeText.setText(course.getBaseLanguage().getLanguageId());
+		targetLanguageCodeText.setText(course.getTargetLanguage().getLanguageId());
+
+		// load language name
+		TextView courseTitleLabel = view.findViewById(R.id.courseTitleText);
+		courseTitleLabel.setText(course.getTitle());
+
+		// hide sentences layout until a sentence has been loaded
+		sentencesLayout.setVisibility(View.INVISIBLE);
+
+		// handle playing/pausing
+		playPauseImage.setOnClickListener(this::playPause);
+
+		return view;
+	}
+
+	private void loadViews(View view) {
 		// load views
 		remainingRepsText = view.findViewById(R.id.remainingRepsText);
 		remainingTimeText = view.findViewById(R.id.remainingTimeText);
@@ -110,21 +142,6 @@ public class StudySessionFragment extends Fragment {
 		targetRomanizationLayout = view.findViewById(R.id.targetRomanizationLayout);
 		targetIpaText = view.findViewById(R.id.targetIpaText);
 		targetIpaLayout = view.findViewById(R.id.targetIpaLayout);
-
-		baseLanguageCodeText.setText(course.getBaseLanguage().getLanguageId());
-		targetLanguageCodeText.setText(course.getTargetLanguage().getLanguageId());
-
-		// load language name
-		TextView courseTitleLabel = view.findViewById(R.id.courseTitleText);
-		courseTitleLabel.setText(course.getTitle());
-
-		// hide sentences layout until a sentence has been loaded
-		sentencesLayout.setVisibility(View.INVISIBLE);
-
-		// handle playing/pausing
-		playPauseImage.setOnClickListener(this::playPause);
-
-		return view;
 	}
 
 	private void connectToService() {
@@ -134,6 +151,11 @@ public class StudySessionFragment extends Fragment {
 			studySessionService = service;
 			sentenceDisposable = studySessionService.sentenceObservable().subscribe(this::nextSentence);
 			finishDisposable = studySessionService.finishObservable().subscribe(this::sessionFinished);
+			setPaused(studySessionService.getPlaybackStatus() == StudySessionService.PlaybackStatus.PAUSED);
+			if (!isPaused) {
+				startTimer();
+			}
+			updateTime();
 			updatePlayPauseImage();
 		});
 		activity.startSession(course.getCurrentDay());
@@ -143,7 +165,9 @@ public class StudySessionFragment extends Fragment {
 		if (studySessionService != null) {
 			if (studySessionService.getPlaybackStatus() == StudySessionService.PlaybackStatus.PLAYING) {
 				studySessionService.pause();
-				countDownTimer.cancel();
+				setPaused(true);
+				if (countDownTimer != null)
+					countDownTimer.cancel();
 			} else {
 				studySessionService.resume();
 				startTimer();
@@ -188,12 +212,12 @@ public class StudySessionFragment extends Fragment {
 
 		// update countdown timer
 		millisLeft = course.getCurrentDay().getTimeLeft();
-		if (countDownTimer != null)
-			countDownTimer.cancel();
+//		if (countDownTimer != null)
+//			countDownTimer.cancel();
 
 		// there
-		startTimer();
-		updateTime();
+//		startTimer();
+//		updateTime();
 
 		// update base sentence views
 		baseSentenceText.setText(baseSentence.getText());
@@ -214,15 +238,24 @@ public class StudySessionFragment extends Fragment {
 		countDownTimer = new CountDownTimer(millisLeft, 100) {
 			@Override
 			public void onTick(long millisUntilFinished) {
-				millisLeft = millisUntilFinished;
-				updateTime();
+				if (!isPaused) {
+					millisLeft = millisUntilFinished;
+					updateTime();
+				}
 			}
 
 			@Override
 			public void onFinish() {
-
+				Log.d(TAG, "timer finished: " + this.toString());
 			}
-		}.start();
+		};
+		setPaused(false);
+		countDownTimer.start();
+	}
+
+	private void setPaused(boolean isPaused) {
+		this.isPaused = isPaused;
+//		prefs.edit().putBoolean(KEY_IS_PAUSED, isPaused).apply();
 	}
 
 	private void updateTime() {
@@ -242,6 +275,12 @@ public class StudySessionFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean(KEY_IS_PAUSED, isPaused);
 	}
 
 	@Override
