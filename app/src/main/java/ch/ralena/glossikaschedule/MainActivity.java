@@ -31,7 +31,6 @@ import io.realm.Realm;
 public class MainActivity extends AppCompatActivity {
 	private static final String TAG = MainActivity.class.getSimpleName();
 	private static final String KEY_SERVICE_BOUND = "key_service_bound";
-	public static final String ACTION_START_SESSION = "action_start_session";
 	private static final int ACTION_OPEN_DRAWER = 0;
 	private static final int ACTION_BACK = 1;
 	private static final int REQUEST_PICK_GLS = 1;
@@ -106,12 +105,12 @@ public class MainActivity extends AppCompatActivity {
 
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();
 		if (isServiceBound) {
 			unbindService(serviceConnection);
 			studySessionService.removeNotification();
 			studySessionService.stopSelf();
 		}
+		super.onDestroy();
 	}
 
 	@Override
@@ -144,8 +143,6 @@ public class MainActivity extends AppCompatActivity {
 			}
 
 			public void onDrawerOpened(View drawerView) {
-//				super.onDrawerOpened(drawerView);
-//				invalidateOptionsMenu();
 			}
 		};
 		drawerToggle.syncState();

@@ -1,5 +1,6 @@
 package ch.ralena.glossikaschedule.service;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -160,13 +161,13 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		} else {
 			sentencePublish.onNext(sentencePair);
 			sentence = day.getCurrentSentence();
-			mediaPlayer.stop();
-			mediaPlayer.reset();
 			try {
+				mediaPlayer.stop();
+				mediaPlayer.reset();
 				// load sentence path into mediaplayer to be played
 				mediaPlayer.setDataSource(sentence.getUri());
 				mediaPlayer.prepare();
-			} catch (IOException e) {
+			} catch (IOException | IllegalStateException e) {
 				e.printStackTrace();
 				stopSelf();
 			}
@@ -231,7 +232,6 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 					.setOngoing(playbackStatus == PlaybackStatus.PLAYING);
 			NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 			notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
-
 		}
 	}
 
@@ -261,6 +261,8 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		playbackStatus = PlaybackStatus.PLAYING;
 		if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
 			mediaPlayer.start();
+		} else {
+			nextSentence();
 		}
 	}
 
@@ -289,6 +291,11 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	// --- notification ---
 
 	public void buildNotification() {
+		if (sentencePair == null) {
+			finishPublish.onNext(day);
+			return;
+		}
+
 		int playPauseDrawable = android.R.drawable.ic_media_pause;
 		PendingIntent playPauseAction = null;
 
@@ -305,8 +312,8 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			// Create the NotificationChannel, but only on API 26+ because
 			// the NotificationChannel class is new and not in the support library
-			CharSequence name = "GlossikaNativeChannel";
-			String description = "Glossika stuff";
+			CharSequence name = "Study Session";
+			String description = "Displays your sentences for a study session.";
 			int importance = NotificationManager.IMPORTANCE_LOW;
 			NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
 			channel.setDescription(description);
@@ -317,10 +324,10 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 		// create the notification
 		Intent activityIntent = new Intent(this, MainActivity.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(this, MainActivity.REQUEST_LOAD_SESSION, activityIntent, 0);
+//		PendingIntent contentIntent = PendingIntent.getActivity(this, MainActivity.REQUEST_LOAD_SESSION, activityIntent, 0);
 		notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
 				.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-				.setContentIntent(contentIntent)
+//				.setContentIntent(contentIntent)
 				.setShowWhen(false)
 				.setOngoing(playbackStatus == PlaybackStatus.PLAYING)
 				.setOnlyAlertOnce(true)
@@ -335,13 +342,16 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 				.addAction(android.R.drawable.ic_media_previous, "prev sentence", iconAction(ACTION_ID_PREVIOUS))
 				.addAction(playPauseDrawable, "pause", playPauseAction)
 				.addAction(android.R.drawable.ic_media_next, "next sentence", iconAction(ACTION_ID_NEXT));
-		notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+		Notification notification = notificationBuilder.build();
+		notificationManager.notify(NOTIFICATION_ID, notification);
+		startForeground(NOTIFICATION_ID, notification);
 	}
 
 	public void removeNotification() {
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.cancel(NOTIFICATION_ID);
-		notificationManager.cancelAll();
+		stopForeground(true);
+		notificationBuilder = null;
 	}
 
 	private PendingIntent iconAction(int actionId) {

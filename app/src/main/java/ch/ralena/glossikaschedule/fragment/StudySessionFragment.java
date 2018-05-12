@@ -81,7 +81,6 @@ public class StudySessionFragment extends Fragment {
 
 		activity = (MainActivity) getActivity();
 
-//		prefs = activity.getSharedPreferences(getString(R.string.shared_preferences_file), Context.MODE_PRIVATE);
 		if (savedInstanceState != null) {
 			isPaused = savedInstanceState.getBoolean(KEY_IS_PAUSED, true);
 		} else {
@@ -148,6 +147,8 @@ public class StudySessionFragment extends Fragment {
 		serviceDisposable = activity.getSessionPublish().subscribe(service -> {
 			if (course.getCurrentDay().getCurrentSentencePair() != null)
 				nextSentence(course.getCurrentDay().getCurrentSentencePair());
+			else
+				sessionFinished(course.getCurrentDay());
 			studySessionService = service;
 			sentenceDisposable = studySessionService.sentenceObservable().subscribe(this::nextSentence);
 			finishDisposable = studySessionService.finishObservable().subscribe(this::sessionFinished);
@@ -210,14 +211,8 @@ public class StudySessionFragment extends Fragment {
 		// update number of reps remaining
 		remainingRepsText.setText(String.format(Locale.getDefault(), "%d", course.getCurrentDay().getNumReviewsLeft()));
 
-		// update countdown timer
+		// update time left
 		millisLeft = course.getCurrentDay().getTimeLeft();
-//		if (countDownTimer != null)
-//			countDownTimer.cancel();
-
-		// there
-//		startTimer();
-//		updateTime();
 
 		// update base sentence views
 		baseSentenceText.setText(baseSentence.getText());
