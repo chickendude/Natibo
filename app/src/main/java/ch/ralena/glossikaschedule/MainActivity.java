@@ -21,6 +21,7 @@ import android.view.View;
 import ch.ralena.glossikaschedule.fragment.CourseListFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageImportFragment;
 import ch.ralena.glossikaschedule.fragment.LanguageListFragment;
+import ch.ralena.glossikaschedule.fragment.MainSettingsFragment;
 import ch.ralena.glossikaschedule.fragment.StudySessionFragment;
 import ch.ralena.glossikaschedule.object.Day;
 import ch.ralena.glossikaschedule.service.StudySessionService;
@@ -163,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
 							loadCourseListFragment();
 							break;
 						case R.id.nav_settings:
+							loadMainSettingsFragment();
 							break;
 						case R.id.nav_import:
 							importLanguagPack();
@@ -184,6 +186,8 @@ public class MainActivity extends AppCompatActivity {
 		startActivityForResult(mediaIntent, REQUEST_PICK_GLS);
 	}
 
+	// --- Loading Fragments ---
+
 	/**
 	 * Loads the LanguageListFragment fragment.
 	 */
@@ -192,6 +196,18 @@ public class MainActivity extends AppCompatActivity {
 		LanguageListFragment fragment = new LanguageListFragment();
 		fragmentManager
 				.beginTransaction()
+				.replace(R.id.fragmentPlaceHolder, fragment)
+				.commit();
+	}
+
+	/**
+	 * Loads the CourseListFragment fragment.
+	 */
+	private void loadMainSettingsFragment() {
+		MainSettingsFragment fragment = new MainSettingsFragment();
+		fragmentManager
+				.beginTransaction()
+				.addToBackStack(null)
 				.replace(R.id.fragmentPlaceHolder, fragment)
 				.commit();
 	}
