@@ -42,7 +42,7 @@ public class LanguageData {
 		languages.add(new LanguageType("FR","French", R.drawable.flag_french));
 		languages.add(new LanguageType("DE","German", R.drawable.flag_german));
 		languages.add(new LanguageType("EL","Greek", R.drawable.flag_greek));
-		languages.add(new LanguageType("HI","Hindi", R.drawable.flag_hindi));
+		languages.add(new LanguageType("HI","Hindi", R.drawable.flag_indian));
 		languages.add(new LanguageType("HU","Hungarian", R.drawable.flag_hungarian));
 		languages.add(new LanguageType("","Icelandic", R.drawable.flag_icelandic));
 		languages.add(new LanguageType("","Indonesian", R.drawable.flag_indonesian));
@@ -60,7 +60,7 @@ public class LanguageData {
 		languages.add(new LanguageType("ESM","Spanish (Mexico)", R.drawable.flag_spanish_mexico));
 		languages.add(new LanguageType("ES","Spanish (Spain)", R.drawable.flag_spanish_spain));
 		languages.add(new LanguageType("SW","Swahili", R.drawable.flag_none));
-		languages.add(new LanguageType("SV","Swedish", R.drawable.flag_sweden));
+		languages.add(new LanguageType("SV","Swedish", R.drawable.flag_swedish));
 		languages.add(new LanguageType("TGL","Tagalog", R.drawable.flag_tagalog));
 		languages.add(new LanguageType("","Thai", R.drawable.flag_thai));
 		languages.add(new LanguageType("TR","Turkish", R.drawable.flag_turkish));
