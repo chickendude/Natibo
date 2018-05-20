@@ -46,7 +46,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	public static final int ACTION_ID_NEXT = 3;
 
 	private static final int NOTIFICATION_ID = 1337;
-	private static final String CHANNEL_ID = "GLOSSIKA_1337";
+	private static final String CHANNEL_ID = "Natibo Study Notification";
 
 	// Media Session
 	private MediaSessionManager mediaSessionManager;
@@ -61,7 +61,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	private Day day;
 	private int stopPosition;
 	private AudioManager audioManager;
-	private boolean inCall = false;
+	private boolean isPlaying = false;
 	private PhoneStateListener phoneStateListener;
 	private TelephonyManager telephonyManager;
 	private Realm realm;
@@ -402,13 +402,13 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 					case TelephonyManager.CALL_STATE_OFFHOOK:
 					case TelephonyManager.CALL_STATE_RINGING:
 						// phone ringing or in phone call
-						inCall = true;
+						isPlaying = playbackStatus == PlaybackStatus.PLAYING;
 						pause();
 						break;
 					case TelephonyManager.CALL_STATE_IDLE:
 						// back from phone call
-						inCall = false;
-						resume();
+						if (isPlaying)
+							resume();
 						break;
 				}
 			}
@@ -441,12 +441,15 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		// when another app makes focus request
 		switch (focusChange) {
 			case AudioManager.AUDIOFOCUS_GAIN:      // we've (re)gained audio focus
-				restartPlaying();
+				if (isPlaying)
+					restartPlaying();
 				break;
 			case AudioManager.AUDIOFOCUS_LOSS:        // we've lost focus indefinitely
+				isPlaying = playbackStatus == PlaybackStatus.PLAYING;
 				pauseAndRelease();
 				break;
 			case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:    // we've lost focus for a short amount of time, e.g. Google Maps announcing directions
+				isPlaying = playbackStatus == PlaybackStatus.PLAYING;
 				stop();
 				break;
 			case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:    // we've lost focus for a short amount of time but we can still play audio in bg
