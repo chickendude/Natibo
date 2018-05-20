@@ -1,6 +1,6 @@
 <resources>
-	<string name="app_name">Glossika Native</string>
-	<string name="shared_preferences_file">ch.ralena.glossikanative.SHARED_PREFERENCES</string>
+	<string name="app_name">Natibo</string>
+	<string name="shared_preferences_file">ch.ralena.natibo.SHARED_PREFERENCES</string>
 	<string name="drawer_open">Open navigation drawer</string>
 	<string name="drawer_close">Close navigation drawer</string>
 	<string name="mark_days_as_complete">Would you like to mark all days before Day %d as complete? (Swipe right to dismiss)</string>
