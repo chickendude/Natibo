@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="scalingPercent" value="58" />
+                                                <entry key="scalingPercent" value="60" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -34,8 +34,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="3f51b5" />
-                                      <entry key="foregroundImage" value="$USER_HOME$/Baixades/owl.svg.png" />
+                                      <entry key="backgroundColor" value="00bcd4" />
+                                      <entry key="foregroundImage" value="$USER_HOME$/Baixades/NatiboIcon.png" />
                                       <entry key="legacyIconShape" value="CIRCLE" />
                                       <entry key="webIconShape" value="CIRCLE" />
                                     </map>
