@@ -3,6 +3,7 @@ package ch.ralena.natibo.fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
+import ch.ralena.natibo.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.adapter.CourseDetailAdapter;
 import ch.ralena.natibo.object.Course;
@@ -45,7 +47,8 @@ public class CourseDetailFragment extends Fragment {
 		realm = Realm.getDefaultInstance();
 		course = realm.where(Course.class).equalTo("id", id).findFirst();
 
-		getActivity().setTitle(course.getTitle());
+		MainActivity activity = (MainActivity) getActivity();
+		activity.setTitle(course.getTitle());
 
 		// load total reps
 		TextView totalRepsText = view.findViewById(R.id.totalRepsText);
@@ -63,6 +66,21 @@ public class CourseDetailFragment extends Fragment {
 		Language targetLanguage = course.getTargetLanguage();
 		TextView languageLabel = view.findViewById(R.id.languageLabel);
 		languageLabel.setText(targetLanguage.getLanguageType().getName());
+
+		// delete course icon
+		ImageView deleteIcon = view.findViewById(R.id.deleteIcon);
+		View.OnClickListener deleteConfirmListener =
+				v -> {
+					realm.executeTransaction(realm -> realm.where(Course.class).equalTo("id", course.getId()).findFirst().deleteFromRealm());
+					activity.loadCourseListFragment();
+				};
+
+
+		deleteIcon.setOnClickListener(v -> {
+			Snackbar.make(view, "Are you sure you want to delete? This cannot be undone", Snackbar.LENGTH_INDEFINITE)
+					.setAction("DELETE", deleteConfirmListener)
+					.show();
+		});
 
 		RealmList<Pack> matchingPacks = targetLanguage.getMatchingPacks(course.getBaseLanguage());
 
