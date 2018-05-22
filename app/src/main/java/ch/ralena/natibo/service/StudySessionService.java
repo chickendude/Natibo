@@ -331,7 +331,8 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 				.setShowWhen(false)
 				.setOngoing(playbackStatus == PlaybackStatus.PLAYING)
 				.setOnlyAlertOnce(true)
-				.setSmallIcon(R.drawable.ic_owl)
+				.setSmallIcon(R.drawable.ic_logo)
+				.setColorized(false)
 				.setStyle(
 						new android.support.v4.media.app.NotificationCompat.MediaStyle()
 								.setMediaSession(mediaSession.getSessionToken())

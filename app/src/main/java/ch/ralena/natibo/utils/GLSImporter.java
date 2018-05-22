@@ -16,8 +16,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -42,7 +40,6 @@ public class GLSImporter {
 	private static final int STATUS_INVALID_LANGUAGE = 2;
 
 	private static int BUFFER_SIZE = 1024;
-	private static List<String> ACCEPTED_LANGUAGES = Arrays.asList("EN", "ES", "ESM", "FR", "PB", "ZS");
 
 	private ContentResolver contentResolver;
 
@@ -151,8 +148,7 @@ public class GLSImporter {
 							String number = parts[2];
 
 							// make sure it's one of the accepted languages
-							if (ACCEPTED_LANGUAGES.contains(language) && entryName.contains(".mp3")) {
-								progressSubject.onNext(++fileNumber);
+							if (entryName.contains(".mp3")) {
 								File folder = new File(activity.getFilesDir() + "/" + language);
 								if (!folder.isDirectory()) {
 									folder.mkdir();
@@ -182,6 +178,7 @@ public class GLSImporter {
 							} else {
 								Log.d(TAG, "Skipping: " + entryName);
 							}
+							progressSubject.onNext(++fileNumber);
 						}
 					}
 
