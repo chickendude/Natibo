@@ -62,10 +62,10 @@ public class LanguageData {
 		languages.add(new LanguageType("SW","Swahili", R.drawable.flag_none));
 		languages.add(new LanguageType("SV","Swedish", R.drawable.flag_swedish));
 		languages.add(new LanguageType("TGL","Tagalog", R.drawable.flag_tagalog));
-		languages.add(new LanguageType("","Thai", R.drawable.flag_thai));
+		languages.add(new LanguageType("TH","Thai", R.drawable.flag_thai));
 		languages.add(new LanguageType("TR","Turkish", R.drawable.flag_turkish));
 		languages.add(new LanguageType("UKR","Ukrainian", R.drawable.flag_ukrainian));
-		languages.add(new LanguageType("","Vietnamese (Northern)", R.drawable.flag_vietnamese_north));
+		languages.add(new LanguageType("VNN","Vietnamese (Northern)", R.drawable.flag_vietnamese_north));
 
 		return languages;
 	}
