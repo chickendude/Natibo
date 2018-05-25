@@ -105,6 +105,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 			mediaPlayer.setOnCompletionListener(this);
 			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			loadSentence();
+			play();
 		}
 
 		if (mediaSessionManager == null) {
@@ -184,7 +185,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			mediaSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
 		}
-		mediaSession = new MediaSessionCompat(getApplicationContext(), "GlossikaNative");
+		mediaSession = new MediaSessionCompat(getApplicationContext(), "Natibo");
 		transportControls = mediaSession.getController().getTransportControls();
 		mediaSession.setActive(true);
 		mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);

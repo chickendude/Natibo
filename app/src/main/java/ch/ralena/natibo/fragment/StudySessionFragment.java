@@ -152,7 +152,7 @@ public class StudySessionFragment extends Fragment {
 			studySessionService = service;
 			sentenceDisposable = studySessionService.sentenceObservable().subscribe(this::nextSentence);
 			finishDisposable = studySessionService.finishObservable().subscribe(this::sessionFinished);
-			setPaused(studySessionService.getPlaybackStatus() == StudySessionService.PlaybackStatus.PAUSED);
+			setPaused(studySessionService.getPlaybackStatus() == null || studySessionService.getPlaybackStatus() == StudySessionService.PlaybackStatus.PAUSED);
 			if (!isPaused) {
 				startTimer();
 			}
