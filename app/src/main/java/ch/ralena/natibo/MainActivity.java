@@ -329,6 +329,14 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
+	public void stopSession() {
+		if (isServiceBound) {
+			unbindService(serviceConnection);
+			studySessionService.removeNotification();
+			studySessionService.stopSelf();
+		}
+	}
+
 	public PublishSubject<StudySessionService> getSessionPublish() {
 		return sessionPublish;
 	}

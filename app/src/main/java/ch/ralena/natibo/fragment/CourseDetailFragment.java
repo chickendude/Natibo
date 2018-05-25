@@ -72,6 +72,7 @@ public class CourseDetailFragment extends Fragment {
 		View.OnClickListener deleteConfirmListener =
 				v -> {
 					realm.executeTransaction(realm -> realm.where(Course.class).equalTo("id", course.getId()).findFirst().deleteFromRealm());
+					activity.stopSession();
 					activity.loadCourseListFragment();
 				};
 
