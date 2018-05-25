@@ -69,6 +69,7 @@
 			android:orientation="vertical">
 
 			<ImageView
+				android:id="@+id/settingsIcon"
 				android:layout_width="30dp"
 				android:layout_height="30dp"
 				android:scaleType="fitCenter"
@@ -80,6 +81,7 @@
 				android:text="@string/total_reps"/>
 
 			<TextView
+				android:id="@+id/totalRepsText"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textColor="@color/colorTextDark"

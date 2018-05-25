@@ -48,4 +48,7 @@
 	<string name="error_opening_file">There was an error opening the file!</string>
 	<string name="puase_course">Pause course when you open the individual course settings screen.</string>
 	<string name="pause_on_opening_settings">Pause on opening settings</string>
+	<string name="confirm_delete">Are you sure you want to delete? This cannot be undone.</string>
+	<string name="delete">DELETE</string>
+	<string name="course_settings_not_implemented">Individual course settings have not been implemented yet, sorry!</string>
 </resources>

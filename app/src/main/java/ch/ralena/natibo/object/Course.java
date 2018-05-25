@@ -235,4 +235,8 @@ public class Course extends RealmObject {
 			numSeen += currentDay.getSentenceSets().get(0).getBaseSentences().size();
 		return numSeen;
 	}
+
+	public int getTotalReps() {
+		return numReps + currentDay.getTotalReviews() - currentDay.getNumReviewsLeft();
+	}
 }

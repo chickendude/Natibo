@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -47,6 +48,7 @@ public class StudySessionFragment extends Fragment {
 	// views
 	private TextView remainingRepsText;
 	private TextView remainingTimeText;
+	private TextView totalRepsText;
 	private ImageView playPauseImage;
 	private LinearLayout sentencesLayout;
 
@@ -97,7 +99,7 @@ public class StudySessionFragment extends Fragment {
 			course.prepareNextDay(realm);
 
 		// in a separate method since we have so many views!
-		loadViews(view);
+		loadGlobalViews(view);
 
 		baseLanguageCodeText.setText(course.getBaseLanguage().getLanguageId());
 		targetLanguageCodeText.setText(course.getTargetLanguage().getLanguageId());
@@ -115,10 +117,11 @@ public class StudySessionFragment extends Fragment {
 		return view;
 	}
 
-	private void loadViews(View view) {
+	private void loadGlobalViews(View view) {
 		// load views
 		remainingRepsText = view.findViewById(R.id.remainingRepsText);
 		remainingTimeText = view.findViewById(R.id.remainingTimeText);
+		totalRepsText = view.findViewById(R.id.totalRepsText);
 		playPauseImage = view.findViewById(R.id.playPauseImage);
 		sentencesLayout = view.findViewById(R.id.sentencesLayout);
 
@@ -141,6 +144,10 @@ public class StudySessionFragment extends Fragment {
 		targetRomanizationLayout = view.findViewById(R.id.targetRomanizationLayout);
 		targetIpaText = view.findViewById(R.id.targetIpaText);
 		targetIpaLayout = view.findViewById(R.id.targetIpaLayout);
+
+		// settings
+		ImageView settingsIcon = view.findViewById(R.id.settingsIcon);
+		settingsIcon.setOnClickListener(v -> Toast.makeText(activity, R.string.course_settings_not_implemented, Toast.LENGTH_SHORT).show());
 	}
 
 	private void connectToService() {
@@ -210,6 +217,7 @@ public class StudySessionFragment extends Fragment {
 
 		// update number of reps remaining
 		remainingRepsText.setText(String.format(Locale.getDefault(), "%d", course.getCurrentDay().getNumReviewsLeft()));
+		totalRepsText.setText(String.format(Locale.getDefault(), "%d", course.getTotalReps()));
 
 		// update time left
 		millisLeft = course.getCurrentDay().getTimeLeft();

@@ -187,6 +187,13 @@ public class Day extends RealmObject {
 		}
 		return numReviews;
 	}
+	public int getTotalReviews() {
+		int totalReviews = 0;
+		for (SentenceSet sentenceSet : sentenceSets) {
+			totalReviews += sentenceSet.getSentencePairs().size();
+		}
+		return totalReviews;
+	}
 
 	public int getTimeLeft() {
 		MediaMetadataRetriever metadataRetriever = new MediaMetadataRetriever();

@@ -52,7 +52,7 @@ public class CourseDetailFragment extends Fragment {
 
 		// load total reps
 		TextView totalRepsText = view.findViewById(R.id.totalRepsText);
-		totalRepsText.setText(String.format(Locale.US, "%d", course.getNumReps()));
+		totalRepsText.setText(String.format(Locale.US, "%d", course.getTotalReps()));
 
 		// load total sentences seen
 		TextView totalSentencesSeenText = view.findViewById(R.id.totalSentencesSeenText);
@@ -77,9 +77,15 @@ public class CourseDetailFragment extends Fragment {
 
 
 		deleteIcon.setOnClickListener(v -> {
-			Snackbar.make(view, "Are you sure you want to delete? This cannot be undone", Snackbar.LENGTH_INDEFINITE)
-					.setAction("DELETE", deleteConfirmListener)
+			Snackbar.make(view, R.string.confirm_delete, Snackbar.LENGTH_INDEFINITE)
+					.setAction(R.string.delete, deleteConfirmListener)
 					.show();
+		});
+
+		// settings icon
+		ImageView settingsIcon = view.findViewById(R.id.settingsIcon);
+		settingsIcon.setOnClickListener(v -> {
+			Toast.makeText(activity, R.string.course_settings_not_implemented, Toast.LENGTH_SHORT).show();
 		});
 
 		RealmList<Pack> matchingPacks = targetLanguage.getMatchingPacks(course.getBaseLanguage());
