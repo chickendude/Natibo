@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import ch.ralena.natibo.MainActivity;
 import ch.ralena.natibo.R;
+import ch.ralena.natibo.object.Course;
 import ch.ralena.natibo.object.Day;
 import ch.ralena.natibo.object.Sentence;
 import ch.ralena.natibo.object.SentencePair;
@@ -58,6 +59,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	}
 
 	private MediaPlayer mediaPlayer;
+	private Course course;
 	private Day day;
 	private int stopPosition;
 	private AudioManager audioManager;
@@ -89,13 +91,19 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 		realm = Realm.getDefaultInstance();
 
-		String id = new Utils.Storage(getApplicationContext()).getDayId();
+		String dayId = new Utils.Storage(getApplicationContext()).getDayId();
 		if (day == null) {
-			day = realm.where(Day.class).equalTo("id", id).findFirst();
+			day = realm.where(Day.class).equalTo("id", dayId).findFirst();
 			if (day == null)
 				stopSelf();
 		}
 
+		String courseId = new Utils.Storage(getApplicationContext()).getCourseId();
+		if (course == null) {
+			course = realm.where(Course.class).equalTo("id", courseId).findFirst();
+			if (course == null)
+				stopSelf();
+		}
 
 		if (!requestAudioFocus())
 			stopSelf();
@@ -434,7 +442,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 				if (playbackStatus == PlaybackStatus.PLAYING)
 					play();
 			};
-			handler.postDelayed(runnable, 1000);
+			handler.postDelayed(runnable, course.getPauseMillis());
 		}
 	}
 

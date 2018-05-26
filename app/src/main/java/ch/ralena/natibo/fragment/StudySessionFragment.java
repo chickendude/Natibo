@@ -166,7 +166,7 @@ public class StudySessionFragment extends Fragment {
 			updateTime();
 			updatePlayPauseImage();
 		});
-		activity.startSession(course.getCurrentDay());
+		activity.startSession(course);
 	}
 
 	private void playPause(View view) {

@@ -25,6 +25,7 @@ public class Utils {
 	public static class Storage {
 		private static final String PREFERENCES = "ch.ralena.natibo.PREFERENCES";
 		private static final String KEY_DAY_ID = "key_day_id";
+		private static final String KEY_COURSE_ID = "key_course_id";
 
 		private Context context;
 
@@ -40,6 +41,16 @@ public class Utils {
 		public String getDayId() {
 			SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
 			return preferences.getString(KEY_DAY_ID, "");
+		}
+
+		public void putCourseId(String dayId) {
+			SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+			preferences.edit().putString(KEY_COURSE_ID, dayId).apply();
+		}
+
+		public String getCourseId() {
+			SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+			return preferences.getString(KEY_COURSE_ID, "");
 		}
 	}
 }

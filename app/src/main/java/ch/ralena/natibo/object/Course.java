@@ -123,6 +123,7 @@ public class Course extends RealmObject {
 
 	public void setPauseMillis(int pauseMillis) {
 		this.pauseMillis = pauseMillis;
+		currentDay.setPauseMillis(pauseMillis);
 	}
 
 	public RealmList<Day> getPastDays() {

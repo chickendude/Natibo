@@ -23,7 +23,7 @@ import ch.ralena.natibo.fragment.LanguageImportFragment;
 import ch.ralena.natibo.fragment.LanguageListFragment;
 import ch.ralena.natibo.fragment.MainSettingsFragment;
 import ch.ralena.natibo.fragment.StudySessionFragment;
-import ch.ralena.natibo.object.Day;
+import ch.ralena.natibo.object.Course;
 import ch.ralena.natibo.service.StudySessionService;
 import ch.ralena.natibo.utils.Utils;
 import io.reactivex.subjects.PublishSubject;
@@ -314,9 +314,10 @@ public class MainActivity extends AppCompatActivity {
 
 	// --- study session service methods ---
 
-	public void startSession(Day day) {
+	public void startSession(Course course) {
 		Utils.Storage storage = new Utils.Storage(this);
-		storage.putDayId(day.getId());
+		storage.putCourseId(course.getId());
+		storage.putDayId(course.getCurrentDay().getId());
 
 		if (!isServiceBound) {
 			Intent intent = new Intent(this, StudySessionService.class);

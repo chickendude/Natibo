@@ -46,52 +46,12 @@ public class CourseDetailFragment extends Fragment {
 		String id = getArguments().getString(TAG_COURSE_ID);
 		realm = Realm.getDefaultInstance();
 		course = realm.where(Course.class).equalTo("id", id).findFirst();
+		Language targetLanguage = course.getTargetLanguage();
 
 		MainActivity activity = (MainActivity) getActivity();
 		activity.setTitle(course.getTitle());
 
-		// load total reps
-		TextView totalRepsText = view.findViewById(R.id.totalRepsText);
-		totalRepsText.setText(String.format(Locale.US, "%d", course.getTotalReps()));
-
-		// load total sentences seen
-		TextView totalSentencesSeenText = view.findViewById(R.id.totalSentencesSeenText);
-		totalSentencesSeenText.setText(String.format(Locale.US, "%d", course.getNumSentencesSeen()));
-
-		// load flag image
-		ImageView flagImage = view.findViewById(R.id.flagImageView);
-		flagImage.setImageResource(course.getTargetLanguage().getLanguageType().getDrawable());
-
-		// load language name
-		Language targetLanguage = course.getTargetLanguage();
-		TextView languageLabel = view.findViewById(R.id.languageLabel);
-		languageLabel.setText(targetLanguage.getLanguageType().getName());
-
-		// delete course icon
-		ImageView deleteIcon = view.findViewById(R.id.deleteIcon);
-		View.OnClickListener deleteConfirmListener =
-				v -> {
-					realm.executeTransaction(realm -> realm.where(Course.class).equalTo("id", course.getId()).findFirst().deleteFromRealm());
-					activity.stopSession();
-					activity.loadCourseListFragment();
-				};
-
-
-		deleteIcon.setOnClickListener(v -> {
-			Snackbar.make(view, R.string.confirm_delete, Snackbar.LENGTH_INDEFINITE)
-					.setAction(R.string.delete, deleteConfirmListener)
-					.show();
-		});
-
-		// settings icon
-		ImageView settingsIcon = view.findViewById(R.id.settingsIcon);
-		settingsIcon.setOnClickListener(v -> {
-			Toast.makeText(activity, R.string.course_settings_not_implemented, Toast.LENGTH_SHORT).show();
-			CourseSettingsFragment fragment = new CourseSettingsFragment();
-			getFragmentManager().beginTransaction()
-					.replace(R.id.fragmentPlaceHolder, fragment)
-					.commit();
-		});
+		loadCourseInfo(view, targetLanguage);
 
 		RealmList<Pack> matchingPacks = targetLanguage.getMatchingPacks(course.getBaseLanguage());
 
@@ -104,7 +64,15 @@ public class CourseDetailFragment extends Fragment {
 
 		adapter.asObservable().subscribe(this::addRemovePack);
 
-		// set up button
+		// set up icons and button
+		prepareDeleteCourseIcon(view, activity);
+		prepareSettingsIcon(view, activity);
+		prepareStartSessionButton(view);
+
+		return view;
+	}
+
+	private void prepareStartSessionButton(View view) {
 		Button startSessionButton = view.findViewById(R.id.startSessionButton);
 
 		startSessionButton.setText(
@@ -128,8 +96,58 @@ public class CourseDetailFragment extends Fragment {
 					.addToBackStack(null)
 					.commit();
 		});
+	}
 
-		return view;
+	private void loadCourseInfo(View view, Language targetLanguage) {
+		// load total reps
+		TextView totalRepsText = view.findViewById(R.id.totalRepsText);
+		totalRepsText.setText(String.format(Locale.US, "%d", course.getTotalReps()));
+
+		// load total sentences seen
+		TextView totalSentencesSeenText = view.findViewById(R.id.totalSentencesSeenText);
+		totalSentencesSeenText.setText(String.format(Locale.US, "%d", course.getNumSentencesSeen()));
+
+		// load flag image
+		ImageView flagImage = view.findViewById(R.id.flagImageView);
+		flagImage.setImageResource(course.getTargetLanguage().getLanguageType().getDrawable());
+
+		// load language name
+		TextView languageLabel = view.findViewById(R.id.languageLabel);
+		languageLabel.setText(targetLanguage.getLanguageType().getName());
+	}
+
+	private void prepareDeleteCourseIcon(View view, MainActivity activity) {
+		ImageView deleteIcon = view.findViewById(R.id.deleteIcon);
+		View.OnClickListener deleteConfirmListener =
+				v -> {
+					realm.executeTransaction(realm -> realm.where(Course.class).equalTo("id", course.getId()).findFirst().deleteFromRealm());
+					activity.stopSession();
+					activity.loadCourseListFragment();
+				};
+
+
+		deleteIcon.setOnClickListener(v -> {
+			Snackbar.make(view, R.string.confirm_delete, Snackbar.LENGTH_INDEFINITE)
+					.setAction(R.string.delete, deleteConfirmListener)
+					.show();
+		});
+	}
+
+	private void prepareSettingsIcon(View view, MainActivity activity) {
+		ImageView settingsIcon = view.findViewById(R.id.settingsIcon);
+		settingsIcon.setOnClickListener(v -> {
+			CourseSettingsFragment fragment = new CourseSettingsFragment();
+
+			// load fragment ID into fragment arguments
+			Bundle bundle = new Bundle();
+			bundle.putString(CourseSettingsFragment.KEY_ID, course.getId());
+			fragment.setArguments(bundle);
+
+			// load the course settings fragment
+			getFragmentManager().beginTransaction()
+					.replace(R.id.fragmentPlaceHolder, fragment)
+					.commit();
+		});
 	}
 
 	private void addRemovePack(Pack pack) {
