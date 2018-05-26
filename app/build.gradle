@@ -38,13 +38,14 @@ dependencies {
 	implementation 'com.android.support:recyclerview-v7:27.1.1'
 	implementation 'com.android.support:cardview-v7:27.1.1'
 	implementation 'com.android.support:design:27.1.1'
-	implementation 'com.android.support:preference-v7:27.1.1'
 	testImplementation 'junit:junit:4.12'
 	// Google
 	implementation 'com.google.android:flexbox:0.3.1'
 	// rxJava
 	implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
 	implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+	// 3rd party
+	implementation 'com.takisoft.fix:preference-v7:27.1.1.1'
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 	debugImplementation 'com.facebook.stetho:stetho:1.5.0'
 	debugImplementation 'com.uphyca:stetho_realm:2.2.2'

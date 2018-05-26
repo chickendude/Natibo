@@ -237,6 +237,9 @@ public class Course extends RealmObject {
 	}
 
 	public int getTotalReps() {
-		return numReps + currentDay.getTotalReviews() - currentDay.getNumReviewsLeft();
+		int totalReps = numReps;
+		if (currentDay != null)
+			totalReps += currentDay.getTotalReviews() - currentDay.getNumReviewsLeft();
+		return totalReps;
 	}
 }

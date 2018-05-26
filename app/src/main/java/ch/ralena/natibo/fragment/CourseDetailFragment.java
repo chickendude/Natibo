@@ -87,6 +87,10 @@ public class CourseDetailFragment extends Fragment {
 		ImageView settingsIcon = view.findViewById(R.id.settingsIcon);
 		settingsIcon.setOnClickListener(v -> {
 			Toast.makeText(activity, R.string.course_settings_not_implemented, Toast.LENGTH_SHORT).show();
+			CourseSettingsFragment fragment = new CourseSettingsFragment();
+			getFragmentManager().beginTransaction()
+					.replace(R.id.fragmentPlaceHolder, fragment)
+					.commit();
 		});
 
 		RealmList<Pack> matchingPacks = targetLanguage.getMatchingPacks(course.getBaseLanguage());
@@ -106,26 +110,23 @@ public class CourseDetailFragment extends Fragment {
 		startSessionButton.setText(
 				course.getCurrentDay() == null || course.getCurrentDay().isCompleted() ? R.string.start_session : R.string.continue_session
 		);
-		startSessionButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// make sure we have books added before starting, otherwise it'll crash!
-				if (course.getTargetPacks().size() == 0) {
-					Toast.makeText(getContext(), "Please add a book to your course first by clicking on it!", Toast.LENGTH_SHORT).show();
-					return;
-				}
-
-				// now we can load the fragment
-				StudySessionFragment fragment = new StudySessionFragment();
-				Bundle bundle = new Bundle();
-				bundle.putString(StudySessionFragment.KEY_COURSE_ID, course.getId());
-				fragment.setArguments(bundle);
-
-				getFragmentManager().beginTransaction()
-						.replace(R.id.fragmentPlaceHolder, fragment)
-						.addToBackStack(null)
-						.commit();
+		startSessionButton.setOnClickListener(v -> {
+			// make sure we have books added before starting, otherwise it'll crash!
+			if (course.getTargetPacks().size() == 0) {
+				Toast.makeText(getContext(), "Please add a book to your course first by clicking on it!", Toast.LENGTH_SHORT).show();
+				return;
 			}
+
+			// now we can load the fragment
+			StudySessionFragment fragment = new StudySessionFragment();
+			Bundle bundle = new Bundle();
+			bundle.putString(StudySessionFragment.KEY_COURSE_ID, course.getId());
+			fragment.setArguments(bundle);
+
+			getFragmentManager().beginTransaction()
+					.replace(R.id.fragmentPlaceHolder, fragment)
+					.addToBackStack(null)
+					.commit();
 		});
 
 		return view;

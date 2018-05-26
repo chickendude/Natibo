@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<PreferenceCategory
+		android:title="Course Settings">
+
+		<EditTextPreference
+			android:defaultValue="1000"
+			android:inputType="number"
+			android:key="pref_pause"
+			android:summary="The amount of time in milliseconds to wait between each sentence."
+			android:title="Pause between sentences"/>
+
+	</PreferenceCategory>
+</PreferenceScreen>
