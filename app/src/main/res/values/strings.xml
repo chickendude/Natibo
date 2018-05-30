@@ -51,4 +51,6 @@
 	<string name="confirm_delete">Are you sure you want to delete? This cannot be undone.</string>
 	<string name="delete">DELETE</string>
 	<string name="course_settings_not_implemented">Individual course settings have not been implemented yet, sorry!</string>
+	<string name="time_in_milliseconds">The amount of time in milliseconds to wait between each sentence.</string>
+	<string name="pause_between_sentences">Pause between sentences</string>
 </resources>

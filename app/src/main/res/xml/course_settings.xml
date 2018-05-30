@@ -8,8 +8,8 @@
 			android:defaultValue="1000"
 			android:inputType="number"
 			android:key="pref_pause"
-			android:summary="The amount of time in milliseconds to wait between each sentence."
-			android:title="Pause between sentences"/>
+			android:summary="@string/time_in_milliseconds"
+			android:title="@string/pause_between_sentences"/>
 
 	</PreferenceCategory>
 </PreferenceScreen>
