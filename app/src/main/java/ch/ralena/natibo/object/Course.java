@@ -123,7 +123,8 @@ public class Course extends RealmObject {
 
 	public void setPauseMillis(int pauseMillis) {
 		this.pauseMillis = pauseMillis;
-		currentDay.setPauseMillis(pauseMillis);
+		if (currentDay != null)
+			currentDay.setPauseMillis(pauseMillis);
 	}
 
 	public RealmList<Day> getPastDays() {
@@ -239,7 +240,7 @@ public class Course extends RealmObject {
 
 	public int getTotalReps() {
 		int totalReps = numReps;
-		if (currentDay != null)
+		if (currentDay != null && !currentDay.isCompleted())
 			totalReps += currentDay.getTotalReviews() - currentDay.getNumReviewsLeft();
 		return totalReps;
 	}

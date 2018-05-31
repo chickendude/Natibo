@@ -134,7 +134,7 @@ public class Day extends RealmObject {
 	public int getNumReps() {
 		int numReps = 0;
 		for (SentenceSet sentenceSet : sentenceSets) {
-			numReps += sentenceSet.getTargetSentences().size();
+			numReps += sentenceSet.getSentencePairs().size();
 		}
 		return numReps;
 	}

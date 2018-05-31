@@ -81,7 +81,7 @@ public class CourseDetailFragment extends Fragment {
 		startSessionButton.setOnClickListener(v -> {
 			// make sure we have books added before starting, otherwise it'll crash!
 			if (course.getTargetPacks().size() == 0) {
-				Toast.makeText(getContext(), "Please add a book to your course first by clicking on it!", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getContext(), R.string.add_book_first, Toast.LENGTH_SHORT).show();
 				return;
 			}
 

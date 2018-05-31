@@ -68,7 +68,7 @@ public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.Vi
 			this.course = course;
 			languageName.setText(course.getTargetLanguage().getLongName());
 			courseTitle.setText(course.getTitle());
-			numReps.setText(String.format("%d reps", course.getNumReps()));
+			numReps.setText(String.format("%d reps", course.getTotalReps()));
 			flagImage.setImageResource(course.getTargetLanguage().getLanguageType().getDrawable());
 		}
 	}

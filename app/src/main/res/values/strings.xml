@@ -53,4 +53,5 @@
 	<string name="course_settings_not_implemented">Individual course settings have not been implemented yet, sorry!</string>
 	<string name="time_in_milliseconds">The amount of time in milliseconds to wait between each sentence.</string>
 	<string name="pause_between_sentences">Pause between sentences</string>
+	<string name="add_book_first">Please add a book to your course first by clicking on it!</string>
 </resources>
