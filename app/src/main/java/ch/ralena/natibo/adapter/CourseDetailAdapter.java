@@ -53,7 +53,7 @@ public class CourseDetailAdapter extends RecyclerView.Adapter<CourseDetailAdapte
 
 		ViewHolder(View view) {
 			super(view);
-			book = view.findViewById(R.id.bookLabel);
+			book = view.findViewById(R.id.packTitleLabel);
 			view.setOnClickListener(v -> packSubject.onNext(pack));
 		}
 

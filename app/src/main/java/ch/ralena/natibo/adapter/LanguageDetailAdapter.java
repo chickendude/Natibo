@@ -54,7 +54,7 @@ public class LanguageDetailAdapter extends RecyclerView.Adapter<LanguageDetailAd
 		ViewHolder(View view) {
 			super(view);
 			this.view = view;
-			book = view.findViewById(R.id.bookLabel);
+			book = view.findViewById(R.id.packTitleLabel);
 			numSentences = view.findViewById(R.id.numSentencesLabel);
 			this.view.setOnClickListener(v -> packSubject.onNext(pack));
 		}

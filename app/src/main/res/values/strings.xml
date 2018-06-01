@@ -54,4 +54,7 @@
 	<string name="time_in_milliseconds">The amount of time in milliseconds to wait between each sentence.</string>
 	<string name="pause_between_sentences">Pause between sentences</string>
 	<string name="add_book_first">Please add a book to your course first by clicking on it!</string>
+	<string name="books">Books</string>
+	<string name="where_to_start">Select where in the course you\'d like to start from if you\'ve previously studied the course or are familiar with the language.</string>
+	<string name="change_starting_point">Change starting point</string>
 </resources>

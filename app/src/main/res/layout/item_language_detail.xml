@@ -13,7 +13,7 @@
 	tools:background="@color/colorPrimaryDark">
 
 	<TextView
-		android:id="@+id/bookLabel"
+		android:id="@+id/packTitleLabel"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:textAlignment="center"
