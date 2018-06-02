@@ -7,6 +7,7 @@ import android.support.v7.preference.Preference;
 
 import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 
+import ch.ralena.natibo.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.object.Course;
 import io.realm.Realm;
@@ -52,6 +53,7 @@ public class CourseSettingsFragment extends PreferenceFragmentCompat {
 	public void onStart() {
 		super.onStart();
 		getActivity().setTitle(getString(R.string.settings));
+
 	}
 
 	@Override
@@ -61,6 +63,8 @@ public class CourseSettingsFragment extends PreferenceFragmentCompat {
 
 	@Override
 	public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
+		((MainActivity) getActivity()).enableBackButton();
+
 		// load course from fragment arguments
 		String courseId = getArguments().getString(KEY_ID);
 		realm = Realm.getDefaultInstance();

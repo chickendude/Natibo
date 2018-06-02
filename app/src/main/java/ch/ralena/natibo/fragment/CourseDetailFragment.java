@@ -50,6 +50,7 @@ public class CourseDetailFragment extends Fragment {
 
 		MainActivity activity = (MainActivity) getActivity();
 		activity.setTitle(course.getTitle());
+		activity.enableHomeButton();
 
 		loadCourseInfo(view, targetLanguage);
 
@@ -146,6 +147,7 @@ public class CourseDetailFragment extends Fragment {
 			// load the course settings fragment
 			getFragmentManager().beginTransaction()
 					.replace(R.id.fragmentPlaceHolder, fragment)
+					.addToBackStack(null)
 					.commit();
 		});
 	}

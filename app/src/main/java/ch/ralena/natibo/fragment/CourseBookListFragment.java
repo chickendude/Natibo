@@ -37,7 +37,7 @@ public class CourseBookListFragment extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_course_book_list, container, false);
 
 		activity = (MainActivity) getActivity();
-		activity.enableHomeButton();
+		activity.enableBackButton();
 
 		// load course that was passed in via bundle from the database
 		realm = Realm.getDefaultInstance();
