@@ -71,7 +71,7 @@ public class LanguageDetailFragment extends Fragment {
 		SentenceListFragment fragment = new SentenceListFragment();
 		Bundle bundle = new Bundle();
 		bundle.putString(SentenceListFragment.TAG_LANGUAGE_ID, language.getLanguageId());
-		bundle.putString(SentenceListFragment.TAG_PACK_ID, pack.getId());
+		bundle.putString(SentenceListFragment.TAG_BASE_PACK_ID, pack.getId());
 		fragment.setArguments(bundle);
 		getFragmentManager()
 				.beginTransaction()

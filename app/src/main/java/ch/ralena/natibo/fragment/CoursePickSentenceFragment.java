@@ -8,6 +8,9 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
@@ -16,47 +19,61 @@ import java.io.IOException;
 
 import ch.ralena.natibo.MainActivity;
 import ch.ralena.natibo.R;
-import ch.ralena.natibo.adapter.SentenceListAdapter;
+import ch.ralena.natibo.adapter.PickSentenceAdapter;
+import ch.ralena.natibo.object.Course;
 import ch.ralena.natibo.object.Language;
 import ch.ralena.natibo.object.Pack;
 import ch.ralena.natibo.object.Sentence;
 import io.realm.Realm;
+import io.realm.RealmList;
 
-public class SentenceListFragment extends Fragment {
-	private static final String TAG = SentenceListFragment.class.getSimpleName();
-	public static final String TAG_LANGUAGE_ID = "language_id";
-	public static final String TAG_BASE_PACK_ID = "base_pack_id";
-	public static final String TAG_TARGET_PACK_ID = "target_pack_id";
+public class CoursePickSentenceFragment extends Fragment {
+	private static final String TAG = CoursePickSentenceFragment.class.getSimpleName();
+	public static final String TAG_COURSE_ID = "course_id";
 
-	Language language;
-	Pack basePack;
+	private Language language;
+	private Course course;
+	private RealmList<Sentence> sentences;
 
 	private Realm realm;
 
 	private MediaPlayer mediaPlayer;
 	private RecyclerView recyclerView;
 	private SeekBar.OnSeekBarChangeListener seekBarChangeListener;
+	private MenuItem checkMenu;
 
 	@Nullable
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_sentence_list, container, false);
 
+		setHasOptionsMenu(true);
+
 		realm = Realm.getDefaultInstance();
 		mediaPlayer = new MediaPlayer();
 
 		// load language and pack from database
-		String languageId = getArguments().getString(TAG_LANGUAGE_ID);
-		String basePackId = getArguments().getString(TAG_BASE_PACK_ID);
-		language = realm.where(Language.class).equalTo("languageId", languageId).findFirst();
-		basePack = realm.where(Pack.class).equalTo("id", basePackId).findFirst();
+		String courseId = getArguments().getString(TAG_COURSE_ID, null);
+
+		course = realm.where(Course.class).equalTo("id", courseId).findFirst();
+		language = course.getTargetLanguage();
+
+		sentences = new RealmList<>();
+		for (Pack pack : course.getTargetPacks()) {
+			// use a sentence with index of -1 to separate the books
+			Sentence sentence = new Sentence();
+			sentence.setIndex(-1);
+			sentence.setText(pack.getBook());
+			sentences.add(sentence);
+			sentences.addAll(pack.getSentences());
+		}
 
 		// load language name
 		getActivity().setTitle(language.getLanguageType().getName());
 
 		// prepare seekbar
 		SeekBar seekBar = view.findViewById(R.id.seekbar);
-		seekBar.setMax(basePack.getSentences().size());
+		seekBar.setMax(sentences.size());
 
 		seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
 			@Override
@@ -79,7 +96,7 @@ public class SentenceListFragment extends Fragment {
 
 		// set up recyclerlist and adapter
 		recyclerView = view.findViewById(R.id.recyclerView);
-		SentenceListAdapter adapter = new SentenceListAdapter(language.getLanguageId(), basePack.getSentences());
+		PickSentenceAdapter adapter = new PickSentenceAdapter(language.getLanguageId(), sentences);
 		recyclerView.setAdapter(adapter);
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
 		recyclerView.setLayoutManager(layoutManager);
@@ -104,6 +121,16 @@ public class SentenceListFragment extends Fragment {
 		return view;
 	}
 
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.check_toolbar, menu);
+		checkMenu = menu.getItem(0);
+		checkMenu.setVisible(false);
+		super.onCreateOptionsMenu(menu, inflater);
+	}
+
+
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -111,6 +138,7 @@ public class SentenceListFragment extends Fragment {
 	}
 
 	private void playSentence(Sentence sentence) {
+		checkMenu.setVisible(true);
 		try {
 			mediaPlayer.reset();
 			mediaPlayer.setDataSource(sentence.getUri());

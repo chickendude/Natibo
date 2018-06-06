@@ -91,11 +91,11 @@ public class CourseSettingsFragment extends PreferenceFragmentCompat {
 	}
 
 	private void loadCourseBookListFragment() {
-		CourseBookListFragment fragment = new CourseBookListFragment();
+		CoursePickSentenceFragment fragment = new CoursePickSentenceFragment();
 
 		// attach course id to bundle
 		Bundle bundle = new Bundle();
-		bundle.putString(CourseBookListFragment.TAG_COURSE_ID, course.getId());
+		bundle.putString(CoursePickSentenceFragment.TAG_COURSE_ID, course.getId());
 		fragment.setArguments(bundle);
 
 		// load fragment
