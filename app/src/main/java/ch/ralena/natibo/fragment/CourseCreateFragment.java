@@ -95,12 +95,10 @@ public class CourseCreateFragment extends Fragment {
 		});
 
 		// buttons
-		Button oldButton = view.findViewById(R.id.oldButton);
-		Button aiButton = view.findViewById(R.id.aiButton);
+		Button aiButton = view.findViewById(R.id.prepackagedButton);
 		Button byocButton = view.findViewById(R.id.byocButton);
 
-		oldButton.setOnClickListener(v -> loadOldCourseFragment());
-		aiButton.setOnClickListener(v -> loadAiCourseFragment());
+		aiButton.setOnClickListener(v -> loadPrepackagedCourseFragment());
 		byocButton.setOnClickListener(v -> loadByocCourseFragment());
 
 		return view;
@@ -110,23 +108,18 @@ public class CourseCreateFragment extends Fragment {
 		return languages.contains(baseLanguage) && languages.contains(targetLanguage) && targetLanguage != baseLanguage;
 	}
 
-	private void loadOldCourseFragment() {
-		if (!checkLanguagesSet())
-			return;
-	}
-
 	private void loadByocCourseFragment() {
 		if (!checkLanguagesSet())
 			return;
 	}
 
-	private void loadAiCourseFragment() {
+	private void loadPrepackagedCourseFragment() {
 		if (!checkLanguagesSet())
 			return;
-		CourseAiCreateFragment fragment = new CourseAiCreateFragment();
+		CoursePrepackagedCreateFragment fragment = new CoursePrepackagedCreateFragment();
 		Bundle bundle = new Bundle();
-		bundle.putString(CourseAiCreateFragment.TAG_BASE_LANGUAGE, baseLanguage.getLanguageId());
-		bundle.putString(CourseAiCreateFragment.TAG_TARGET_LANGUAGE, targetLanguage.getLanguageId());
+		bundle.putString(CoursePrepackagedCreateFragment.TAG_BASE_LANGUAGE, baseLanguage.getLanguageId());
+		bundle.putString(CoursePrepackagedCreateFragment.TAG_TARGET_LANGUAGE, targetLanguage.getLanguageId());
 		fragment.setArguments(bundle);
 		getFragmentManager().beginTransaction()
 				.replace(R.id.fragmentPlaceHolder, fragment)

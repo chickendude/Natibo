@@ -1,5 +1,6 @@
 package ch.ralena.natibo.adapter;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,14 +18,15 @@ public class PickSentenceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	private static final int TYPE_SENTENCE = 0;
 	private static final int TYPE_MARKER = 1;
 
-	PublishSubject<Sentence> languageSubject = PublishSubject.create();
+	PublishSubject<Sentence> sentenceSubject = PublishSubject.create();
 
 	public PublishSubject<Sentence> asObservable() {
-		return languageSubject;
+		return sentenceSubject;
 	}
 
 	private RealmList<Sentence> sentences;
 	private String language;
+	private Sentence selectedSentence;
 
 	public PickSentenceAdapter(String languageId, RealmList<Sentence> sentences) {
 		this.language = languageId;
@@ -70,6 +72,7 @@ public class PickSentenceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 	class ViewHolder extends RecyclerView.ViewHolder {
 		private View view;
+		private LinearLayout sentenceLayout;
 		private TextView index;
 		private TextView languageCode;
 		private TextView sentenceText;
@@ -84,6 +87,7 @@ public class PickSentenceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		ViewHolder(View view) {
 			super(view);
 			this.view = view;
+			sentenceLayout = view.findViewById(R.id.sentenceLayout);
 			index = view.findViewById(R.id.indexLabel);
 			languageCode = view.findViewById(R.id.languageCodeLabel);
 			languageCode.setText(language);
@@ -94,11 +98,20 @@ public class PickSentenceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 			romanizationLayout = view.findViewById(R.id.romanizationLayout);
 			ipa = view.findViewById(R.id.ipaLabel);
 			ipaLayout = view.findViewById(R.id.ipaLayout);
-			this.view.setOnClickListener(v -> languageSubject.onNext(sentence));
+			this.view.setOnClickListener(v -> {
+				selectedSentence = sentence;
+				sentenceSubject.onNext(sentence);
+				notifyDataSetChanged();
+			});
 		}
 
 		void bindView(Sentence sentence) {
 			this.sentence = sentence;
+			if (sentence == selectedSentence) {
+				sentenceLayout.setBackgroundColor(Color.BLUE);
+			} else {
+				sentenceLayout.setBackgroundColor(Color.TRANSPARENT);
+			}
 			index.setText("" + sentence.getIndex());
 			sentenceText.setText(sentence.getText());
 			if (sentence.getAlternate() != null) {
@@ -123,12 +136,10 @@ public class PickSentenceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 	}
 
 	class DivideViewHolder extends RecyclerView.ViewHolder {
-		private View view;
 		private TextView book;
 
 		DivideViewHolder(View view) {
 			super(view);
-			this.view = view;
 			book = view.findViewById(R.id.bookLabel);
 		}
 

@@ -31,8 +31,8 @@ import ch.ralena.natibo.utils.Utils;
 import io.realm.Realm;
 
 // TODO: 13/04/18 move to course detail page
-public class CourseAiCreateFragment extends Fragment {
-	private static final String TAG = CourseAiCreateFragment.class.getSimpleName();
+public class CoursePrepackagedCreateFragment extends Fragment {
+	private static final String TAG = CoursePrepackagedCreateFragment.class.getSimpleName();
 	public static final String TAG_BASE_LANGUAGE = "tag_base_language";
 	public static final String TAG_TARGET_LANGUAGE = "tag_target_language";
 

@@ -21,13 +21,12 @@ import io.realm.annotations.PrimaryKey;
  * OPTIONS:
  * 0.1 - select base/target language
  * 0.2 - select packs
- * 1. Select pre-packaged schedule
- * 2. New Glossika
+ * 1. Pre-Packaged
  *	a. # sentences/day
  *	b. # days to review/reviews per day
  *		+ pre-set
  *		+ set manually
- * 3. Create your own
+ * 2. Create your own
  *	a. Add sentence pack type
  *		+ # sentences
  *		+ # days to review (1 = GMS style) / reviews per day (similar to 2.b)

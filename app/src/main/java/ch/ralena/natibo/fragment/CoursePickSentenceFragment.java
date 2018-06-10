@@ -34,11 +34,13 @@ public class CoursePickSentenceFragment extends Fragment {
 	private Language language;
 	private Course course;
 	private RealmList<Sentence> sentences;
+	private Sentence curSentence;
 
 	private Realm realm;
 
 	private MediaPlayer mediaPlayer;
 	private RecyclerView recyclerView;
+	private SeekBar seekBar;
 	private SeekBar.OnSeekBarChangeListener seekBarChangeListener;
 	private MenuItem checkMenu;
 
@@ -58,21 +60,47 @@ public class CoursePickSentenceFragment extends Fragment {
 		course = realm.where(Course.class).equalTo("id", courseId).findFirst();
 		language = course.getTargetLanguage();
 
-		sentences = new RealmList<>();
-		for (Pack pack : course.getTargetPacks()) {
-			// use a sentence with index of -1 to separate the books
-			Sentence sentence = new Sentence();
-			sentence.setIndex(-1);
-			sentence.setText(pack.getBook());
-			sentences.add(sentence);
-			sentences.addAll(pack.getSentences());
-		}
-
 		// load language name
 		getActivity().setTitle(language.getLanguageType().getName());
 
+		loadSentences();
+
 		// prepare seekbar
-		SeekBar seekBar = view.findViewById(R.id.seekbar);
+		loadSeekBar(view);
+
+		// set up recyclerlist and adapter
+		loadRecyclerView(view);
+
+		return view;
+	}
+
+	private void loadRecyclerView(View view) {
+		recyclerView = view.findViewById(R.id.recyclerView);
+		PickSentenceAdapter adapter = new PickSentenceAdapter(language.getLanguageId(), sentences);
+		recyclerView.setAdapter(adapter);
+		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+		recyclerView.setLayoutManager(layoutManager);
+
+		adapter.asObservable().subscribe(this::onSentenceClicked);
+
+		recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				super.onScrolled(recyclerView, dx, dy);
+				seekBar.setOnSeekBarChangeListener(null);
+				seekBar.setProgress(((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition());
+				seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
+			}
+
+			@Override
+			public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+				super.onScrollStateChanged(recyclerView, newState);
+			}
+		});
+	}
+
+	private void loadSeekBar(View view) {
+		seekBar = view.findViewById(R.id.seekbar);
 		seekBar.setMax(sentences.size());
 
 		seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
@@ -93,32 +121,18 @@ public class CoursePickSentenceFragment extends Fragment {
 		};
 
 		seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
+	}
 
-		// set up recyclerlist and adapter
-		recyclerView = view.findViewById(R.id.recyclerView);
-		PickSentenceAdapter adapter = new PickSentenceAdapter(language.getLanguageId(), sentences);
-		recyclerView.setAdapter(adapter);
-		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-		recyclerView.setLayoutManager(layoutManager);
-
-		adapter.asObservable().subscribe(this::playSentence);
-
-		recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-			@Override
-			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-				super.onScrolled(recyclerView, dx, dy);
-				seekBar.setOnSeekBarChangeListener(null);
-				seekBar.setProgress(((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition());
-				seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
-			}
-
-			@Override
-			public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-				super.onScrollStateChanged(recyclerView, newState);
-			}
-		});
-
-		return view;
+	private void loadSentences() {
+		sentences = new RealmList<>();
+		for (Pack pack : course.getTargetPacks()) {
+			// use a sentence with index of -1 to separate the books
+			Sentence sentence = new Sentence();
+			sentence.setIndex(-1);
+			sentence.setText(pack.getBook());
+			sentences.add(sentence);
+			sentences.addAll(pack.getSentences());
+		}
 	}
 
 
@@ -130,6 +144,18 @@ public class CoursePickSentenceFragment extends Fragment {
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.action_confirm:
+				setStartingSentence();
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	private void setStartingSentence() {
+		getActivity().onBackPressed();
+	}
 
 	@Override
 	public void onResume() {
@@ -137,7 +163,8 @@ public class CoursePickSentenceFragment extends Fragment {
 		((MainActivity) getActivity()).setNavigationDrawerItemChecked(R.id.nav_languages);
 	}
 
-	private void playSentence(Sentence sentence) {
+	private void onSentenceClicked(Sentence sentence) {
+		curSentence = sentence;
 		checkMenu.setVisible(true);
 		try {
 			mediaPlayer.reset();

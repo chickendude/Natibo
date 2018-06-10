@@ -12,7 +12,7 @@ public class MainApplication extends Application {
 		// initialize Realm
 		Realm.init(this);
 		RealmConfiguration config = new RealmConfiguration.Builder()
-				.name("glossikaschedule.realm")
+				.name("natibo.realm")
 				.schemaVersion(1)
 				.deleteRealmIfMigrationNeeded()
 				.build();
