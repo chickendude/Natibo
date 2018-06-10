@@ -57,6 +57,7 @@ public class Course extends RealmObject {
 	private int pauseMillis;
 	private RealmList<Day> pastDays = new RealmList<>();
 	private RealmList<Schedule> schedules = new RealmList<>();    // the different pieces that make up the study routine for each day
+	private RealmList<Sentence> sentencesSeen = new RealmList<>();    // keep track of which sentences have been seen and which haven't
 
 	// --- getters and setters ---
 
@@ -148,6 +149,15 @@ public class Course extends RealmObject {
 
 	// --- helper methods ---
 
+	public void setStartingSentenceForAllSchedules(Realm realm, Sentence sentence) {
+		// remember, the sentence index starts at 1, not 0!
+		realm.executeTransaction(r -> {
+			for (Schedule schedule : schedules) {
+				schedule.setSentenceIndex(sentence.getIndex() - 1);
+			}
+		});
+	}
+
 	public void addReps(int reps) {
 		numReps += reps;
 	}
@@ -206,6 +216,7 @@ public class Course extends RealmObject {
 	private RealmList<Sentence> getSentences(int index, int numSentences, RealmList<Pack> packs) {
 		RealmList<Sentence> sentences = new RealmList<>();
 
+		// go through each pack
 		for (Pack pack : packs) {
 			RealmList<Sentence> packSentences = pack.getSentences();
 			if (index >= pack.getSentences().size())

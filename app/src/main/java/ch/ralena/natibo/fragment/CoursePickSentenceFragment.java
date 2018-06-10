@@ -154,6 +154,7 @@ public class CoursePickSentenceFragment extends Fragment {
 	}
 
 	private void setStartingSentence() {
+		course.setStartingSentenceForAllSchedules(realm, curSentence);
 		getActivity().onBackPressed();
 	}
 
