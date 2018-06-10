@@ -1,6 +1,5 @@
 package ch.ralena.natibo.adapter;
 
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -108,9 +107,9 @@ public class PickSentenceAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 		void bindView(Sentence sentence) {
 			this.sentence = sentence;
 			if (sentence == selectedSentence) {
-				sentenceLayout.setBackgroundColor(Color.BLUE);
+				sentenceLayout.setBackground(view.getContext().getResources().getDrawable(R.drawable.sentence_list_border_selected));
 			} else {
-				sentenceLayout.setBackgroundColor(Color.TRANSPARENT);
+				sentenceLayout.setBackground(view.getContext().getResources().getDrawable(R.drawable.sentence_list_border));
 			}
 			index.setText("" + sentence.getIndex());
 			sentenceText.setText(sentence.getText());
