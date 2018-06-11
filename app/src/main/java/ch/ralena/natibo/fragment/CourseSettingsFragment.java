@@ -57,11 +57,6 @@ public class CourseSettingsFragment extends PreferenceFragmentCompat {
 	}
 
 	@Override
-	public void onCreate(@Nullable Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-	}
-
-	@Override
 	public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
 		((MainActivity) getActivity()).enableBackButton();
 
@@ -82,6 +77,11 @@ public class CourseSettingsFragment extends PreferenceFragmentCompat {
 		prefs.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
 
 		addPreferencesFromResource(R.xml.course_settings);
+
+		// check if you should be able to choose the starting sentence or not
+		Preference start = findPreference(PREF_START);
+		start.setEnabled(course.getTargetPacks().size() > 0);
+
 	}
 
 	@Override

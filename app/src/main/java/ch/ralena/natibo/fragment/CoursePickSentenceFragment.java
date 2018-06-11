@@ -14,8 +14,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import ch.ralena.natibo.MainActivity;
 import ch.ralena.natibo.R;
@@ -155,6 +157,14 @@ public class CoursePickSentenceFragment extends Fragment {
 
 	private void setStartingSentence() {
 		course.setStartingSentenceForAllSchedules(realm, curSentence);
+		String book = "";
+		for (Pack pack : course.getTargetPacks()) {
+			if (pack.getSentences().contains(curSentence)) {
+				book = pack.getBook();
+				break;
+			}
+		}
+		Toast.makeText(getContext(), String.format(Locale.getDefault(), getString(R.string.sentence_set), book, curSentence.getIndex()), Toast.LENGTH_SHORT).show();
 		getActivity().onBackPressed();
 	}
 

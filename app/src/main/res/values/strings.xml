@@ -54,4 +54,5 @@
 	<string name="books">Books</string>
 	<string name="where_to_start">Select where in the course you\'d like to start from if you\'ve previously studied the course or are familiar with the language.</string>
 	<string name="change_starting_point">Change starting point</string>
+	<string name="sentence_set">Sentence set to book \'%s\', sentence \'%d\'.</string>
 </resources>
