@@ -81,7 +81,6 @@ public class CourseSettingsFragment extends PreferenceFragmentCompat {
 		// check if you should be able to choose the starting sentence or not
 		Preference start = findPreference(PREF_START);
 		start.setEnabled(course.getTargetPacks().size() > 0);
-
 	}
 
 	@Override

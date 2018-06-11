@@ -26,14 +26,7 @@ import io.realm.annotations.PrimaryKey;
  *	b. # days to review/reviews per day
  *		+ pre-set
  *		+ set manually
- * 2. Create your own
- *	a. Add sentence pack type
- *		+ # sentences
- *		+ # days to review (1 = GMS style) / reviews per day (similar to 2.b)
- *		+ add languages (e.g. base + target + target, target + base, target, etc.)
- *		+ starting sentence (<= 0 means not started yet)
- *		+ study pattern: X = X + 1
- * 4? Temporary schedule (eg. quick run-through of all sentences)
+ * 2? Temporary schedule (eg. quick run-through of all sentences)
  *
  *
  * Course:
@@ -56,7 +49,7 @@ public class Course extends RealmObject {
 	private int numReps;
 	private int pauseMillis;
 	private RealmList<Day> pastDays = new RealmList<>();
-	private RealmList<Schedule> schedules = new RealmList<>();    // the different pieces that make up the study routine for each day
+	private Schedule schedule = new Schedule();    // the different pieces that make up the study routine for each day
 	private RealmList<Sentence> sentencesSeen = new RealmList<>();    // keep track of which sentences have been seen and which haven't
 
 	// --- getters and setters ---
@@ -105,8 +98,8 @@ public class Course extends RealmObject {
 		this.targetPacks = targetPacks;
 	}
 
-	public void setSchedules(RealmList<Schedule> schedules) {
-		this.schedules = schedules;
+	public void setSchedule(Schedule schedule) {
+		this.schedule = schedule;
 	}
 
 	public int getNumReps() {
@@ -143,8 +136,8 @@ public class Course extends RealmObject {
 		this.currentDay = currentDay;
 	}
 
-	public RealmList<Schedule> getSchedules() {
-		return schedules;
+	public Schedule getSchedule() {
+		return schedule;
 	}
 
 	// --- helper methods ---
@@ -152,9 +145,7 @@ public class Course extends RealmObject {
 	public void setStartingSentenceForAllSchedules(Realm realm, Sentence sentence) {
 		// remember, the sentence index starts at 1, not 0!
 		realm.executeTransaction(r -> {
-			for (Schedule schedule : schedules) {
-				schedule.setSentenceIndex(sentence.getIndex() - 1);
-			}
+			schedule.setSentenceIndex(sentence.getIndex() - 1);
 		});
 	}
 
@@ -181,23 +172,21 @@ public class Course extends RealmObject {
 				day.getSentenceSets().remove(lastSet);
 				day.getSentenceSets().add(0, lastSet);
 			}
-			for (Schedule schedule : schedules) {
-				RealmList<Integer> reviewPattern = schedule.getReviewPattern();
-				int numSentences = schedule.getNumSentences();
-				int sentenceIndex = schedule.getSentenceIndex();
-				schedule.setSentenceIndex(sentenceIndex + numSentences);
+			RealmList<Integer> reviewPattern = schedule.getReviewPattern();
+			int numSentences = schedule.getNumSentences();
+			int sentenceIndex = schedule.getSentenceIndex();
+			schedule.setSentenceIndex(sentenceIndex + numSentences);
 
-				// create new set of sentences based off the schedule
-				SentenceSet sentenceSet = new SentenceSet();
-				sentenceSet.setBaseSentences(getSentences(sentenceIndex, numSentences, basePacks));
-				sentenceSet.setTargetSentences(getSentences(sentenceIndex, numSentences, targetPacks));
-				sentenceSet.setReviews(reviewPattern);
-				sentenceSet.setFirstDay(true);
-				sentenceSet.setOrder(schedule.getOrder());
+			// create new set of sentences based off the schedule
+			SentenceSet sentenceSet = new SentenceSet();
+			sentenceSet.setBaseSentences(getSentences(sentenceIndex, numSentences, basePacks));
+			sentenceSet.setTargetSentences(getSentences(sentenceIndex, numSentences, targetPacks));
+			sentenceSet.setReviews(reviewPattern);
+			sentenceSet.setFirstDay(true);
+			sentenceSet.setOrder(schedule.getOrder());
 
-				// add sentence set to list of sentencesets for the next day's studies
-				day.getSentenceSets().add(sentenceSet);
-			}
+			// add sentence set to list of sentencesets for the next day's studies
+			day.getSentenceSets().add(sentenceSet);
 			day.setCompleted(false);
 			day.setPauseMillis(pauseMillis);
 			currentDay = day;

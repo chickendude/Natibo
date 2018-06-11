@@ -61,7 +61,6 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	private MediaPlayer mediaPlayer;
 	private Course course;
 	private Day day;
-	private int stopPosition;
 	private AudioManager audioManager;
 	private boolean isPlaying = false;
 	private PhoneStateListener phoneStateListener;
@@ -261,7 +260,6 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	public void pause() {
 		playbackStatus = PlaybackStatus.PAUSED;
 		if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-			stopPosition = mediaPlayer.getCurrentPosition();
 			mediaPlayer.pause();
 		}
 	}

@@ -233,7 +233,7 @@ public class CoursePrepackagedCreateFragment extends Fragment {
 		course.setBaseLanguage(baseLanguage);
 		course.setTargetLanguage(targetLanguage);
 		course.setPauseMillis(1000);
-		course.getSchedules().add(schedule);
+		course.setSchedule(schedule);
 		realm.commitTransaction();
 		// --- end transaction
 		return course.getId();
