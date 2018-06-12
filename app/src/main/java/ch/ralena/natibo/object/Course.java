@@ -43,6 +43,7 @@ public class Course extends RealmObject {
 	private String title;
 	private Language baseLanguage;
 	private Language targetLanguage;
+	private RealmList<Language> languages;
 	private RealmList<Pack> basePacks;
 	private RealmList<Pack> targetPacks;
 	private Day currentDay;
