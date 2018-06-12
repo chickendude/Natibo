@@ -57,4 +57,5 @@
 	<string name="sentence_set">Sentence set to book \'%s\', sentence \'%d\'.</string>
 	<string name="select_languages">Select languages</string>
 	<string name="drag_handle">Drag Handle</string>
+	<string name="base">%s - base</string>
 </resources>

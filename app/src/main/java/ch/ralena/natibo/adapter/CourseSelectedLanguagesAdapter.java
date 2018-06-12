@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.callback.ItemTouchHelperCallback;
@@ -46,7 +47,7 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-		holder.bindView(languages.get(position));
+		holder.bindView(languages.get(position), position == 0);
 	}
 
 	@Override
@@ -57,16 +58,22 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 
 	@Override
 	public boolean onItemMove(int fromPosition, int toPosition) {
+		int start, count;
 		if (fromPosition < toPosition) {
+			start = fromPosition;
+			count = toPosition - fromPosition;
 			for (int i = fromPosition; i < toPosition; i++) {
 				Collections.swap(languages, i, i + 1);
 			}
 		} else {
+			start = toPosition;
+			count = fromPosition - toPosition;
 			for (int i = fromPosition; i > toPosition; i--) {
 				Collections.swap(languages, i, i - 1);
 			}
 		}
 		notifyItemMoved(fromPosition, toPosition);
+		notifyItemRangeChanged(start, count + 1);
 		return true;
 	}
 
@@ -98,9 +105,12 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 			this.view.setOnClickListener(v -> languageSubject.onNext(language));
 		}
 
-		void bindView(Language language) {
+		void bindView(Language language, boolean isFirst) {
 			this.language = language;
-			languageName.setText(language.getLongName());
+			if (isFirst)
+				languageName.setText(String.format(Locale.getDefault(), view.getResources().getString(R.string.base), language.getLongName()));
+			else
+				languageName.setText(language.getLongName());
 			flagImage.setImageResource(language.getLanguageType().getDrawable());
 		}
 	}
