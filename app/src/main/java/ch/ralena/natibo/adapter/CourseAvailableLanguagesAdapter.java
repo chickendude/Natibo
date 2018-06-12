@@ -78,9 +78,9 @@ public class CourseAvailableLanguagesAdapter extends RecyclerView.Adapter<Course
 			this.language = language;
 			if (selectedLanguages.contains(language)) {
 				checkedImage.setVisibility(View.VISIBLE);
-				checkedImage.animate().scaleX(1f).start();
+				checkedImage.animate().scaleX(1f).setDuration(200).start();
 			} else {
-				checkedImage.animate().scaleX(0f).start();
+				checkedImage.animate().scaleX(0f).setDuration(200).start();
 			}
 			languageName.setText(language.getLongName());
 			flagImage.setImageResource(language.getLanguageType().getDrawable());

@@ -3,20 +3,27 @@ package ch.ralena.natibo.adapter;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import ch.ralena.natibo.R;
+import ch.ralena.natibo.callback.ItemTouchHelperCallback;
 import ch.ralena.natibo.object.Language;
 import io.reactivex.subjects.PublishSubject;
 
-public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseSelectedLanguagesAdapter.ViewHolder> {
+public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseSelectedLanguagesAdapter.ViewHolder> implements ItemTouchHelperCallback.ItemTouchHelperAdapter {
+	public interface OnDragListener {
+		void onStartDrag(RecyclerView.ViewHolder holder);
+	}
 
 	PublishSubject<Language> languageSubject = PublishSubject.create();
+	OnDragListener dragListener;
 
 	public PublishSubject<Language> asObservable() {
 		return languageSubject;
@@ -24,8 +31,9 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 
 	private ArrayList<Language> languages;
 
-	public CourseSelectedLanguagesAdapter(ArrayList<Language> languages) {
+	public CourseSelectedLanguagesAdapter(ArrayList<Language> languages, OnDragListener dragListener) {
 		this.languages = languages;
+		this.dragListener = dragListener;
 	}
 
 	@NonNull
@@ -38,8 +46,7 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-		if (position < getItemCount())
-			holder.bindView(languages.get(position));
+		holder.bindView(languages.get(position));
 	}
 
 	@Override
@@ -47,10 +54,33 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 		return languages.size();
 	}
 
+
+	@Override
+	public boolean onItemMove(int fromPosition, int toPosition) {
+		if (fromPosition < toPosition) {
+			for (int i = fromPosition; i < toPosition; i++) {
+				Collections.swap(languages, i, i + 1);
+			}
+		} else {
+			for (int i = fromPosition; i > toPosition; i--) {
+				Collections.swap(languages, i, i - 1);
+			}
+		}
+		notifyItemMoved(fromPosition, toPosition);
+		return true;
+	}
+
+	@Override
+	public void onItemDismiss(int position) {
+		languages.remove(position);
+		notifyItemRemoved(position);
+	}
+
 	class ViewHolder extends RecyclerView.ViewHolder {
 		private View view;
 		private TextView languageName;
 		private ImageView flagImage;
+		private ImageView handleImage;
 		private Language language;
 
 		ViewHolder(View view) {
@@ -58,6 +88,13 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 			this.view = view;
 			languageName = view.findViewById(R.id.languageLabel);
 			flagImage = view.findViewById(R.id.flagImageView);
+			handleImage = view.findViewById(R.id.handleImage);
+			handleImage.setOnTouchListener((v, event) -> {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					dragListener.onStartDrag(ViewHolder.this);
+				}
+				return false;
+			});
 			this.view.setOnClickListener(v -> languageSubject.onNext(language));
 		}
 

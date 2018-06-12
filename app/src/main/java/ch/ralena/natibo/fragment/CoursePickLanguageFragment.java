@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +18,12 @@ import ch.ralena.natibo.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.adapter.CourseAvailableLanguagesAdapter;
 import ch.ralena.natibo.adapter.CourseSelectedLanguagesAdapter;
+import ch.ralena.natibo.callback.ItemTouchHelperCallback;
 import ch.ralena.natibo.object.Language;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-public class CoursePickLanguageFragment extends Fragment {
+public class CoursePickLanguageFragment extends Fragment implements CourseSelectedLanguagesAdapter.OnDragListener {
 	private static final String TAG = CoursePickLanguageFragment.class.getSimpleName();
 	public static final String TAG_COURSE_ID = "language_id";
 
@@ -36,6 +38,8 @@ public class CoursePickLanguageFragment extends Fragment {
 	RecyclerView selectedLanguagesRecyclerView;
 	CourseAvailableLanguagesAdapter availableAdapter;
 	CourseSelectedLanguagesAdapter selectedAdapter;
+
+	private ItemTouchHelper itemTouchHelper;
 
 	@Nullable
 	@Override
@@ -61,9 +65,12 @@ public class CoursePickLanguageFragment extends Fragment {
 		availableLanguagesRecyclerView.setAdapter(availableAdapter);
 		availableLanguagesRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
-		selectedAdapter = new CourseSelectedLanguagesAdapter(selectedLanguages);
+		selectedAdapter = new CourseSelectedLanguagesAdapter(selectedLanguages, this);
 		selectedLanguagesRecyclerView.setAdapter(selectedAdapter);
 		selectedLanguagesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+		ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(selectedAdapter, false);
+		itemTouchHelper = new ItemTouchHelper(callback);
+		itemTouchHelper.attachToRecyclerView(selectedLanguagesRecyclerView);
 
 		return view;
 	}
@@ -87,5 +94,10 @@ public class CoursePickLanguageFragment extends Fragment {
 				.replace(R.id.fragmentPlaceHolder, fragment)
 				.addToBackStack(null)
 				.commit();
+	}
+
+	@Override
+	public void onStartDrag(RecyclerView.ViewHolder holder) {
+		itemTouchHelper.startDrag(holder);
 	}
 }
