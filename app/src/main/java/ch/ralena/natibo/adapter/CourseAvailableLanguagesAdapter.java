@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.object.Language;
 import io.reactivex.subjects.PublishSubject;
@@ -22,9 +24,11 @@ public class CourseAvailableLanguagesAdapter extends RecyclerView.Adapter<Course
 	}
 
 	private RealmResults<Language> languages;
+	private ArrayList<Language> selectedLanguages;
 
 	public CourseAvailableLanguagesAdapter(RealmResults<Language> languages) {
 		this.languages = languages;
+		selectedLanguages = new ArrayList<>();
 	}
 
 	@NonNull
@@ -50,6 +54,7 @@ public class CourseAvailableLanguagesAdapter extends RecyclerView.Adapter<Course
 		private View view;
 		private TextView languageName;
 		private ImageView flagImage;
+		private ImageView checkedImage;
 		private Language language;
 
 		ViewHolder(View view) {
@@ -57,11 +62,25 @@ public class CourseAvailableLanguagesAdapter extends RecyclerView.Adapter<Course
 			this.view = view;
 			languageName = view.findViewById(R.id.languageLabel);
 			flagImage = view.findViewById(R.id.flagImageView);
-			this.view.setOnClickListener(v -> languageSubject.onNext(language));
+			checkedImage = view.findViewById(R.id.checkedImage);
+			this.view.setOnClickListener(v -> {
+				if (selectedLanguages.contains(language)) {
+					selectedLanguages.remove(language);
+				} else {
+					selectedLanguages.add(language);
+				}
+				languageSubject.onNext(language);
+				notifyDataSetChanged();
+			});
 		}
 
 		void bindView(Language language) {
 			this.language = language;
+			if (selectedLanguages.contains(language)) {
+				checkedImage.setVisibility(View.VISIBLE);
+			} else {
+				checkedImage.setVisibility(View.GONE);
+			}
 			languageName.setText(language.getLongName());
 			flagImage.setImageResource(language.getLanguageType().getDrawable());
 		}
