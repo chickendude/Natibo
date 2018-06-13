@@ -1,9 +1,14 @@
 package ch.ralena.natibo.object;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import ch.ralena.natibo.data.LanguageData;
 import ch.ralena.natibo.data.LanguageType;
+import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.RealmResults;
 import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 
@@ -53,7 +58,6 @@ public class Language extends RealmObject {
 		return numSentences;
 	}
 
-
 	/**
 	 * Looks for matching sentence packs in another language set.
 	 *
@@ -81,4 +85,15 @@ public class Language extends RealmObject {
 		}
 		return null;
 	}
+
+	// ### STATIC HELPER METHODS ###
+
+	public static ArrayList<Language> getLanguagesSorted(Realm realm) {
+		RealmResults<Language> languages = realm.where(Language.class).findAll();
+		ArrayList<Language> languagesSorted = new ArrayList<>();
+		languagesSorted.addAll(languages);
+		Collections.sort(languagesSorted, (lang1, lang2) -> lang1.getLanguageType().getName().compareTo(lang2.getLanguageType().getName()));
+		return languagesSorted;
+	}
+
 }

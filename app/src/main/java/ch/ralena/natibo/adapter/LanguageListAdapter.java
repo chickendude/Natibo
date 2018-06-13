@@ -8,10 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.object.Language;
 import io.reactivex.subjects.PublishSubject;
-import io.realm.RealmResults;
 
 public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapter.ViewHolder> {
 
@@ -21,9 +22,9 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 		return languageSubject;
 	}
 
-	private RealmResults<Language> languages;
+	private ArrayList<Language> languages;
 
-	public LanguageListAdapter(RealmResults<Language> languages) {
+	public LanguageListAdapter(ArrayList<Language> languages) {
 		this.languages = languages;
 	}
 

@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.object.Language;
 import io.reactivex.subjects.PublishSubject;
-import io.realm.RealmResults;
 
 public class CourseAvailableLanguagesAdapter extends RecyclerView.Adapter<CourseAvailableLanguagesAdapter.ViewHolder> {
 
@@ -23,10 +22,10 @@ public class CourseAvailableLanguagesAdapter extends RecyclerView.Adapter<Course
 		return languageSubject;
 	}
 
-	private RealmResults<Language> languages;
+	private ArrayList<Language> languages;
 	private ArrayList<Language> selectedLanguages;
 
-	public CourseAvailableLanguagesAdapter(RealmResults<Language> languages) {
+	public CourseAvailableLanguagesAdapter(ArrayList<Language> languages) {
 		this.languages = languages;
 		selectedLanguages = new ArrayList<>();
 	}

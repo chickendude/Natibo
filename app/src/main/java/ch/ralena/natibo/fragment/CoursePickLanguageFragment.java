@@ -9,6 +9,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -21,13 +23,12 @@ import ch.ralena.natibo.adapter.CourseSelectedLanguagesAdapter;
 import ch.ralena.natibo.callback.ItemTouchHelperCallback;
 import ch.ralena.natibo.object.Language;
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 public class CoursePickLanguageFragment extends Fragment implements CourseSelectedLanguagesAdapter.OnDragListener {
 	private static final String TAG = CoursePickLanguageFragment.class.getSimpleName();
 	public static final String TAG_COURSE_ID = "language_id";
 
-	RealmResults<Language> availableLanguages;
+	ArrayList<Language> availableLanguages;
 	ArrayList<Language> selectedLanguages;
 	Language baseLanguage;
 	Language targetLanguage;
@@ -51,14 +52,28 @@ public class CoursePickLanguageFragment extends Fragment implements CourseSelect
 		activity.enableBackButton();
 		activity.setTitle(getString(R.string.select_languages));
 
+		setHasOptionsMenu(true);
+
 		realm = Realm.getDefaultInstance();
 
-		availableLanguages = realm.where(Language.class).findAll();
+		availableLanguages = Language.getLanguagesSorted(realm);
+
 		selectedLanguages = new ArrayList<>();
 
 		// recycler views
+		loadRecyclerViews(view);
+
+		return view;
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+	}
+
+	private void loadRecyclerViews(View view) {
 		availableLanguagesRecyclerView = view.findViewById(R.id.availableLanguagesRecyclerView);
-		selectedLanguagesRecyclerView= view.findViewById(R.id.selectedLanguagesRecyclerView);
+		selectedLanguagesRecyclerView = view.findViewById(R.id.selectedLanguagesRecyclerView);
 
 		availableAdapter = new CourseAvailableLanguagesAdapter(availableLanguages);
 		availableAdapter.asObservable().subscribe(this::availableLanguageClicked);
@@ -71,8 +86,6 @@ public class CoursePickLanguageFragment extends Fragment implements CourseSelect
 		ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(selectedAdapter, false);
 		itemTouchHelper = new ItemTouchHelper(callback);
 		itemTouchHelper.attachToRecyclerView(selectedLanguagesRecyclerView);
-
-		return view;
 	}
 
 	private void availableLanguageClicked(Language language) {
@@ -82,6 +95,7 @@ public class CoursePickLanguageFragment extends Fragment implements CourseSelect
 			selectedLanguages.add(language);
 		}
 		selectedAdapter.notifyDataSetChanged();
+
 	}
 
 	private void loadPrepackagedCourseFragment() {

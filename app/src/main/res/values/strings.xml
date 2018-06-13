@@ -24,12 +24,6 @@
 	<string name="alt">ALT</string>
 	<string name="no_courses">You aren\'t currently studying any courses, please create a course!</string>
 	<string name="no_languages">You haven\'t loaded any languages yet, please load a language pack (or two)!</string>
-	<string name="prepackaged">Pre-Packaged</string>
-	<string name="prepackaged_button">Select a Pre-Packaged Course</string>
-	<string name="prepackaged_details">Start a pre-packaged course or edit them slightly, choosing how many sentences a day you want to learn, how many days to review them, and more!</string>
-	<string name="byoc">BYOC</string>
-	<string name="byoc_details">Build your own course! For the brave, the experienced, and the slightly insane! Your imagination (and our ability to code these features in…) is the limit!</string>
-	<string name="byoc_button">Build Your Own Course</string>
 	<string name="target_language">Target Language</string>
 	<string name="base_language">Base Language</string>
 	<string name="create">Create</string>
