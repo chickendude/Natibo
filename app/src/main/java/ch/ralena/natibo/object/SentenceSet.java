@@ -19,7 +19,7 @@ public class SentenceSet extends RealmObject {
 	private boolean isFirstDay;
 	private RealmList<Sentence> baseSentences;
 	private RealmList<Sentence> targetSentences;
-	private RealmList<SentencePair> sentences;
+	private RealmList<SentenceGroup> sentences;
 	private RealmList<Integer> reviews;    // number of reviews per sentence per day, eg. [6, 4, 3, 2]
 	private String order;          // order to play sentences, eg. base + target + target, base + target, etc.
 
@@ -43,11 +43,11 @@ public class SentenceSet extends RealmObject {
 		this.targetSentences = targetSentences;
 	}
 
-	public RealmList<SentencePair> getSentencePairs() {
+	public RealmList<SentenceGroup> getSentenceGroups() {
 		return sentences;
 	}
 
-	public void setSentences(RealmList<SentencePair> sentences) {
+	public void setSentences(RealmList<SentenceGroup> sentences) {
 		this.sentences = sentences;
 	}
 
@@ -91,22 +91,22 @@ public class SentenceSet extends RealmObject {
 			if (isFirstDay) {
 				numReviews--;
 				for (int i = 0; i < targetSentences.size(); i++) {
-					SentencePair sentencePair = new SentencePair();
-					sentencePair.setBaseSentence(baseSentences.get(i));
-					sentencePair.setTargetSentence(targetSentences.get(i));
-					sentences.add(sentencePair);
+					SentenceGroup sentenceGroup = new SentenceGroup();
+					sentenceGroup.setBaseSentence(baseSentences.get(i));
+					sentenceGroup.setTargetSentence(targetSentences.get(i));
+					sentences.add(sentenceGroup);
 				}
 				isFirstDay = false;
 			}
 
 			// shuffle sentences
-			ArrayList<SentencePair> sentencePairs = new ArrayList<>();
+			ArrayList<SentenceGroup> sentencePairs = new ArrayList<>();
 			for (int i = 0; i < numReviews; i++) {
 				for (int j = 0; j < targetSentences.size(); j++) {
-					SentencePair sentencePair = new SentencePair();
-					sentencePair.setBaseSentence(baseSentences.get(j));
-					sentencePair.setTargetSentence(targetSentences.get(j));
-					sentencePairs.add(sentencePair);
+					SentenceGroup sentenceGroup = new SentenceGroup();
+					sentenceGroup.setBaseSentence(baseSentences.get(j));
+					sentenceGroup.setTargetSentence(targetSentences.get(j));
+					sentencePairs.add(sentenceGroup);
 				}
 			}
 			Collections.shuffle(sentencePairs);

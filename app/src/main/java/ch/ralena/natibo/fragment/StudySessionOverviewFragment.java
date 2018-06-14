@@ -51,7 +51,7 @@ public class StudySessionOverviewFragment extends Fragment {
 
 		// set up recyclerlist and adapter
 		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-		StudySessionAdapter adapter = new StudySessionAdapter(course.getBaseLanguage().getLanguageId(), course.getTargetLanguage().getLanguageId(), sentenceSet.getSentencePairs());
+		StudySessionAdapter adapter = new StudySessionAdapter(course.getLanguages(), sentenceSet.getSentenceGroups());
 		recyclerView.setAdapter(adapter);
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
 		recyclerView.setLayoutManager(layoutManager);

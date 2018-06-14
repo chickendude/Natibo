@@ -9,8 +9,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import ch.ralena.natibo.R;
+import ch.ralena.natibo.object.Language;
 import ch.ralena.natibo.object.Sentence;
-import ch.ralena.natibo.object.SentencePair;
+import ch.ralena.natibo.object.SentenceGroup;
 import io.reactivex.subjects.PublishSubject;
 import io.realm.RealmList;
 
@@ -22,14 +23,12 @@ public class StudySessionAdapter extends RecyclerView.Adapter<StudySessionAdapte
 		return languageSubject;
 	}
 
-	private RealmList<SentencePair> sentences;
-	private String baseLanguageId;
-	private String targetLanguageId;
+	private RealmList<SentenceGroup> sentences;
+	private RealmList<Language> languageIds;
 
-	public StudySessionAdapter(String baseLanguageId, String targetLanguageId, RealmList<SentencePair> sentences) {
-		this.baseLanguageId = baseLanguageId;
-		this.targetLanguageId = targetLanguageId;
+	public StudySessionAdapter(RealmList<Language> languageIds, RealmList<SentenceGroup> sentences) {
 		this.sentences = sentences;
+		this.languageIds = languageIds;
 	}
 
 	@NonNull
@@ -75,7 +74,7 @@ public class StudySessionAdapter extends RecyclerView.Adapter<StudySessionAdapte
 			index = view.findViewById(R.id.indexLabel);
 			// base
 			baseLanguageCode = view.findViewById(R.id.baseLanguageCodeLabel);
-			baseLanguageCode.setText(baseLanguageId);
+			baseLanguageCode.setText(languageIds.first().getLanguageId());
 			baseSentenceText = view.findViewById(R.id.baseSentenceLabel);
 			baseAlternateSentence = view.findViewById(R.id.baseAlternateSentenceLabel);
 			baseAlternateSentenceLayout = view.findViewById(R.id.baseAlternateSentenceLayout);
@@ -85,7 +84,7 @@ public class StudySessionAdapter extends RecyclerView.Adapter<StudySessionAdapte
 			baseIpaLayout = view.findViewById(R.id.baseIpaLayout);
 			// target
 			targetLanguageCode = view.findViewById(R.id.targetLanguageCodeLabel);
-			targetLanguageCode.setText(targetLanguageId);
+			targetLanguageCode.setText(languageIds.last().getLanguageId());
 			targetSentenceText = view.findViewById(R.id.targetSentenceLabel);
 			targetAlternateSentence = view.findViewById(R.id.targetAlternateSentenceLabel);
 			targetAlternateSentenceLayout = view.findViewById(R.id.targetAlternateSentenceLayout);
@@ -95,7 +94,7 @@ public class StudySessionAdapter extends RecyclerView.Adapter<StudySessionAdapte
 			targetIpaLayout = view.findViewById(R.id.targetIpaLayout);
 		}
 
-		void bindView(SentencePair sentencePair) {
+		void bindView(SentenceGroup sentencePair) {
 			Sentence targetSentence = sentencePair.getTargetSentence();
 			Sentence baseSentence = sentencePair.getBaseSentence();
 			index.setText("" + targetSentence.getIndex());

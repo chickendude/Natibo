@@ -92,7 +92,7 @@ public class Language extends RealmObject {
 		RealmResults<Language> languages = realm.where(Language.class).findAll();
 		ArrayList<Language> languagesSorted = new ArrayList<>();
 		languagesSorted.addAll(languages);
-		Collections.sort(languagesSorted, (lang1, lang2) -> lang1.getLanguageType().getName().compareTo(lang2.getLanguageType().getName()));
+		Collections.sort(languagesSorted, (lang1, lang2) -> lang1.getLongName().compareTo(lang2.getLongName()));
 		return languagesSorted;
 	}
 

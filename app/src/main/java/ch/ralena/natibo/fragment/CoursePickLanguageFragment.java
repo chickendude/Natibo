@@ -11,6 +11,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -30,8 +31,6 @@ public class CoursePickLanguageFragment extends Fragment implements CourseSelect
 
 	ArrayList<Language> availableLanguages;
 	ArrayList<Language> selectedLanguages;
-	Language baseLanguage;
-	Language targetLanguage;
 
 	private Realm realm;
 
@@ -41,6 +40,7 @@ public class CoursePickLanguageFragment extends Fragment implements CourseSelect
 	CourseSelectedLanguagesAdapter selectedAdapter;
 
 	private ItemTouchHelper itemTouchHelper;
+	private MenuItem checkMenu;
 
 	@Nullable
 	@Override
@@ -68,7 +68,19 @@ public class CoursePickLanguageFragment extends Fragment implements CourseSelect
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.check_toolbar, menu);
+		checkMenu = menu.getItem(0);
+		checkMenu.setVisible(false);
 		super.onCreateOptionsMenu(menu, inflater);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.action_confirm:
+				loadCoursePreparationFragment();
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	private void loadRecyclerViews(View view) {
@@ -94,16 +106,22 @@ public class CoursePickLanguageFragment extends Fragment implements CourseSelect
 		} else {
 			selectedLanguages.add(language);
 		}
+		checkMenu.setVisible(selectedLanguages.size() > 0);
 		selectedAdapter.notifyDataSetChanged();
-
 	}
 
-	private void loadPrepackagedCourseFragment() {
-		CoursePrepackagedCreateFragment fragment = new CoursePrepackagedCreateFragment();
+	private void loadCoursePreparationFragment() {
+		CoursePreparationFragment fragment = new CoursePreparationFragment();
+
+		// add language ids in a bundle
 		Bundle bundle = new Bundle();
-		bundle.putString(CoursePrepackagedCreateFragment.TAG_BASE_LANGUAGE, baseLanguage.getLanguageId());
-		bundle.putString(CoursePrepackagedCreateFragment.TAG_TARGET_LANGUAGE, targetLanguage.getLanguageId());
+		ArrayList<String> languageIds = new ArrayList<>();
+		for (Language language : selectedLanguages) {
+			languageIds.add(language.getLanguageId());
+		}
+		bundle.putStringArrayList(CoursePreparationFragment.TAG_LANGUAGE_IDS, languageIds);
 		fragment.setArguments(bundle);
+
 		getFragmentManager().beginTransaction()
 				.replace(R.id.fragmentPlaceHolder, fragment)
 				.addToBackStack(null)

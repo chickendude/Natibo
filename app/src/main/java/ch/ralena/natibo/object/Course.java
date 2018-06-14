@@ -41,8 +41,6 @@ public class Course extends RealmObject {
 	private String id = UUID.randomUUID().toString();
 
 	private String title;
-	private Language baseLanguage;
-	private Language targetLanguage;
 	private RealmList<Language> languages;
 	private RealmList<Pack> basePacks;
 	private RealmList<Pack> targetPacks;
@@ -67,20 +65,12 @@ public class Course extends RealmObject {
 		this.title = title;
 	}
 
-	public Language getBaseLanguage() {
-		return baseLanguage;
+	public RealmList<Language> getLanguages() {
+		return languages;
 	}
 
-	public void setBaseLanguage(Language baseLanguage) {
-		this.baseLanguage = baseLanguage;
-	}
-
-	public Language getTargetLanguage() {
-		return targetLanguage;
-	}
-
-	public void setTargetLanguage(Language targetLanguage) {
-		this.targetLanguage = targetLanguage;
+	public void setLanguages(RealmList<Language> languages) {
+		this.languages = languages;
 	}
 
 	public RealmList<Pack> getBasePacks() {

@@ -66,24 +66,24 @@ public class Day extends RealmObject {
 		});
 	}
 
-	public SentencePair getCurrentSentencePair() {
+	public SentenceGroup getCurrentSentenceGroup() {
 		if (curSentenceSetId >= sentenceSets.size())
 			return null;
 		SentenceSet sentenceSet = sentenceSets.get(curSentenceSetId);
-		SentencePair sentencePair = sentenceSet.getSentencePairs().get(curSentenceId);
-		return sentencePair;
+		SentenceGroup sentenceGroup = sentenceSet.getSentenceGroups().get(curSentenceId);
+		return sentenceGroup;
 	}
 
 	public Sentence getCurrentSentence() {
 		if (curSentenceSetId >= sentenceSets.size())
 			return null;
 		SentenceSet sentenceSet = sentenceSets.get(curSentenceSetId);
-		SentencePair sentencePair = sentenceSet.getSentencePairs().get(curSentenceId);
+		SentenceGroup sentenceGroup = sentenceSet.getSentenceGroups().get(curSentenceId);
 		Sentence sentence;
 		if (sentenceSet.getOrder().charAt(patternIndex) == 'B')
-			sentence = sentencePair.getBaseSentence();
+			sentence = sentenceGroup.getBaseSentence();
 		else
-			sentence = sentencePair.getTargetSentence();
+			sentence = sentenceGroup.getTargetSentence();
 		return sentence;
 	}
 
@@ -110,7 +110,7 @@ public class Day extends RealmObject {
 		realm.executeTransaction(r -> {
 			patternIndex = 0;
 			curSentenceId++;
-			curSentenceId %= sentenceSets.get(curSentenceSetId).getSentencePairs().size();
+			curSentenceId %= sentenceSets.get(curSentenceSetId).getSentenceGroups().size();
 			if (curSentenceId == 0) {
 				curSentenceSetId++;
 			}
@@ -123,7 +123,7 @@ public class Day extends RealmObject {
 			curSentenceId--;
 			if (curSentenceId < 0) {
 				if (curSentenceSetId > 0) {
-					curSentenceId = sentenceSets.get(--curSentenceSetId).getSentencePairs().size();
+					curSentenceId = sentenceSets.get(--curSentenceSetId).getSentenceGroups().size();
 				} else {
 					curSentenceId = 0;
 				}
@@ -134,7 +134,7 @@ public class Day extends RealmObject {
 	public int getNumReps() {
 		int numReps = 0;
 		for (SentenceSet sentenceSet : sentenceSets) {
-			numReps += sentenceSet.getSentencePairs().size();
+			numReps += sentenceSet.getSentenceGroups().size();
 		}
 		return numReps;
 	}
@@ -144,29 +144,29 @@ public class Day extends RealmObject {
 		for (int i = curSentenceSetId; i < sentenceSets.size(); i++) {
 			SentenceSet sentenceSet = sentenceSets.get(i);
 
-			List<SentencePair> tempSentencePairs = new ArrayList<>();
-			RealmList<SentencePair> setSentencePairs = sentenceSet.getSentencePairs();
+			List<SentenceGroup> tempSentenceGroups = new ArrayList<>();
+			RealmList<SentenceGroup> setSentenceGroups = sentenceSet.getSentenceGroups();
 
 			String order = sentenceSet.getOrder();
 
 			// only get subsection of SentencePairs if it's the first sentence set
 			if (i == curSentenceSetId) {
-				tempSentencePairs.addAll(setSentencePairs.subList(curSentenceId, setSentencePairs.size()));
+				tempSentenceGroups.addAll(setSentenceGroups.subList(curSentenceId, setSentenceGroups.size()));
 
 				// first sentence pair will possible have fewer sentences depending on whether the base sentence has been played or not
 				for (int j = patternIndex; j < order.length(); j++) {
 					if (order.charAt(j) == 'B')
-						sentences.add(tempSentencePairs.get(0).getBaseSentence());
+						sentences.add(tempSentenceGroups.get(0).getBaseSentence());
 					else if (order.charAt(j) == 'T')
-						sentences.add(tempSentencePairs.get(0).getTargetSentence());
+						sentences.add(tempSentenceGroups.get(0).getTargetSentence());
 				}
-				tempSentencePairs.remove(0);
+				tempSentenceGroups.remove(0);
 			} else {
-				tempSentencePairs.addAll(setSentencePairs);
+				tempSentenceGroups.addAll(setSentenceGroups);
 			}
 
 			// add all sentences according to the order to the list of sentences
-			for (SentencePair sentencePair : tempSentencePairs) {
+			for (SentenceGroup sentencePair : tempSentenceGroups) {
 				for (char c : order.toCharArray()) {
 					if (c == 'B')
 						sentences.add(sentencePair.getBaseSentence());
@@ -181,7 +181,7 @@ public class Day extends RealmObject {
 	public int getNumReviewsLeft() {
 		int numReviews = 0;
 		for (int i = curSentenceSetId; i < sentenceSets.size(); i++) {
-			numReviews += sentenceSets.get(i).getSentencePairs().size();
+			numReviews += sentenceSets.get(i).getSentenceGroups().size();
 			if (i == curSentenceSetId)
 				numReviews -= curSentenceId;
 		}
@@ -190,7 +190,7 @@ public class Day extends RealmObject {
 	public int getTotalReviews() {
 		int totalReviews = 0;
 		for (SentenceSet sentenceSet : sentenceSets) {
-			totalReviews += sentenceSet.getSentencePairs().size();
+			totalReviews += sentenceSet.getSentenceGroups().size();
 		}
 		return totalReviews;
 	}

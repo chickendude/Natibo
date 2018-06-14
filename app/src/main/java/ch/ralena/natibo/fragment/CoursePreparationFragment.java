@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -18,8 +19,8 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import ch.ralena.natibo.MainActivity;
@@ -29,18 +30,18 @@ import ch.ralena.natibo.object.Language;
 import ch.ralena.natibo.object.Schedule;
 import ch.ralena.natibo.utils.Utils;
 import io.realm.Realm;
+import io.realm.RealmList;
 
 // TODO: 13/04/18 move to course detail page
-public class CoursePrepackagedCreateFragment extends Fragment {
-	private static final String TAG = CoursePrepackagedCreateFragment.class.getSimpleName();
-	public static final String TAG_BASE_LANGUAGE = "tag_base_language";
-	public static final String TAG_TARGET_LANGUAGE = "tag_target_language";
+public class CoursePreparationFragment extends Fragment {
+	private static final String TAG = CoursePreparationFragment.class.getSimpleName();
+	public static final String TAG_LANGUAGE_IDS = "tag_language_ids";
 
 	private Realm realm;
-	Language baseLanguage;
-	Language targetLanguage;
+	RealmList<Language> languages;
 
 	// Views
+	EditText languageNamesLabel;
 	EditText sentencesPerDayEdit;
 	SeekBar sentencesPerDaySeek;
 	EditText customScheduleEdit;
@@ -129,7 +130,7 @@ public class CoursePrepackagedCreateFragment extends Fragment {
 	@Nullable
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_course_ai_create, container, false);
+		View view = inflater.inflate(R.layout.fragment_course_preparation, container, false);
 
 		// switch to back button
 		activity = (MainActivity) getActivity();
@@ -142,16 +143,18 @@ public class CoursePrepackagedCreateFragment extends Fragment {
 		realm = Realm.getDefaultInstance();
 
 		// load arguments
-		String baseId = getArguments().getString(TAG_BASE_LANGUAGE);
-		String targetId = getArguments().getString(TAG_TARGET_LANGUAGE);
+		ArrayList<String> languageIds = getArguments().getStringArrayList(TAG_LANGUAGE_IDS);
 
 		// load languages passed in from create course fragment
-		baseLanguage = realm.where(Language.class).equalTo("languageId", baseId).findFirst();
-		targetLanguage = realm.where(Language.class).equalTo("languageId", targetId).findFirst();
+		languages = new RealmList<>();
+		for (String languageId : languageIds) {
+			languages.add(realm.where(Language.class).equalTo("languageId", languageId).findFirst());
+		}
 
 		// get views
-		TextView baseLanguageLabel = view.findViewById(R.id.baseLanguageLabel);
-		TextView targetLanguageLabel = view.findViewById(R.id.targetLanguageLabel);
+//		TextView baseLanguageLabel = view.findViewById(R.id.baseLanguageLabel);
+//		TextView targetLanguageLabel = view.findViewById(R.id.targetLanguageLabel);
+		languageNamesLabel = view.findViewById(R.id.languageNamesLabel);
 		sentencesPerDayEdit = view.findViewById(R.id.sentencesPerDayEdit);
 		sentencesPerDaySeek = view.findViewById(R.id.sentencesPerDaySeek);
 		customScheduleEdit = view.findViewById(R.id.customScheduleEdit);
@@ -161,9 +164,18 @@ public class CoursePrepackagedCreateFragment extends Fragment {
 		customDayRadio = view.findViewById(R.id.customDayRadio);
 		chorusCheckBox = view.findViewById(R.id.chorusCheckBox);
 
-		// display base and target language
-		baseLanguageLabel.setText(baseLanguage.getLongName());
-		targetLanguageLabel.setText(targetLanguage.getLongName());
+		// display languages in the course
+		ArrayList<String> languageNames = new ArrayList<>();
+		for (Language language : languages) {
+			languageNames.add(language.getLongName());
+		}
+		languageNamesLabel.setText(TextUtils.join(" → ", languageNames));
+		languageNamesLabel.setOnClickListener(v -> {
+			languageNamesLabel.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+		});
+
+		//		baseLanguageLabel.setText(baseLanguage.getLongName());
+//		targetLanguageLabel.setText(targetLanguage.getLongName());
 
 		// custom schedule edit should start off gone
 		customScheduleEdit.setVisibility(View.GONE);
@@ -229,9 +241,11 @@ public class CoursePrepackagedCreateFragment extends Fragment {
 
 		// build course
 		Course course = realm.createObject(Course.class, UUID.randomUUID().toString());
-		course.setTitle(String.format("%s > %s", baseLanguage.getLanguageId(), targetLanguage.getLanguageId()));
-		course.setBaseLanguage(baseLanguage);
-		course.setTargetLanguage(targetLanguage);
+
+		course.setTitle(languageNamesLabel.getText().toString());
+		course.setLanguages(languages);
+//		course.setBaseLanguage(baseLanguage);
+//		course.setTargetLanguage(targetLanguage);
 		course.setPauseMillis(1000);
 		course.setSchedule(schedule);
 		realm.commitTransaction();

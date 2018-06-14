@@ -60,7 +60,7 @@ public class CoursePickSentenceFragment extends Fragment {
 		String courseId = getArguments().getString(TAG_COURSE_ID, null);
 
 		course = realm.where(Course.class).equalTo("id", courseId).findFirst();
-		language = course.getTargetLanguage();
+		language = course.getLanguages().last();
 
 		// load language name
 		getActivity().setTitle(language.getLanguageType().getName());

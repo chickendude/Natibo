@@ -4,43 +4,27 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:layout_margin="4dp"
 	android:background="?android:windowBackground"
 	android:orientation="vertical">
 
-	<LinearLayout
+	<EditText
+		android:id="@+id/languageNamesLabel"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:padding="8dp">
-
-		<TextView
-			android:id="@+id/baseLanguageLabel"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:textAlignment="center"
-			android:textSize="18sp"
-			tools:text="English"/>
-
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text=">"/>
-
-		<TextView
-			android:id="@+id/targetLanguageLabel"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:textAlignment="center"
-			android:textSize="18sp"
-			tools:text="Chinese (Mandarin)"/>
-	</LinearLayout>
+		android:background="@color/colorPrimary"
+		android:inputType="none"
+		android:padding="8dp"
+		android:singleLine="true"
+		android:textAlignment="center"
+		android:textColor="@color/colorTextWhite"
+		android:textSize="20sp"
+		android:textStyle="bold"
+		tools:text="English → Spanish (Mexico) → German → Russian"/>
 
 	<ScrollView
 		android:layout_width="match_parent"
-		android:layout_height="match_parent">
+		android:layout_height="match_parent"
+		android:layout_margin="4dp">
 
 		<LinearLayout
 			android:layout_width="match_parent"
