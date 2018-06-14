@@ -55,15 +55,15 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_below="@id/flagImageView"
-		android:background="@color/colorPrimary"
 		android:gravity="center_horizontal"
 		android:orientation="vertical"
-		android:padding="8dp">
+		>
 
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:gravity="center"
+			android:background="@color/colorPrimary"
 			android:orientation="horizontal">
 
 			<LinearLayout
@@ -123,7 +123,7 @@
 				android:layout_height="wrap_content"
 				android:layout_margin="4dp"
 				android:text="0"
-				android:textColor="@color/colorTextWhite"/>
+				android:textColor="@color/colorTextLight"/>
 
 			<ProgressBar
 				android:id="@+id/milestoneProgress"
@@ -140,7 +140,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_margin="4dp"
-				android:textColor="@color/colorTextWhite"
+				android:textColor="@color/colorTextLight"
 				tools:text="50k"/>
 		</LinearLayout>
 
@@ -153,14 +153,14 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:src="@drawable/ic_clock"
-				android:tint="@color/colorTextWhite"/>
+				android:tint="@color/colorTextLight"/>
 
 			<TextView
 				android:id="@+id/timeStudiedLabel"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_margin="4dp"
-				android:textColor="@color/colorTextWhite"
+				android:textColor="@color/colorTextDark"
 				tools:text="37:22"/>
 		</LinearLayout>
 
