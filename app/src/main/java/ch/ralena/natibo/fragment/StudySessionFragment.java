@@ -6,6 +6,7 @@ import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import java.util.Locale;
 
 import ch.ralena.natibo.MainActivity;
 import ch.ralena.natibo.R;
+import ch.ralena.natibo.adapter.SentenceGroupAdapter;
 import ch.ralena.natibo.object.Course;
 import ch.ralena.natibo.object.Day;
 import ch.ralena.natibo.object.Sentence;
@@ -46,6 +48,7 @@ public class StudySessionFragment extends Fragment {
 	private long millisLeft;
 	private CountDownTimer countDownTimer;
 	private boolean isPaused;
+	SentenceGroupAdapter adapter;
 
 	// views
 	private TextView remainingRepsText;
@@ -53,26 +56,6 @@ public class StudySessionFragment extends Fragment {
 	private TextView totalRepsText;
 	private ImageView playPauseImage;
 	private LinearLayout sentencesLayout;
-
-	// base language views
-//	private TextView baseLanguageCodeText;
-//	private TextView baseSentenceText;
-//	private TextView baseAlternateSentenceText;
-//	private LinearLayout baseAlternateSentenceLayout;
-//	private TextView baseRomanizationText;
-//	private LinearLayout baseRomanizationLayout;
-//	private TextView baseIpaText;
-//	private LinearLayout baseIpaLayout;
-
-	// target language views
-//	private TextView targetLanguageCodeText;
-//	private TextView targetSentenceText;
-//	private TextView targetAlternateSentenceText;
-//	private LinearLayout targetAlternateSentenceLayout;
-//	private TextView targetRomanizationText;
-//	private LinearLayout targetRomanizationLayout;
-//	private TextView targetIpaText;
-//	private LinearLayout targetIpaLayout;
 
 	Disposable serviceDisposable;
 	Disposable sentenceDisposable;
@@ -100,19 +83,14 @@ public class StudySessionFragment extends Fragment {
 		if (course.getCurrentDay() == null || course.getCurrentDay().isCompleted())
 			course.prepareNextDay(realm);
 
-		// in a separate method since we have so many views!
+		// load all the views
 		loadGlobalViews(view);
 
+		// set up recycler view
 		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-//		baseLanguageCodeText.setText(course.getBaseLanguage().getLanguageId());
-//		targetLanguageCodeText.setText(course.getTargetLanguage().getLanguageId());
-
-		// load language name
-		TextView courseTitleLabel = view.findViewById(R.id.courseTitleText);
-		courseTitleLabel.setText(course.getTitle());
-
-		// hide sentences layout until a sentence has been loaded
-		sentencesLayout.setVisibility(View.INVISIBLE);
+		adapter = new SentenceGroupAdapter();
+		recyclerView.setAdapter(adapter);
+		recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
 		// handle playing/pausing
 		playPauseImage.setOnClickListener(this::playPause);
@@ -128,25 +106,12 @@ public class StudySessionFragment extends Fragment {
 		playPauseImage = view.findViewById(R.id.playPauseImage);
 		sentencesLayout = view.findViewById(R.id.sentencesLayout);
 
-		// load base language views
-//		baseLanguageCodeText = view.findViewById(R.id.baseLanguageCodeText);
-//		baseSentenceText = view.findViewById(R.id.baseSentenceText);
-//		baseAlternateSentenceText = view.findViewById(R.id.baseAlternateSentenceText);
-//		baseAlternateSentenceLayout = view.findViewById(R.id.baseAlternateSentenceLayout);
-//		baseRomanizationText = view.findViewById(R.id.baseRomanizationText);
-//		baseRomanizationLayout = view.findViewById(R.id.baseRomanizationLayout);
-//		baseIpaText = view.findViewById(R.id.baseIpaText);
-//		baseIpaLayout = view.findViewById(R.id.baseIpaLayout);
+		// hide sentences layout until a sentence has been loaded
+		sentencesLayout.setVisibility(View.VISIBLE);
 
-		// load target language views
-//		targetLanguageCodeText = view.findViewById(R.id.targetLanguageCodeText);
-//		targetSentenceText = view.findViewById(R.id.targetSentenceText);
-//		targetAlternateSentenceText = view.findViewById(R.id.targetAlternateSentenceText);
-//		targetAlternateSentenceLayout = view.findViewById(R.id.targetAlternateSentenceLayout);
-//		targetRomanizationText = view.findViewById(R.id.targetRomanizationText);
-//		targetRomanizationLayout = view.findViewById(R.id.targetRomanizationLayout);
-//		targetIpaText = view.findViewById(R.id.targetIpaText);
-//		targetIpaLayout = view.findViewById(R.id.targetIpaLayout);
+		// load course title
+		TextView courseTitleLabel = view.findViewById(R.id.courseTitleText);
+		courseTitleLabel.setText(course.getTitle());
 
 		// settings
 		ImageView settingsIcon = view.findViewById(R.id.settingsIcon);
@@ -215,8 +180,7 @@ public class StudySessionFragment extends Fragment {
 	private void nextSentence(SentenceGroup sentenceGroup) {
 		sentencesLayout.setVisibility(View.VISIBLE);
 		RealmList<Sentence> sentences = sentenceGroup.getSentences();
-//		Sentence baseSentence = sentenceGroup.getBaseSentence();
-//		Sentence targetSentence = sentenceGroup.getTargetSentence();
+		adapter.updateSentencGroup(sentenceGroup);
 
 		// update number of reps remaining
 		remainingRepsText.setText(String.format(Locale.getDefault(), "%d", course.getCurrentDay().getNumReviewsLeft()));
@@ -224,18 +188,6 @@ public class StudySessionFragment extends Fragment {
 
 		// update time left
 		millisLeft = course.getCurrentDay().getTimeLeft();
-
-		// update base sentence views
-//		baseSentenceText.setText(baseSentence.getText());
-//		updateSentencePart(baseAlternateSentenceLayout, baseAlternateSentenceText, baseSentence.getAlternate());
-//		updateSentencePart(baseRomanizationLayout, baseRomanizationText, baseSentence.getRomanization());
-//		updateSentencePart(baseIpaLayout, baseIpaText, baseSentence.getIpa());
-
-		// update target sentence views
-//		targetSentenceText.setText(targetSentence.getText());
-//		updateSentencePart(targetAlternateSentenceLayout, targetAlternateSentenceText, targetSentence.getAlternate());
-//		updateSentencePart(targetRomanizationLayout, targetRomanizationText, targetSentence.getRomanization());
-//		updateSentencePart(targetIpaLayout, targetIpaText, targetSentence.getIpa());
 	}
 
 	private void startTimer() {
@@ -261,21 +213,11 @@ public class StudySessionFragment extends Fragment {
 
 	private void setPaused(boolean isPaused) {
 		this.isPaused = isPaused;
-//		prefs.edit().putBoolean(KEY_IS_PAUSED, isPaused).apply();
 	}
 
 	private void updateTime() {
 		int secondsLeft = (int) (millisLeft / 1000);
 		remainingTimeText.setText(String.format(Locale.US, "%d:%02d", secondsLeft / 60, secondsLeft % 60));
-	}
-
-	private void updateSentencePart(ViewGroup layout, TextView textView, String text) {
-		if (text != null) {
-			layout.setVisibility(View.VISIBLE);
-			textView.setText(text);
-		} else {
-			layout.setVisibility(View.GONE);
-		}
 	}
 
 	@Override

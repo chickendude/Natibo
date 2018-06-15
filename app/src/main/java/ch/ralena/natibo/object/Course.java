@@ -42,8 +42,7 @@ public class Course extends RealmObject {
 
 	private String title;
 	private RealmList<Language> languages;
-	private RealmList<Pack> basePacks;
-	private RealmList<Pack> targetPacks;
+	private RealmList<Pack> packs;
 	private Day currentDay;
 	private int numReps;
 	private int pauseMillis;
@@ -73,20 +72,12 @@ public class Course extends RealmObject {
 		this.languages = languages;
 	}
 
-	public RealmList<Pack> getBasePacks() {
-		return basePacks;
+	public RealmList<Pack> getPacks() {
+		return packs;
 	}
 
-	public void setBasePacks(RealmList<Pack> basePacks) {
-		this.basePacks = basePacks;
-	}
-
-	public RealmList<Pack> getTargetPacks() {
-		return targetPacks;
-	}
-
-	public void setTargetPacks(RealmList<Pack> targetPacks) {
-		this.targetPacks = targetPacks;
+	public void setPacks(RealmList<Pack> packs) {
+		this.packs = packs;
 	}
 
 	public void setSchedule(Schedule schedule) {
@@ -170,8 +161,7 @@ public class Course extends RealmObject {
 
 			// create new set of sentences based off the schedule
 			SentenceSet sentenceSet = new SentenceSet();
-			sentenceSet.setBaseSentences(getSentences(sentenceIndex, numSentences, basePacks));
-			sentenceSet.setTargetSentences(getSentences(sentenceIndex, numSentences, targetPacks));
+			sentenceSet.setSentences(getSentenceGroups(sentenceIndex, numSentences));
 			sentenceSet.setReviews(reviewPattern);
 			sentenceSet.setFirstDay(true);
 			sentenceSet.setOrder(schedule.getOrder());
@@ -193,25 +183,38 @@ public class Course extends RealmObject {
 		realm.executeTransaction(r -> currentDay.getSentenceSets().removeAll(emptySentenceSets));
 	}
 
-	private RealmList<Sentence> getSentences(int index, int numSentences, RealmList<Pack> packs) {
-		RealmList<Sentence> sentences = new RealmList<>();
+	private RealmList<SentenceGroup> getSentenceGroups(int index, int numSentences) {
+		RealmList<SentenceGroup> sentenceGroups = new RealmList<>();
 
 		// go through each pack
-		for (Pack pack : packs) {
-			RealmList<Sentence> packSentences = pack.getSentences();
-			if (index >= pack.getSentences().size())
-				index -= packSentences.size();
-			else {
-				while (numSentences > 0) {
-					if (index >= pack.getSentences().size())
-						break;
-					numSentences--;
-					Sentence sentence = packSentences.get(index++);
-					sentences.add(sentence);
+		for (Language language : languages) {
+			int i = 0;
+			for (Pack pack : getPacksPerLanguage(language)) {
+				RealmList<Sentence> packSentences = pack.getSentences();
+				if (index >= pack.getSentences().size())
+					index -= packSentences.size();
+				else {
+					while (numSentences > 0) {
+						if (index >= pack.getSentences().size())
+							break;
+						numSentences--;
+						Sentence sentence = packSentences.get(index++);
+						sentenceGroups.get(i).getSentences().add(sentence);
+						sentenceGroups.get(i++).getLanguages().add(language);
+					}
 				}
 			}
 		}
-		return sentences;
+		return sentenceGroups;
+	}
+
+	private RealmList<Pack> getPacksPerLanguage(Language language) {
+		RealmList<Pack> langPacks = new RealmList<>();
+		for (Pack pack : packs) {
+			if (language.getPacks().contains(pack))
+				langPacks.add(pack);
+		}
+		return langPacks;
 	}
 
 	public int getNumSentencesSeen() {
@@ -219,12 +222,12 @@ public class Course extends RealmObject {
 
 		// count number of sentences we've studied in the past
 		for (Day day : pastDays) {
-			numSeen += day.getSentenceSets().get(0).getBaseSentences().size();
+			numSeen += day.getSentenceSets().get(0).getSentenceGroups().size();
 		}
 
 		// if the current day has been completed, add those as well
 		if (currentDay != null && currentDay.isCompleted())
-			numSeen += currentDay.getSentenceSets().get(0).getBaseSentences().size();
+			numSeen += currentDay.getSentenceSets().get(0).getSentenceGroups().size();
 		return numSeen;
 	}
 

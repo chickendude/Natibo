@@ -152,8 +152,6 @@ public class CoursePreparationFragment extends Fragment {
 		}
 
 		// get views
-//		TextView baseLanguageLabel = view.findViewById(R.id.baseLanguageLabel);
-//		TextView targetLanguageLabel = view.findViewById(R.id.targetLanguageLabel);
 		languageNamesLabel = view.findViewById(R.id.languageNamesLabel);
 		sentencesPerDayEdit = view.findViewById(R.id.sentencesPerDayEdit);
 		sentencesPerDaySeek = view.findViewById(R.id.sentencesPerDaySeek);
@@ -173,9 +171,6 @@ public class CoursePreparationFragment extends Fragment {
 		languageNamesLabel.setOnClickListener(v -> {
 			languageNamesLabel.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 		});
-
-		//		baseLanguageLabel.setText(baseLanguage.getLongName());
-//		targetLanguageLabel.setText(targetLanguage.getLongName());
 
 		// custom schedule edit should start off gone
 		customScheduleEdit.setVisibility(View.GONE);
@@ -244,8 +239,6 @@ public class CoursePreparationFragment extends Fragment {
 
 		course.setTitle(languageNamesLabel.getText().toString());
 		course.setLanguages(languages);
-//		course.setBaseLanguage(baseLanguage);
-//		course.setTargetLanguage(targetLanguage);
 		course.setPauseMillis(1000);
 		course.setSchedule(schedule);
 		realm.commitTransaction();

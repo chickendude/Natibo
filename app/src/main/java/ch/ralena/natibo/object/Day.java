@@ -81,9 +81,9 @@ public class Day extends RealmObject {
 		SentenceGroup sentenceGroup = sentenceSet.getSentenceGroups().get(curSentenceId);
 		Sentence sentence;
 		if (sentenceSet.getOrder().charAt(patternIndex) == 'B')
-			sentence = sentenceGroup.getBaseSentence();
+			sentence = sentenceGroup.getSentences().first();
 		else
-			sentence = sentenceGroup.getTargetSentence();
+			sentence = sentenceGroup.getSentences().last();
 		return sentence;
 	}
 
@@ -149,16 +149,16 @@ public class Day extends RealmObject {
 
 			String order = sentenceSet.getOrder();
 
-			// only get subsection of SentencePairs if it's the first sentence set
+			// only get subsection of SentenceGroups if it's the first sentence set
 			if (i == curSentenceSetId) {
 				tempSentenceGroups.addAll(setSentenceGroups.subList(curSentenceId, setSentenceGroups.size()));
 
 				// first sentence pair will possible have fewer sentences depending on whether the base sentence has been played or not
 				for (int j = patternIndex; j < order.length(); j++) {
 					if (order.charAt(j) == 'B')
-						sentences.add(tempSentenceGroups.get(0).getBaseSentence());
+						sentences.add(tempSentenceGroups.get(0).getSentences().first());
 					else if (order.charAt(j) == 'T')
-						sentences.add(tempSentenceGroups.get(0).getTargetSentence());
+						sentences.add(tempSentenceGroups.get(0).getSentences().last());
 				}
 				tempSentenceGroups.remove(0);
 			} else {
@@ -169,9 +169,9 @@ public class Day extends RealmObject {
 			for (SentenceGroup sentencePair : tempSentenceGroups) {
 				for (char c : order.toCharArray()) {
 					if (c == 'B')
-						sentences.add(sentencePair.getBaseSentence());
+						sentences.add(sentencePair.getSentences().first());
 					else if (c == 'T')
-						sentences.add(sentencePair.getTargetSentence());
+						sentences.add(sentencePair.getSentences().last());
 				}
 			}
 		}

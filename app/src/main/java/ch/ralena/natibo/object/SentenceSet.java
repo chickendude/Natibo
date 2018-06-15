@@ -17,30 +17,12 @@ public class SentenceSet extends RealmObject {
 	private String id = UUID.randomUUID().toString();
 
 	private boolean isFirstDay;
-	private RealmList<Sentence> baseSentences;
-	private RealmList<Sentence> targetSentences;
 	private RealmList<SentenceGroup> sentences;
 	private RealmList<Integer> reviews;    // number of reviews per sentence per day, eg. [6, 4, 3, 2]
 	private String order;          // order to play sentences, eg. base + target + target, base + target, etc.
 
 	public String getId() {
 		return id;
-	}
-
-	public RealmList<Sentence> getBaseSentences() {
-		return baseSentences;
-	}
-
-	public void setBaseSentences(RealmList<Sentence> baseSentences) {
-		this.baseSentences = baseSentences;
-	}
-
-	public RealmList<Sentence> getTargetSentences() {
-		return targetSentences;
-	}
-
-	public void setTargetSentences(RealmList<Sentence> targetSentences) {
-		this.targetSentences = targetSentences;
 	}
 
 	public RealmList<SentenceGroup> getSentenceGroups() {
@@ -90,8 +72,9 @@ public class SentenceSet extends RealmObject {
 			// don't shuffle first repetition if it is the first time seeing sentences
 			if (isFirstDay) {
 				numReviews--;
-				for (int i = 0; i < targetSentences.size(); i++) {
+				for (int i = 0; i < sentences.size(); i++) {
 					SentenceGroup sentenceGroup = new SentenceGroup();
+					sentenceGroup = sentences.get(i);
 					sentenceGroup.setBaseSentence(baseSentences.get(i));
 					sentenceGroup.setTargetSentence(targetSentences.get(i));
 					sentences.add(sentenceGroup);

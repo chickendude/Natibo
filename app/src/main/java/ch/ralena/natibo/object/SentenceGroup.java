@@ -15,9 +15,6 @@ public class SentenceGroup extends RealmObject {
 	private RealmList<Sentence> sentences;
 	private RealmList<Language> languages;
 
-	private Sentence baseSentence;
-	private Sentence targetSentence;
-
 	public String getId() {
 		return id;
 	}
@@ -36,21 +33,5 @@ public class SentenceGroup extends RealmObject {
 
 	public void setLanguages(RealmList<Language> languages) {
 		this.languages = languages;
-	}
-
-	public Sentence getBaseSentence() {
-		return baseSentence;
-	}
-
-	public void setBaseSentence(Sentence baseSentences) {
-		this.baseSentence = baseSentences;
-	}
-
-	public Sentence getTargetSentence() {
-		return targetSentence;
-	}
-
-	public void setTargetSentence(Sentence targetSentence) {
-		this.targetSentence = targetSentence;
 	}
 }
