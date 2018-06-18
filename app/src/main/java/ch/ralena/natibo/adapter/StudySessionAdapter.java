@@ -95,49 +95,49 @@ public class StudySessionAdapter extends RecyclerView.Adapter<StudySessionAdapte
 		}
 
 		void bindView(SentenceGroup sentencePair) {
-			Sentence targetSentence = sentencePair.getTargetSentence();
-			Sentence baseSentence = sentencePair.getBaseSentence();
-			index.setText("" + targetSentence.getIndex());
-			// base
-			baseSentenceText.setText(baseSentence.getText());
-			if (targetSentence.getAlternate() != null) {
-				baseAlternateSentenceLayout.setVisibility(View.VISIBLE);
-				baseAlternateSentence.setText(baseSentence.getAlternate());
-			} else {
-				baseAlternateSentenceLayout.setVisibility(View.GONE);
-			}
-			if (baseSentence.getRomanization() != null) {
-				baseRomanizationLayout.setVisibility(View.VISIBLE);
-				baseRomanization.setText(baseSentence.getRomanization());
-			} else {
-				baseRomanizationLayout.setVisibility(View.GONE);
-			}
-			if (baseSentence.getIpa() != null) {
-				baseIpaLayout.setVisibility(View.VISIBLE);
-				baseIpa.setText(baseSentence.getIpa());
-			} else {
-				baseIpaLayout.setVisibility(View.GONE);
-			}
-			// target
-			targetSentenceText.setText(targetSentence.getText());
-			if (targetSentence.getAlternate() != null) {
-				targetAlternateSentenceLayout.setVisibility(View.VISIBLE);
-				targetAlternateSentence.setText(targetSentence.getAlternate());
-			} else {
-				targetAlternateSentenceLayout.setVisibility(View.GONE);
-			}
-			if (targetSentence.getRomanization() != null) {
-				targetRomanizationLayout.setVisibility(View.VISIBLE);
-				targetRomanization.setText(targetSentence.getRomanization());
-			} else {
-				targetRomanizationLayout.setVisibility(View.GONE);
-			}
-			if (targetSentence.getIpa() != null) {
-				targetIpaLayout.setVisibility(View.VISIBLE);
-				targetIpa.setText(targetSentence.getIpa());
-			} else {
-				targetIpaLayout.setVisibility(View.GONE);
-			}
+//			Sentence targetSentence = sentencePair.getTargetSentence();
+//			Sentence baseSentence = sentencePair.getBaseSentence();
+//			index.setText("" + targetSentence.getIndex());
+//			// base
+//			baseSentenceText.setText(baseSentence.getText());
+//			if (targetSentence.getAlternate() != null) {
+//				baseAlternateSentenceLayout.setVisibility(View.VISIBLE);
+//				baseAlternateSentence.setText(baseSentence.getAlternate());
+//			} else {
+//				baseAlternateSentenceLayout.setVisibility(View.GONE);
+//			}
+//			if (baseSentence.getRomanization() != null) {
+//				baseRomanizationLayout.setVisibility(View.VISIBLE);
+//				baseRomanization.setText(baseSentence.getRomanization());
+//			} else {
+//				baseRomanizationLayout.setVisibility(View.GONE);
+//			}
+//			if (baseSentence.getIpa() != null) {
+//				baseIpaLayout.setVisibility(View.VISIBLE);
+//				baseIpa.setText(baseSentence.getIpa());
+//			} else {
+//				baseIpaLayout.setVisibility(View.GONE);
+//			}
+//			// target
+//			targetSentenceText.setText(targetSentence.getText());
+//			if (targetSentence.getAlternate() != null) {
+//				targetAlternateSentenceLayout.setVisibility(View.VISIBLE);
+//				targetAlternateSentence.setText(targetSentence.getAlternate());
+//			} else {
+//				targetAlternateSentenceLayout.setVisibility(View.GONE);
+//			}
+//			if (targetSentence.getRomanization() != null) {
+//				targetRomanizationLayout.setVisibility(View.VISIBLE);
+//				targetRomanization.setText(targetSentence.getRomanization());
+//			} else {
+//				targetRomanizationLayout.setVisibility(View.GONE);
+//			}
+//			if (targetSentence.getIpa() != null) {
+//				targetIpaLayout.setVisibility(View.VISIBLE);
+//				targetIpa.setText(targetSentence.getIpa());
+//			} else {
+//				targetIpaLayout.setVisibility(View.GONE);
+//			}
 		}
 	}
 }

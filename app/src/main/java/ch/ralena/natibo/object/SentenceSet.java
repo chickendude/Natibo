@@ -18,6 +18,7 @@ public class SentenceSet extends RealmObject {
 
 	private boolean isFirstDay;
 	private RealmList<SentenceGroup> sentences;
+	private RealmList<SentenceGroup> sentenceSet;
 	private RealmList<Integer> reviews;    // number of reviews per sentence per day, eg. [6, 4, 3, 2]
 	private String order;          // order to play sentences, eg. base + target + target, base + target, etc.
 
@@ -62,7 +63,7 @@ public class SentenceSet extends RealmObject {
 		if (reviews.size() == 0)
 			return false;
 
-		realm.executeTransaction(r -> {
+		realm.executeTransaction((Realm r) -> {
 			sentences.clear();
 
 			// get the number of reviews and remove it from the list
@@ -72,43 +73,35 @@ public class SentenceSet extends RealmObject {
 			// don't shuffle first repetition if it is the first time seeing sentences
 			if (isFirstDay) {
 				numReviews--;
-				for (int i = 0; i < sentences.size(); i++) {
-					SentenceGroup sentenceGroup = new SentenceGroup();
-					sentenceGroup = sentences.get(i);
-					sentenceGroup.setBaseSentence(baseSentences.get(i));
-					sentenceGroup.setTargetSentence(targetSentences.get(i));
-					sentences.add(sentenceGroup);
-				}
+				sentences.addAll(sentenceSet);
 				isFirstDay = false;
 			}
 
 			// shuffle sentences
-			ArrayList<SentenceGroup> sentencePairs = new ArrayList<>();
+			ArrayList<SentenceGroup> sentenceGroups = new ArrayList<>();
 			for (int i = 0; i < numReviews; i++) {
-				for (int j = 0; j < targetSentences.size(); j++) {
-					SentenceGroup sentenceGroup = new SentenceGroup();
-					sentenceGroup.setBaseSentence(baseSentences.get(j));
-					sentenceGroup.setTargetSentence(targetSentences.get(j));
-					sentencePairs.add(sentenceGroup);
+				for (int j = 0; j < sentenceSet.size(); j++) {
+					SentenceGroup sentenceGroup = sentenceSet.get(i);
+					sentenceGroups.add(sentenceGroup);
 				}
 			}
-			Collections.shuffle(sentencePairs);
+			Collections.shuffle(sentenceGroups);
 
 			// if there is more than one sentence, try to avoid duplicates being placed consecutively (so you don't get the same sentence twice in a row)
-			if (baseSentences.size() > 1) {
-				for (int i = 0; i < sentencePairs.size(); i++) {
-					int size = sentencePairs.size();
+			if (sentenceSet.size() > 1) {
+				for (int i = 0; i < sentenceGroups.size(); i++) {
+					int size = sentenceGroups.size();
 					Random rand = new Random();
-					if (i + 1 < size && sentencePairs.get(i).getBaseSentence().getIndex() == sentencePairs.get(i + 1).getBaseSentence().getIndex()) {
+					if (i + 1 < size && sentenceGroups.get(i).getSentences().get(1).getIndex() == sentenceGroups.get(i + 1).getSentences().get(1).getIndex()) {
 						int swap = rand.nextInt(size);
-						Collections.swap(sentencePairs, i, swap);
+						Collections.swap(sentenceGroups, i, swap);
 						i = -1;
 					}
 				}
 			}
 
 			// combine all the sentences, first day reviews (if any) and shuffled reviews
-			sentences.addAll(sentencePairs);
+			sentences.addAll(sentenceGroups);
 		});
 		return true;
 	}

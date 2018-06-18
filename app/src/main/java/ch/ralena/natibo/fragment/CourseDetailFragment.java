@@ -58,7 +58,7 @@ public class CourseDetailFragment extends Fragment {
 
 		// set up recyclerlist and adapter
 		RecyclerView recyclerView = view.findViewById(R.id.booksRecyclerView);
-		adapter = new CourseDetailAdapter(course.getTargetPacks(), matchingPacks);
+		adapter = new CourseDetailAdapter(course.getPacks(), matchingPacks);
 		recyclerView.setAdapter(adapter);
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 		recyclerView.setLayoutManager(layoutManager);
@@ -81,7 +81,7 @@ public class CourseDetailFragment extends Fragment {
 		);
 		startSessionButton.setOnClickListener(v -> {
 			// make sure we have books added before starting, otherwise it'll crash!
-			if (course.getTargetPacks().size() == 0) {
+			if (course.getPacks().size() == 0) {
 				Toast.makeText(getContext(), R.string.add_book_first, Toast.LENGTH_SHORT).show();
 				return;
 			}
@@ -153,16 +153,13 @@ public class CourseDetailFragment extends Fragment {
 	}
 
 	private void addRemovePack(Pack pack) {
-		Pack basePack = course.getLanguages().first().getMatchingPack(pack);
-		if (course.getTargetPacks().contains(pack)) {
+		if (course.getPacks().contains(pack)) {
 			realm.executeTransaction(r -> {
-				course.getBasePacks().remove(basePack);
-				course.getTargetPacks().remove(pack);
+				course.getPacks().remove(pack);
 			});
 		} else {
 			realm.executeTransaction(r -> {
-				course.getBasePacks().add(basePack);
-				course.getTargetPacks().add(pack);
+				course.getPacks().add(pack);
 			});
 		}
 		adapter.notifyDataSetChanged();

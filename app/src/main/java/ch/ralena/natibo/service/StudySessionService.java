@@ -235,8 +235,8 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	private void updateNotificationText() {
 		if (notificationBuilder != null) {
 			notificationBuilder
-					.setContentText(sentenceGroup.getBaseSentence().getText())
-					.setContentTitle(sentenceGroup.getTargetSentence().getText())
+					.setContentText(sentenceGroup.getSentences().first().getText())
+					.setContentTitle(sentenceGroup.getSentences().last().getText())
 					.setOngoing(playbackStatus == PlaybackStatus.PLAYING);
 			NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 			notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
@@ -345,8 +345,8 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 								.setMediaSession(mediaSession.getSessionToken())
 								.setShowActionsInCompactView(1)
 				)
-				.setContentText(sentenceGroup.getBaseSentence().getText())
-				.setContentTitle(sentenceGroup.getTargetSentence().getText())
+				.setContentText(sentenceGroup.getSentences().first().getText())
+				.setContentTitle(sentenceGroup.getSentences().last().getText())
 				.addAction(android.R.drawable.ic_media_previous, "prev sentence", iconAction(ACTION_ID_PREVIOUS))
 				.addAction(playPauseDrawable, "pause", playPauseAction)
 				.addAction(android.R.drawable.ic_media_next, "next sentence", iconAction(ACTION_ID_NEXT));
