@@ -52,4 +52,5 @@
 	<string name="select_languages">Select languages</string>
 	<string name="drag_handle">Drag Handle</string>
 	<string name="base">%s - base</string>
+	<string name="target">%s - target %d</string>
 </resources>

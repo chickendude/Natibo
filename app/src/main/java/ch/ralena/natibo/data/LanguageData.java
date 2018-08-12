@@ -32,6 +32,7 @@ public class LanguageData {
 		languages.add(new LanguageType("","Chinese (Hakka)", R.drawable.flag_chinese_china));
 		languages.add(new LanguageType("ZS","Chinese (Mandarin, China)", R.drawable.flag_chinese_china));
 		languages.add(new LanguageType("ZT","Chinese (Mandarin, Taiwan)", R.drawable.flag_chinese_taiwan));
+		languages.add(new LanguageType("SHA","Chinese (Shanghainese)", R.drawable.flag_chinese_china));
 		languages.add(new LanguageType("MNN","Chinese (Taiwanese Hokkien)", R.drawable.flag_chinese_taiwan));
 		languages.add(new LanguageType("","Chinese (Wenzhounese)", R.drawable.flag_chinese_china));
 		languages.add(new LanguageType("","Czech", R.drawable.flag_czech));

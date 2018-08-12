@@ -47,7 +47,7 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-		holder.bindView(languages.get(position), position == 0);
+		holder.bindView(languages.get(position), position);
 	}
 
 	@Override
@@ -105,12 +105,12 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 			this.view.setOnClickListener(v -> languageSubject.onNext(language));
 		}
 
-		void bindView(Language language, boolean isFirst) {
+		void bindView(Language language, int position) {
 			this.language = language;
-			if (isFirst)
+			if (position == 0)
 				languageName.setText(String.format(Locale.getDefault(), view.getResources().getString(R.string.base), language.getLongName()));
 			else
-				languageName.setText(language.getLongName());
+				languageName.setText(String.format(Locale.getDefault(), view.getResources().getString(R.string.target), language.getLongName(), position));
 			flagImage.setImageResource(language.getLanguageType().getDrawable());
 		}
 	}
