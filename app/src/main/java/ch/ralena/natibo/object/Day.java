@@ -123,7 +123,7 @@ public class Day extends RealmObject {
 			curSentenceId--;
 			if (curSentenceId < 0) {
 				if (curSentenceSetId > 0) {
-					curSentenceId = sentenceSets.get(--curSentenceSetId).getSentencePairs().size();
+					curSentenceId = sentenceSets.get(--curSentenceSetId).getSentencePairs().size() - 1;
 				} else {
 					curSentenceId = 0;
 				}
