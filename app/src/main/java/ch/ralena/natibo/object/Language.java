@@ -36,6 +36,14 @@ public class Language extends RealmObject {
 		return null;
 	}
 
+	public boolean hasBook(String book) {
+		boolean hasBook = false;
+		for (Pack p : packs) {
+			hasBook = p.getBook().equals(book) || hasBook;
+		}
+		return hasBook;
+	}
+
 	public String getLongName() {
 		return getLanguageType().getName();
 	}

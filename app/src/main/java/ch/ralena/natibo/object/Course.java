@@ -161,7 +161,7 @@ public class Course extends RealmObject {
 
 			// create new set of sentences based off the schedule
 			SentenceSet sentenceSet = new SentenceSet();
-			sentenceSet.setSentences(getSentenceGroups(sentenceIndex, numSentences));
+			sentenceSet.setSentenceSet(getSentenceGroups(sentenceIndex, numSentences));
 			sentenceSet.setReviews(reviewPattern);
 			sentenceSet.setFirstDay(true);
 			sentenceSet.setOrder(schedule.getOrder());
@@ -189,16 +189,18 @@ public class Course extends RealmObject {
 		// go through each pack
 		for (Language language : languages) {
 			int i = 0;
+			int sentenceIndex = index;
+			int sentencesToAdd = numSentences;
 			for (Pack pack : getPacksPerLanguage(language)) {
 				RealmList<Sentence> packSentences = pack.getSentences();
-				if (index >= pack.getSentences().size())
-					index -= packSentences.size();
+				if (sentenceIndex >= pack.getSentences().size())
+					sentenceIndex -= packSentences.size();
 				else {
-					while (numSentences > 0) {
-						if (index >= pack.getSentences().size())
+					while (sentencesToAdd > 0) {
+						if (sentenceIndex >= pack.getSentences().size())
 							break;
-						numSentences--;
-						Sentence sentence = packSentences.get(index++);
+						sentencesToAdd--;
+						Sentence sentence = packSentences.get(sentenceIndex);
 						if (sentenceGroups.size() <= i) {
 							sentenceGroups.add(new SentenceGroup());
 						}
@@ -214,8 +216,8 @@ public class Course extends RealmObject {
 	private RealmList<Pack> getPacksPerLanguage(Language language) {
 		RealmList<Pack> langPacks = new RealmList<>();
 		for (Pack pack : packs) {
-			if (language.getPacks().contains(pack))
-				langPacks.add(pack);
+			if (language.hasBook(pack.getBook()))
+				langPacks.add(language.getPack(pack.getBook()));
 		}
 		return langPacks;
 	}

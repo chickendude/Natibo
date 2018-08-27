@@ -17,8 +17,8 @@ public class SentenceSet extends RealmObject {
 	private String id = UUID.randomUUID().toString();
 
 	private boolean isFirstDay;
-	private RealmList<SentenceGroup> sentences;
-	private RealmList<SentenceGroup> sentenceSet;
+	private RealmList<SentenceGroup> sentences = new RealmList<>(); // the shuffled set of sentences
+	private RealmList<SentenceGroup> sentenceSet; // the set of unique sentences to be learned
 	private RealmList<Integer> reviews;    // number of reviews per sentence per day, eg. [6, 4, 3, 2]
 	private String order;          // order to play sentences, eg. base + target + target, base + target, etc.
 
@@ -32,6 +32,10 @@ public class SentenceSet extends RealmObject {
 
 	public void setSentences(RealmList<SentenceGroup> sentences) {
 		this.sentences = sentences;
+	}
+
+	public void setSentenceSet(RealmList<SentenceGroup> sentenceSet) {
+		this.sentenceSet = sentenceSet;
 	}
 
 	public RealmList<Integer> getReviews() {
@@ -88,6 +92,7 @@ public class SentenceSet extends RealmObject {
 			Collections.shuffle(sentenceGroups);
 
 			// if there is more than one sentence, try to avoid duplicates being placed consecutively (so you don't get the same sentence twice in a row)
+			// todo freezes here
 			if (sentenceSet.size() > 1) {
 				for (int i = 0; i < sentenceGroups.size(); i++) {
 					int size = sentenceGroups.size();

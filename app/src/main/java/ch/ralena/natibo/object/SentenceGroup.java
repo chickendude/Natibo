@@ -12,8 +12,8 @@ public class SentenceGroup extends RealmObject {
 	@Index
 	private String id = UUID.randomUUID().toString();
 
-	private RealmList<Sentence> sentences;
-	private RealmList<Language> languages;
+	private RealmList<Sentence> sentences = new RealmList<>();
+	private RealmList<Language> languages = new RealmList<>();
 
 	public String getId() {
 		return id;

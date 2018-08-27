@@ -17,7 +17,7 @@ public class Day extends RealmObject {
 	@Index
 	private String id = UUID.randomUUID().toString();
 
-	private RealmList<SentenceSet> sentenceSets;
+	private RealmList<SentenceSet> sentenceSets = new RealmList<>();
 	private boolean isCompleted;
 	private int pauseMillis;
 
