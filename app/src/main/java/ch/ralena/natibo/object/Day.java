@@ -200,8 +200,11 @@ public class Day extends RealmObject {
 
 		int millisecondsLeft = 0;
 		for (Sentence sentence : getRemainingSentences()) {
-			metadataRetriever.setDataSource(sentence.getUri());
-			millisecondsLeft += Integer.parseInt(metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) + pauseMillis;
+			// check for null URIs (i.e. when there is no audio file loaded for that particular sentence)
+			if(sentence.getUri() != null) {
+				metadataRetriever.setDataSource(sentence.getUri());
+				millisecondsLeft += Integer.parseInt(metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) + pauseMillis;
+			}
 		}
 
 		return millisecondsLeft;
