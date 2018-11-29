@@ -26,6 +26,7 @@ public class LanguageData {
 		languages.add(new LanguageType("AR","Arabic (Standard)", R.drawable.flag_arabic_msa));
 		languages.add(new LanguageType("ARE","Arabic (Egyptian)", R.drawable.flag_arabic_egypt));
 		languages.add(new LanguageType("","Armenian", R.drawable.flag_armenian));
+		languages.add(new LanguageType("EU","Basque", R.drawable.flag_basque));
 		languages.add(new LanguageType("","Belarusian", R.drawable.flag_belarusian));
 		languages.add(new LanguageType("CA","Catalan", R.drawable.flag_catalan));
 		languages.add(new LanguageType("YUE","Chinese (Cantonese)", R.drawable.flag_chinese_hongkong));
