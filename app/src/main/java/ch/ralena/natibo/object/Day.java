@@ -70,8 +70,8 @@ public class Day extends RealmObject {
 		if (curSentenceSetId >= sentenceSets.size())
 			return null;
 		SentenceSet sentenceSet = sentenceSets.get(curSentenceSetId);
-		SentencePair sentencePair = sentenceSet.getSentencePairs().get(curSentenceId);
-		return sentencePair;
+		return sentenceSet.getSentencePairs().size() > 0 ?
+				sentenceSet.getSentencePairs().get(curSentenceId) : null;
 	}
 
 	public Sentence getCurrentSentence() {

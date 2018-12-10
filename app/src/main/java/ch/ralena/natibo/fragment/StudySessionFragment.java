@@ -1,6 +1,7 @@
 package ch.ralena.natibo.fragment;
 
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -75,6 +76,8 @@ public class StudySessionFragment extends Fragment {
 	Disposable serviceDisposable;
 	Disposable sentenceDisposable;
 	Disposable finishDisposable;
+
+	private AsyncTask<Void, Void, Void> timerCalculationAsync;
 
 	@Nullable
 	@Override
@@ -220,7 +223,23 @@ public class StudySessionFragment extends Fragment {
 		totalRepsText.setText(String.format(Locale.getDefault(), "%d", course.getTotalReps()));
 
 		// update time left
-		millisLeft = course.getCurrentDay().getTimeLeft();
+		final String courseId = course.getId();
+
+		timerCalculationAsync = new AsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void... voids) {
+				Realm realm = Realm.getDefaultInstance();
+				Course c = realm.where(Course.class).equalTo("id", courseId).findFirst();
+				millisLeft = c.getCurrentDay().getTimeLeft();
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void aVoid) {
+				startTimer();
+			}
+		};
+		timerCalculationAsync.execute();
 
 		// update base sentence views
 		baseSentenceText.setText(baseSentence.getText());
@@ -238,6 +257,8 @@ public class StudySessionFragment extends Fragment {
 	private void startTimer() {
 		millisLeft = millisLeft - millisLeft % 1000 - 1;
 		updateTime();
+		if (countDownTimer != null)
+			countDownTimer.cancel();
 		countDownTimer = new CountDownTimer(millisLeft, 100) {
 			@Override
 			public void onTick(long millisUntilFinished) {
@@ -297,6 +318,9 @@ public class StudySessionFragment extends Fragment {
 			finishDisposable.dispose();
 		if (countDownTimer != null)
 			countDownTimer.cancel();
+		if (timerCalculationAsync != null) {
+			timerCalculationAsync.cancel(true);
+		}
 	}
 
 	@Override
