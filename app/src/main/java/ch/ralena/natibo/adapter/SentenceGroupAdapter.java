@@ -15,6 +15,7 @@ import ch.ralena.natibo.object.SentenceGroup;
 import io.reactivex.subjects.PublishSubject;
 import io.realm.RealmList;
 
+
 public class SentenceGroupAdapter extends RecyclerView.Adapter<SentenceGroupAdapter.ViewHolder> {
 
 	PublishSubject<Sentence> languageSubject = PublishSubject.create();
@@ -70,14 +71,14 @@ public class SentenceGroupAdapter extends RecyclerView.Adapter<SentenceGroupAdap
 		ViewHolder(View view) {
 			super(view);
 
-			languageCode = view.findViewById(R.id.baseLanguageCodeLabel);
-			sentenceText = view.findViewById(R.id.baseSentenceLabel);
-			alternateSentence = view.findViewById(R.id.baseAlternateSentenceLabel);
-			alternateSentenceLayout = view.findViewById(R.id.baseAlternateSentenceLayout);
-			romanization = view.findViewById(R.id.baseRomanizationLabel);
-			romanizationLayout = view.findViewById(R.id.baseRomanizationLayout);
-			ipa = view.findViewById(R.id.baseIpaLabel);
-			ipaLayout = view.findViewById(R.id.baseIpaLayout);
+			languageCode = view.findViewById(R.id.languageCodeLabel);
+			sentenceText = view.findViewById(R.id.sentenceLabel);
+			alternateSentence = view.findViewById(R.id.alternateSentenceLabel);
+			alternateSentenceLayout = view.findViewById(R.id.alternateSentenceLayout);
+			romanization = view.findViewById(R.id.romanizationLabel);
+			romanizationLayout = view.findViewById(R.id.romanizationLayout);
+			ipa = view.findViewById(R.id.ipaLabel);
+			ipaLayout = view.findViewById(R.id.ipaLayout);
 
 			divider = view.findViewById(R.id.divider);
 		}

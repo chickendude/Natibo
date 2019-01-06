@@ -110,4 +110,16 @@ public class SentenceSet extends RealmObject {
 		});
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "SentenceSet{" +
+				"id='" + id + '\'' +
+				", isFirstDay=" + isFirstDay +
+				", sentences=" + sentences +
+				", sentenceSet=" + sentenceSet +
+				", reviews=" + reviews +
+				", order='" + order + '\'' +
+				'}';
+	}
 }

@@ -201,7 +201,7 @@ public class Course extends RealmObject {
 						if (sentenceIndex >= pack.getSentences().size())
 							break;
 						sentencesToAdd--;
-						Sentence sentence = packSentences.get(sentenceIndex);
+						Sentence sentence = packSentences.get(sentenceIndex++);
 						if (sentenceGroups.size() <= i) {
 							sentenceGroups.add(new SentenceGroup());
 						}

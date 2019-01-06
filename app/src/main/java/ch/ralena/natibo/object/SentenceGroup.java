@@ -34,4 +34,13 @@ public class SentenceGroup extends RealmObject {
 	public void setLanguages(RealmList<Language> languages) {
 		this.languages = languages;
 	}
+
+	@Override
+	public String toString() {
+		return "SentenceGroup{" +
+				"id='" + id + '\'' +
+				", sentences=" + sentences +
+				", languages=" + languages +
+				'}';
+	}
 }
