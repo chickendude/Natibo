@@ -180,6 +180,7 @@ public class Course extends RealmObject {
 			}
 		}
 
+		// delete the sentence sets with no reviews left
 		realm.executeTransaction(r -> currentDay.getSentenceSets().removeAll(emptySentenceSets));
 	}
 
