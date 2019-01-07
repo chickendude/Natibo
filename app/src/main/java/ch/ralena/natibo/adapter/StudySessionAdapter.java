@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -37,16 +36,7 @@ public class StudySessionAdapter extends RecyclerView.Adapter<StudySessionAdapte
 	@NonNull
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-		View view;
-		view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_study_session_container, parent, false);
-
-
-		View sentenceView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_study_session_sentence, parent, false);
-
-		LinearLayout sentenceLayout = view.findViewById(R.id.sentenceLayout);
-		sentenceLayout.addView(sentenceView);
-
-
+		View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_study_session_container, parent, false);
 		return new ViewHolder(view);
 	}
 
