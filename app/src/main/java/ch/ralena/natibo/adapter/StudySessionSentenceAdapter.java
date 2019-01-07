@@ -40,7 +40,7 @@ public class StudySessionSentenceAdapter extends RecyclerView.Adapter<StudySessi
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 		if (position < getItemCount())
-			holder.bindView(sentences.get(position), languages.get(position));
+			holder.bindView(sentences.get(position), languages.get(position), position == sentences.size() - 1);
 	}
 
 	@Override
@@ -57,6 +57,7 @@ public class StudySessionSentenceAdapter extends RecyclerView.Adapter<StudySessi
 		private LinearLayout romanizationLayout;
 		private TextView ipa;
 		private LinearLayout ipaLayout;
+		private View divider;
 
 		ViewHolder(View view) {
 			super(view);
@@ -69,9 +70,10 @@ public class StudySessionSentenceAdapter extends RecyclerView.Adapter<StudySessi
 			romanizationLayout = view.findViewById(R.id.romanizationLayout);
 			ipa = view.findViewById(R.id.ipaLabel);
 			ipaLayout = view.findViewById(R.id.ipaLayout);
+			divider = view.findViewById(R.id.divider);
 		}
 
-		void bindView(Sentence sentence, Language language) {
+		void bindView(Sentence sentence, Language language, boolean isLast) {
 			// base
 			sentenceText.setText(sentence.getText());
 			languageCode.setText(language.getLanguageId());
@@ -94,6 +96,7 @@ public class StudySessionSentenceAdapter extends RecyclerView.Adapter<StudySessi
 			} else {
 				ipaLayout.setVisibility(View.GONE);
 			}
+			divider.setVisibility(isLast ? View.GONE : View.VISIBLE);
 		}
 	}
 }

@@ -15,7 +15,7 @@ import io.realm.RealmList;
 
 public class SentenceListAdapter extends RecyclerView.Adapter<SentenceListAdapter.ViewHolder> {
 
-	PublishSubject<Sentence> languageSubject = PublishSubject.create();
+	private PublishSubject<Sentence> languageSubject = PublishSubject.create();
 
 	public PublishSubject<Sentence> asObservable() {
 		return languageSubject;
@@ -32,8 +32,7 @@ public class SentenceListAdapter extends RecyclerView.Adapter<SentenceListAdapte
 	@NonNull
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-		View view;
-		view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_sentence_list, parent, false);
+		View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_sentence_list, parent, false);
 		return new ViewHolder(view);
 	}
 

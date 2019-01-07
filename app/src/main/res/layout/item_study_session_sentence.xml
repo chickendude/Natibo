@@ -33,9 +33,9 @@
 				android:id="@+id/sentenceLabel"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:padding="4dp"
+				android:padding="8dp"
 				android:textColor="@color/colorTextDark"
-				android:textSize="12sp"
+				android:textSize="16sp"
 				tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
 		</LinearLayout>
 
@@ -57,7 +57,7 @@
 				android:id="@+id/alternateSentenceLabel"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:padding="4dp"
+				android:paddingLeft="8dp"
 				android:textColor="@color/colorTextDark"
 				android:textSize="12sp"
 				tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
@@ -81,7 +81,7 @@
 				android:id="@+id/romanizationLabel"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:padding="4dp"
+				android:paddingLeft="8dp"
 				android:textColor="@color/colorTextDark"
 				android:textSize="12sp"
 				tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
@@ -105,7 +105,7 @@
 				android:id="@+id/ipaLabel"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:padding="4dp"
+				android:paddingLeft="8dp"
 				android:textColor="@color/colorTextDark"
 				android:textSize="12sp"
 				tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
@@ -113,6 +113,7 @@
 	</LinearLayout>
 
 	<View
+		android:id="@+id/divider"
 		android:layout_width="match_parent"
 		android:layout_height="1dp"
 		android:layout_margin="4dp"

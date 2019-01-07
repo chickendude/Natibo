@@ -180,7 +180,7 @@ public class StudySessionFragment extends Fragment {
 	private void nextSentence(SentenceGroup sentenceGroup) {
 		sentencesLayout.setVisibility(View.VISIBLE);
 		RealmList<Sentence> sentences = sentenceGroup.getSentences();
-		adapter.updateSentencGroup(sentenceGroup);
+		adapter.updateSentenceGroup(sentenceGroup);
 
 		// update number of reps remaining
 		remainingRepsText.setText(String.format(Locale.getDefault(), "%d", course.getCurrentDay().getNumReviewsLeft()));

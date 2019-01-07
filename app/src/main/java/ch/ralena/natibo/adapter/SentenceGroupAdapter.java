@@ -51,7 +51,7 @@ public class SentenceGroupAdapter extends RecyclerView.Adapter<SentenceGroupAdap
 		return sentences.size();
 	}
 
-	public void updateSentencGroup(SentenceGroup sentenceGroup) {
+	public void updateSentenceGroup(SentenceGroup sentenceGroup) {
 		sentences = sentenceGroup.getSentences();
 		languages = sentenceGroup.getLanguages();
 		notifyDataSetChanged();
