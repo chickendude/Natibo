@@ -30,6 +30,10 @@ public class SentenceSet extends RealmObject {
 		return sentences;
 	}
 
+	public RealmList<SentenceGroup> getSentenceSet() {
+		return sentenceSet;
+	}
+
 	public void setSentences(RealmList<SentenceGroup> sentences) {
 		this.sentences = sentences;
 	}
@@ -85,7 +89,7 @@ public class SentenceSet extends RealmObject {
 			ArrayList<SentenceGroup> sentenceGroups = new ArrayList<>();
 			for (int i = 0; i < numReviews; i++) {
 				for (int j = 0; j < sentenceSet.size(); j++) {
-					SentenceGroup sentenceGroup = sentenceSet.get(i);
+					SentenceGroup sentenceGroup = sentenceSet.get(j);
 					sentenceGroups.add(sentenceGroup);
 				}
 			}

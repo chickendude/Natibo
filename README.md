@@ -1,5 +1,5 @@
 # Natibo
-This is an app which can load GLS packs ([another tool](https://github.com/chickendude/GlossikaNativeGLS) i've been working on to split Glossika GMS/PDF files into individual sentences) and use the old Glossika mp3 + PDF courses similar to the new AI platform.
+This is an app which can load GLS packs ([another tool](https://github.com/chickendude/GlossikaNativeGLS) i've been working on to split Glossika GMS/PDF files into individual sentenceGroups) and use the old Glossika mp3 + PDF courses similar to the new AI platform.
 
 Eventually, it will support other courses (including user/community-created courses) as well.
 

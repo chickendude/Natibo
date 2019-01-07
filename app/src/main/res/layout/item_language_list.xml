@@ -75,7 +75,7 @@
 					android:textColor="@color/colorTextLight"
 					android:layout_height="wrap_content"
 					android:layout_marginEnd="4dp"
-					android:text="@string/sentences"
+					android:text="@string/sentenceGroups"
 					android:textSize="12sp"/>
 
 				<TextView
