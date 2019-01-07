@@ -4,43 +4,27 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:layout_margin="4dp"
 	android:background="?android:windowBackground"
 	android:orientation="vertical">
 
-	<LinearLayout
+	<EditText
+		android:id="@+id/languageNamesLabel"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:padding="8dp">
-
-		<TextView
-			android:id="@+id/baseLanguageLabel"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:textAlignment="center"
-			android:textSize="18sp"
-			tools:text="English"/>
-
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text=">"/>
-
-		<TextView
-			android:id="@+id/targetLanguageLabel"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:textAlignment="center"
-			android:textSize="18sp"
-			tools:text="Chinese (Mandarin)"/>
-	</LinearLayout>
+		android:background="@color/colorPrimary"
+		android:inputType="none"
+		android:padding="8dp"
+		android:singleLine="true"
+		android:textAlignment="center"
+		android:textColor="@color/colorTextWhite"
+		android:textSize="20sp"
+		android:textStyle="bold"
+		tools:text="English → Spanish (Mexico) → German → Russian"/>
 
 	<ScrollView
 		android:layout_width="match_parent"
-		android:layout_height="match_parent">
+		android:layout_height="match_parent"
+		android:layout_margin="4dp">
 
 		<LinearLayout
 			android:layout_width="match_parent"
@@ -86,7 +70,7 @@
 							<TextView
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:text="How many new sentences per day do you want to learn? Don't forget that you will also be reviewing previous days' sentences as well!"
+								android:text="How many new sentenceGroups per day do you want to learn? Don't forget that you will also be reviewing previous days' sentenceGroups as well!"
 								android:textSize="14sp"/>
 
 							<LinearLayout
@@ -170,7 +154,7 @@
 								<TextView
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:text="This is the standard schedule for studying 1-15 sentences per day. The first day you will see each new sentence 6 times, the next day 4, then 3, and the last day you will see each sentence twice. In total, you will practice each sentence 15 times."
+									android:text="This is the standard schedule for studying 1-15 sentenceGroups per day. The first day you will see each new sentence 6 times, the next day 4, then 3, and the last day you will see each sentence twice. In total, you will practice each sentence 15 times."
 									android:textSize="12sp"/>
 
 								<RadioButton
@@ -182,7 +166,7 @@
 								<TextView
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:text="This is the standard schedule for studying 16+ sentences per day. Similar to above but starts at 7 reps per sentence on the first day. You will see each sentence 21 times."
+									android:text="This is the standard schedule for studying 16+ sentenceGroups per day. Similar to above but starts at 7 reps per sentence on the first day. You will see each sentence 21 times."
 									android:textSize="12sp"/>
 
 								<RadioButton
@@ -256,7 +240,7 @@
 							<TextView
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:text="If enabled, you will hear the target language twice instead of once. This can be changed later, however sentences that have already been studied one way will remain like that for all reviews."
+								android:text="If enabled, you will hear the target language twice instead of once. This can be changed later, however sentenceGroups that have already been studied one way will remain like that for all reviews."
 								android:textSize="12sp"/>
 						</LinearLayout>
 					</LinearLayout>

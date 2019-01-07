@@ -1,6 +1,7 @@
 package ch.ralena.natibo.adapter;
 
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,6 +62,8 @@ public class CourseDetailAdapter extends RecyclerView.Adapter<CourseDetailAdapte
 			this.pack = pack;
 			book.setText(pack.getBook());
 			book.setChecked(targetPacks.contains(pack));
+			int color = book.isChecked() ? R.color.colorPrimaryDark : R.color.colorPrimaryLight;
+			book.setTextColor(ContextCompat.getColor(book.getContext(), color));
 		}
 	}
 }

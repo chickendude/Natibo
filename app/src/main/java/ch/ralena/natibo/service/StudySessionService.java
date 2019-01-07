@@ -30,7 +30,7 @@ import ch.ralena.natibo.R;
 import ch.ralena.natibo.object.Course;
 import ch.ralena.natibo.object.Day;
 import ch.ralena.natibo.object.Sentence;
-import ch.ralena.natibo.object.SentencePair;
+import ch.ralena.natibo.object.SentenceGroup;
 import ch.ralena.natibo.utils.Utils;
 import io.reactivex.subjects.PublishSubject;
 import io.realm.Realm;
@@ -66,13 +66,13 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	private PhoneStateListener phoneStateListener;
 	private TelephonyManager telephonyManager;
 	private Realm realm;
-	private SentencePair sentencePair;
+	private SentenceGroup sentenceGroup;
 	private Sentence sentence;
 	private PlaybackStatus playbackStatus;
 	private NotificationCompat.Builder notificationBuilder;
 
 
-	PublishSubject<SentencePair> sentencePublish = PublishSubject.create();
+	PublishSubject<SentenceGroup> sentencePublish = PublishSubject.create();
 	PublishSubject<Day> finishPublish = PublishSubject.create();
 
 	// given to clients that connect to the service
@@ -158,16 +158,16 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	// --- setup ---
 
 	private void loadSentence() {
-		sentencePair = day.getCurrentSentencePair();
+		sentenceGroup = day.getCurrentSentenceGroup();
 
-		// if sentencePair is null, we're done studying for the day!
-		if (sentencePair == null) {
+		// if sentenceGroup is null, we're done studying for the day!
+		if (sentenceGroup == null) {
 			removeNotification();
 			finishPublish.onNext(day);
 			stop();
 			stopSelf();
 		} else {
-			sentencePublish.onNext(sentencePair);
+			sentencePublish.onNext(sentenceGroup);
 			sentence = day.getCurrentSentence();
 			try {
 				mediaPlayer.stop();
@@ -235,8 +235,8 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	private void updateNotificationText() {
 		if (notificationBuilder != null) {
 			notificationBuilder
-					.setContentText(sentencePair.getBaseSentence().getText())
-					.setContentTitle(sentencePair.getTargetSentence().getText())
+					.setContentText(sentenceGroup.getSentences().first().getText())
+					.setContentTitle(sentenceGroup.getSentences().last().getText())
 					.setOngoing(playbackStatus == PlaybackStatus.PLAYING);
 			NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 			notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
@@ -298,7 +298,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	// --- notification ---
 
 	public void buildNotification() {
-		if (sentencePair == null) {
+		if (sentenceGroup == null) {
 			finishPublish.onNext(day);
 			return;
 		}
@@ -345,8 +345,8 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 								.setMediaSession(mediaSession.getSessionToken())
 								.setShowActionsInCompactView(1)
 				)
-				.setContentText(sentencePair.getBaseSentence().getText())
-				.setContentTitle(sentencePair.getTargetSentence().getText())
+				.setContentText(sentenceGroup.getSentences().first().getText())
+				.setContentTitle(sentenceGroup.getSentences().last().getText())
 				.addAction(android.R.drawable.ic_media_previous, "prev sentence", iconAction(ACTION_ID_PREVIOUS))
 				.addAction(playPauseDrawable, "pause", playPauseAction)
 				.addAction(android.R.drawable.ic_media_next, "next sentence", iconAction(ACTION_ID_NEXT));
@@ -542,7 +542,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		}
 	}
 
-	public PublishSubject<SentencePair> sentenceObservable() {
+	public PublishSubject<SentenceGroup> sentenceObservable() {
 		return sentencePublish;
 	}
 

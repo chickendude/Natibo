@@ -46,7 +46,7 @@ public class CourseDetailFragment extends Fragment {
 		String id = getArguments().getString(TAG_COURSE_ID);
 		realm = Realm.getDefaultInstance();
 		course = realm.where(Course.class).equalTo("id", id).findFirst();
-		Language targetLanguage = course.getTargetLanguage();
+		Language targetLanguage = course.getLanguages().first();
 
 		MainActivity activity = (MainActivity) getActivity();
 		activity.setTitle(course.getTitle());
@@ -54,11 +54,11 @@ public class CourseDetailFragment extends Fragment {
 
 		loadCourseInfo(view, targetLanguage);
 
-		RealmList<Pack> matchingPacks = targetLanguage.getMatchingPacks(course.getBaseLanguage());
+		RealmList<Pack> matchingPacks = targetLanguage.getMatchingPacks(course.getLanguages().last());
 
 		// set up recyclerlist and adapter
 		RecyclerView recyclerView = view.findViewById(R.id.booksRecyclerView);
-		adapter = new CourseDetailAdapter(course.getTargetPacks(), matchingPacks);
+		adapter = new CourseDetailAdapter(course.getPacks(), matchingPacks);
 		recyclerView.setAdapter(adapter);
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 		recyclerView.setLayoutManager(layoutManager);
@@ -81,7 +81,7 @@ public class CourseDetailFragment extends Fragment {
 		);
 		startSessionButton.setOnClickListener(v -> {
 			// make sure we have books added before starting, otherwise it'll crash!
-			if (course.getTargetPacks().size() == 0) {
+			if (course.getPacks().size() == 0) {
 				Toast.makeText(getContext(), R.string.add_book_first, Toast.LENGTH_SHORT).show();
 				return;
 			}
@@ -110,7 +110,7 @@ public class CourseDetailFragment extends Fragment {
 
 		// load flag image
 		ImageView flagImage = view.findViewById(R.id.flagImageView);
-		flagImage.setImageResource(course.getTargetLanguage().getLanguageType().getDrawable());
+		flagImage.setImageResource(course.getLanguages().last().getLanguageType().getDrawable());
 
 		// load language name
 		TextView languageLabel = view.findViewById(R.id.languageLabel);
@@ -153,16 +153,13 @@ public class CourseDetailFragment extends Fragment {
 	}
 
 	private void addRemovePack(Pack pack) {
-		Pack basePack = course.getBaseLanguage().getMatchingPack(pack);
-		if (course.getTargetPacks().contains(pack)) {
+		if (course.getPacks().contains(pack)) {
 			realm.executeTransaction(r -> {
-				course.getBasePacks().remove(basePack);
-				course.getTargetPacks().remove(pack);
+				course.getPacks().remove(pack);
 			});
 		} else {
 			realm.executeTransaction(r -> {
-				course.getBasePacks().add(basePack);
-				course.getTargetPacks().add(pack);
+				course.getPacks().add(pack);
 			});
 		}
 		adapter.notifyDataSetChanged();

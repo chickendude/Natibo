@@ -9,37 +9,41 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import ch.ralena.natibo.R;
+import ch.ralena.natibo.object.Language;
 import ch.ralena.natibo.object.Sentence;
+import ch.ralena.natibo.object.SentenceGroup;
 import io.reactivex.subjects.PublishSubject;
 import io.realm.RealmList;
 
-public class SentenceListAdapter extends RecyclerView.Adapter<SentenceListAdapter.ViewHolder> {
 
-	private PublishSubject<Sentence> languageSubject = PublishSubject.create();
+public class SentenceGroupAdapter extends RecyclerView.Adapter<SentenceGroupAdapter.ViewHolder> {
+
+	PublishSubject<Sentence> languageSubject = PublishSubject.create();
 
 	public PublishSubject<Sentence> asObservable() {
 		return languageSubject;
 	}
 
 	private RealmList<Sentence> sentences;
-	private String language;
+	private RealmList<Language> languages;
 
-	public SentenceListAdapter(String languageId, RealmList<Sentence> sentences) {
-		this.language = languageId;
-		this.sentences = sentences;
+	public SentenceGroupAdapter() {
+		sentences = new RealmList<>();
+		languages = new RealmList<>();
 	}
 
 	@NonNull
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-		View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_sentence_list, parent, false);
+		View view;
+		view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_sentence_group, parent, false);
 		return new ViewHolder(view);
 	}
 
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 		if (position < getItemCount())
-			holder.bindView(sentences.get(position));
+			holder.bindView(sentences.get(position), languages.get(position), position == sentences.size() - 1);
 	}
 
 	@Override
@@ -47,9 +51,13 @@ public class SentenceListAdapter extends RecyclerView.Adapter<SentenceListAdapte
 		return sentences.size();
 	}
 
+	public void updateSentenceGroup(SentenceGroup sentenceGroup) {
+		sentences = sentenceGroup.getSentences();
+		languages = sentenceGroup.getLanguages();
+		notifyDataSetChanged();
+	}
+
 	class ViewHolder extends RecyclerView.ViewHolder {
-		private View view;
-		private TextView index;
 		private TextView languageCode;
 		private TextView sentenceText;
 		private TextView alternateSentence;
@@ -58,14 +66,12 @@ public class SentenceListAdapter extends RecyclerView.Adapter<SentenceListAdapte
 		private LinearLayout romanizationLayout;
 		private TextView ipa;
 		private LinearLayout ipaLayout;
-		private Sentence sentence;
+		private View divider;
 
 		ViewHolder(View view) {
 			super(view);
-			this.view = view;
-			index = view.findViewById(R.id.indexLabel);
+
 			languageCode = view.findViewById(R.id.languageCodeLabel);
-			languageCode.setText(language);
 			sentenceText = view.findViewById(R.id.sentenceLabel);
 			alternateSentence = view.findViewById(R.id.alternateSentenceLabel);
 			alternateSentenceLayout = view.findViewById(R.id.alternateSentenceLayout);
@@ -73,12 +79,12 @@ public class SentenceListAdapter extends RecyclerView.Adapter<SentenceListAdapte
 			romanizationLayout = view.findViewById(R.id.romanizationLayout);
 			ipa = view.findViewById(R.id.ipaLabel);
 			ipaLayout = view.findViewById(R.id.ipaLayout);
-			this.view.setOnClickListener(v -> languageSubject.onNext(sentence));
+
+			divider = view.findViewById(R.id.divider);
 		}
 
-		void bindView(Sentence sentence) {
-			this.sentence = sentence;
-			index.setText("" + sentence.getIndex());
+		void bindView(Sentence sentence, Language language, boolean isLast) {
+			languageCode.setText(language.getLanguageId());
 			sentenceText.setText(sentence.getText());
 			if (sentence.getAlternate() != null) {
 				alternateSentenceLayout.setVisibility(View.VISIBLE);
@@ -98,6 +104,7 @@ public class SentenceListAdapter extends RecyclerView.Adapter<SentenceListAdapte
 			} else {
 				ipaLayout.setVisibility(View.GONE);
 			}
+			divider.setVisibility(isLast ? View.GONE : View.VISIBLE);
 		}
 	}
 }

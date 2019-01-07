@@ -60,7 +60,7 @@ public class CoursePickSentenceFragment extends Fragment {
 		String courseId = getArguments().getString(TAG_COURSE_ID, null);
 
 		course = realm.where(Course.class).equalTo("id", courseId).findFirst();
-		language = course.getTargetLanguage();
+		language = course.getLanguages().last();
 
 		// load language name
 		getActivity().setTitle(language.getLanguageType().getName());
@@ -127,7 +127,7 @@ public class CoursePickSentenceFragment extends Fragment {
 
 	private void loadSentences() {
 		sentences = new RealmList<>();
-		for (Pack pack : course.getTargetPacks()) {
+		for (Pack pack : course.getPacks()) {
 			// use a sentence with index of -1 to separate the books
 			Sentence sentence = new Sentence();
 			sentence.setIndex(-1);
@@ -158,7 +158,7 @@ public class CoursePickSentenceFragment extends Fragment {
 	private void setStartingSentence() {
 		course.setStartingSentenceForAllSchedules(realm, curSentence);
 		String book = "";
-		for (Pack pack : course.getTargetPacks()) {
+		for (Pack pack : course.getPacks()) {
 			if (pack.getSentences().contains(curSentence)) {
 				book = pack.getBook();
 				break;

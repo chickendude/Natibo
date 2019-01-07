@@ -11,11 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ch.ralena.natibo.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.adapter.StudySessionAdapter;
 import ch.ralena.natibo.object.Course;
 import ch.ralena.natibo.object.Day;
+import ch.ralena.natibo.object.SentenceGroup;
 import ch.ralena.natibo.object.SentenceSet;
 import io.realm.Realm;
 
@@ -47,11 +51,14 @@ public class StudySessionOverviewFragment extends Fragment {
 		courseTitleLabel.setText(course.getTitle());
 
 		Day day = course.getCurrentDay();
-		SentenceSet sentenceSet = day.getSentenceSets().get(0);
+		List<SentenceGroup> sentenceGroups = new ArrayList<>();
+		for (SentenceSet sentenceSet : day.getSentenceSets()) {
+			sentenceGroups.addAll(sentenceSet.getSentenceSet());
+		}
 
 		// set up recyclerlist and adapter
 		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-		StudySessionAdapter adapter = new StudySessionAdapter(course.getBaseLanguage().getLanguageId(), course.getTargetLanguage().getLanguageId(), sentenceSet.getSentencePairs());
+		StudySessionAdapter adapter = new StudySessionAdapter(course.getLanguages(), sentenceGroups);
 		recyclerView.setAdapter(adapter);
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
 		recyclerView.setLayoutManager(layoutManager);

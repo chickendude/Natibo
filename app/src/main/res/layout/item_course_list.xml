@@ -20,7 +20,7 @@
 			android:layout_gravity="center"
 			android:layout_margin="8dp"
 			android:contentDescription="@string/language_flag"
-			android:scaleType="fitCenter"
+			android:scaleType="fitXY"
 			tools:src="@drawable/flag_french"/>
 
 		<LinearLayout

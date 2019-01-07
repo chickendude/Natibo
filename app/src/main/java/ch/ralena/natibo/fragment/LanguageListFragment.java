@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import ch.ralena.natibo.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.adapter.LanguageListAdapter;
@@ -19,12 +21,11 @@ import ch.ralena.natibo.object.Language;
 import io.reactivex.functions.Consumer;
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmResults;
 
 public class LanguageListFragment extends Fragment {
 	private static final String TAG = LanguageListFragment.class.getSimpleName();
 
-	RealmResults<Language> languages;
+	ArrayList<Language> languages;
 
 	private Realm realm;
 
@@ -35,7 +36,7 @@ public class LanguageListFragment extends Fragment {
 
 		// load schedules from database
 		realm = Realm.getDefaultInstance();
-		languages = realm.where(Language.class).findAll();
+		languages = Language.getLanguagesSorted(realm);
 
 		// load views
 		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);

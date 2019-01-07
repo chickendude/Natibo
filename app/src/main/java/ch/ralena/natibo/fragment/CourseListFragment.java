@@ -107,7 +107,7 @@ public class CourseListFragment extends Fragment {
 			activity.snackBar(R.string.no_languages);
 		} else {
 			// load new fragment
-			CourseCreateFragment fragment = new CourseCreateFragment();
+			CoursePickLanguageFragment fragment = new CoursePickLanguageFragment();
 			getFragmentManager()
 					.beginTransaction()
 					.replace(R.id.fragmentPlaceHolder, fragment)

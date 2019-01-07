@@ -14,7 +14,7 @@ import ch.ralena.natibo.R;
 import ch.ralena.natibo.object.Language;
 import io.reactivex.subjects.PublishSubject;
 
-public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapter.ViewHolder> {
+public class CourseAvailableLanguagesAdapter extends RecyclerView.Adapter<CourseAvailableLanguagesAdapter.ViewHolder> {
 
 	PublishSubject<Language> languageSubject = PublishSubject.create();
 
@@ -23,16 +23,18 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 	}
 
 	private ArrayList<Language> languages;
+	private ArrayList<Language> selectedLanguages;
 
-	public LanguageListAdapter(ArrayList<Language> languages) {
+	public CourseAvailableLanguagesAdapter(ArrayList<Language> languages) {
 		this.languages = languages;
+		selectedLanguages = new ArrayList<>();
 	}
 
 	@NonNull
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 		View view;
-		view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_language_list, parent, false);
+		view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_available_language_list, parent, false);
 		return new ViewHolder(view);
 	}
 
@@ -50,26 +52,36 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 	class ViewHolder extends RecyclerView.ViewHolder {
 		private View view;
 		private TextView languageName;
-		private TextView numPacks;
-		private TextView numSentences;
 		private ImageView flagImage;
+		private ImageView checkedImage;
 		private Language language;
 
 		ViewHolder(View view) {
 			super(view);
 			this.view = view;
 			languageName = view.findViewById(R.id.languageLabel);
-			numPacks = view.findViewById(R.id.numPacksLabel);
-			numSentences = view.findViewById(R.id.numSentencesLabel);
 			flagImage = view.findViewById(R.id.flagImageView);
-			this.view.setOnClickListener(v -> languageSubject.onNext(language));
+			checkedImage = view.findViewById(R.id.checkedImage);
+			this.view.setOnClickListener(v -> {
+				if (selectedLanguages.contains(language)) {
+					selectedLanguages.remove(language);
+				} else {
+					selectedLanguages.add(language);
+				}
+				languageSubject.onNext(language);
+				notifyDataSetChanged();
+			});
 		}
 
 		void bindView(Language language) {
 			this.language = language;
+			if (selectedLanguages.contains(language)) {
+				checkedImage.setVisibility(View.VISIBLE);
+				checkedImage.animate().scaleX(1f).setDuration(200).start();
+			} else {
+				checkedImage.animate().scaleX(0f).setDuration(200).start();
+			}
 			languageName.setText(language.getLongName());
-			numPacks.setText("" + language.getPacks().size());
-			numSentences.setText("" + language.getSentenceCount());
 			flagImage.setImageResource(language.getLanguageType().getDrawable());
 		}
 	}

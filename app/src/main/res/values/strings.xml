@@ -11,12 +11,12 @@
 	<string name="languages">Languages</string>
 	<string name="courses">Courses</string>
 	<string name="opening_file">Opening file…</string>
-	<string name="counting_sentences">Counting sentences</string>
-	<string name="reading_sentences">Reading sentences from text file</string>
+	<string name="counting_sentences">Counting sentenceGroups</string>
+	<string name="reading_sentences">Reading sentenceGroups from text file</string>
 	<string name="extracting_sentence_text">Extracting sentence texts</string>
 	<string name="extracting_sentence_audio">Extracting sentence audio</string>
 	<string name="packs">Packs:</string>
-	<string name="sentences">Sentences:</string>
+	<string name="sentenceGroups">Sentences:</string>
 	<string name="language_flag">Language Flag</string>
 	<string name="flag_image">Flag Image</string>
 	<string name="ipa">IPA</string>
@@ -24,12 +24,6 @@
 	<string name="alt">ALT</string>
 	<string name="no_courses">You aren\'t currently studying any courses, please create a course!</string>
 	<string name="no_languages">You haven\'t loaded any languages yet, please load a language pack (or two)!</string>
-	<string name="prepackaged">Pre-Packaged</string>
-	<string name="prepackaged_button">Select a Pre-Packaged Course</string>
-	<string name="prepackaged_details">Start a pre-packaged course or edit them slightly, choosing how many sentences a day you want to learn, how many days to review them, and more!</string>
-	<string name="byoc">BYOC</string>
-	<string name="byoc_details">Build your own course! For the brave, the experienced, and the slightly insane! Your imagination (and our ability to code these features in…) is the limit!</string>
-	<string name="byoc_button">Build Your Own Course</string>
 	<string name="target_language">Target Language</string>
 	<string name="base_language">Base Language</string>
 	<string name="create">Create</string>
@@ -49,10 +43,14 @@
 	<string name="delete">DELETE</string>
 	<string name="course_settings_not_implemented">Individual course settings have not been implemented yet, sorry!</string>
 	<string name="time_in_milliseconds">The amount of time in milliseconds to wait between each sentence.</string>
-	<string name="pause_between_sentences">Pause between sentences</string>
+	<string name="pause_between_sentences">Pause between sentenceGroups</string>
 	<string name="add_book_first">Please add a book to your course first by clicking on it!</string>
 	<string name="books">Books</string>
 	<string name="where_to_start">Select where in the course you\'d like to start from if you\'ve previously studied the course or are familiar with the language.</string>
 	<string name="change_starting_point">Change starting point</string>
 	<string name="sentence_set">Sentence set to book \'%s\', sentence \'%d\'.</string>
+	<string name="select_languages">Select languages</string>
+	<string name="drag_handle">Drag Handle</string>
+	<string name="base">%s - base</string>
+	<string name="target">%s - target %d</string>
 </resources>

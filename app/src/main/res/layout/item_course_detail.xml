@@ -19,7 +19,7 @@
 		android:background="@drawable/book_background"
 		android:padding="12dp"
 		android:textAlignment="center"
-		android:textColor="@color/colorTextWhite"
+		android:textColor="@color/colorPrimaryLight"
 		android:textSize="20sp"
 		android:textStyle="bold"
 		tools:text="F1"/>

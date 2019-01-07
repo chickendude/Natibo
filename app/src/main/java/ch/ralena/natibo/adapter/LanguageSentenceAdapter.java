@@ -13,33 +13,35 @@ import ch.ralena.natibo.object.Sentence;
 import io.reactivex.subjects.PublishSubject;
 import io.realm.RealmList;
 
-public class SentenceListAdapter extends RecyclerView.Adapter<SentenceListAdapter.ViewHolder> {
+public class LanguageSentenceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+	private static final int TYPE_SENTENCE = 0;
+	private static final int TYPE_MARKER = 1;
 
-	private PublishSubject<Sentence> languageSubject = PublishSubject.create();
+	PublishSubject<Sentence> sentenceSubject = PublishSubject.create();
 
 	public PublishSubject<Sentence> asObservable() {
-		return languageSubject;
+		return sentenceSubject;
 	}
 
 	private RealmList<Sentence> sentences;
 	private String language;
+	private Sentence selectedSentence;
 
-	public SentenceListAdapter(String languageId, RealmList<Sentence> sentences) {
+	public LanguageSentenceAdapter(String languageId, RealmList<Sentence> sentences) {
 		this.language = languageId;
 		this.sentences = sentences;
 	}
 
 	@NonNull
 	@Override
-	public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-		View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_sentence_list, parent, false);
+	public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+		View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_language_sentence_list, parent, false);
 		return new ViewHolder(view);
 	}
 
 	@Override
-	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-		if (position < getItemCount())
-			holder.bindView(sentences.get(position));
+	public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+		((ViewHolder) holder).bindView(sentences.get(position));
 	}
 
 	@Override
@@ -47,8 +49,13 @@ public class SentenceListAdapter extends RecyclerView.Adapter<SentenceListAdapte
 		return sentences.size();
 	}
 
+	private boolean isBookMarker(int position) {
+		return sentences.get(position).getIndex() == -1;
+	}
+
 	class ViewHolder extends RecyclerView.ViewHolder {
 		private View view;
+		private LinearLayout sentenceLayout;
 		private TextView index;
 		private TextView languageCode;
 		private TextView sentenceText;
@@ -63,6 +70,7 @@ public class SentenceListAdapter extends RecyclerView.Adapter<SentenceListAdapte
 		ViewHolder(View view) {
 			super(view);
 			this.view = view;
+			sentenceLayout = view.findViewById(R.id.sentenceLayout);
 			index = view.findViewById(R.id.indexLabel);
 			languageCode = view.findViewById(R.id.languageCodeLabel);
 			languageCode.setText(language);
@@ -73,11 +81,20 @@ public class SentenceListAdapter extends RecyclerView.Adapter<SentenceListAdapte
 			romanizationLayout = view.findViewById(R.id.romanizationLayout);
 			ipa = view.findViewById(R.id.ipaLabel);
 			ipaLayout = view.findViewById(R.id.ipaLayout);
-			this.view.setOnClickListener(v -> languageSubject.onNext(sentence));
+			this.view.setOnClickListener(v -> {
+				selectedSentence = sentence;
+				sentenceSubject.onNext(sentence);
+				notifyDataSetChanged();
+			});
 		}
 
 		void bindView(Sentence sentence) {
 			this.sentence = sentence;
+			if (sentence == selectedSentence) {
+				sentenceLayout.setBackground(view.getContext().getResources().getDrawable(R.drawable.sentence_list_border_selected));
+			} else {
+				sentenceLayout.setBackground(view.getContext().getResources().getDrawable(R.drawable.sentence_list_border));
+			}
 			index.setText("" + sentence.getIndex());
 			sentenceText.setText(sentence.getText());
 			if (sentence.getAlternate() != null) {
@@ -100,4 +117,18 @@ public class SentenceListAdapter extends RecyclerView.Adapter<SentenceListAdapte
 			}
 		}
 	}
+
+	class DivideViewHolder extends RecyclerView.ViewHolder {
+		private TextView book;
+
+		DivideViewHolder(View view) {
+			super(view);
+			book = view.findViewById(R.id.bookLabel);
+		}
+
+		void bindView(Sentence sentence) {
+			book.setText("- " + sentence.getText() + " -");
+		}
+	}
+
 }
