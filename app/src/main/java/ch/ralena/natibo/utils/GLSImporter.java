@@ -149,13 +149,13 @@ public class GLSImporter {
 
 							// make sure it's one of the accepted languages
 							if (entryName.contains(".mp3")) {
-								File folder = new File(activity.getFilesDir() + "/" + language);
+								File folder = new File(activity.getFilesDir() + "/" + language + "/" + book);
 								if (!folder.isDirectory()) {
 									folder.mkdir();
 								}
 
 								// set up file path
-								File audioFile = new File(activity.getFilesDir() + "/" + language + "/" + number);
+								File audioFile = new File(folder.getAbsolutePath() + "/" + number);
 
 								// actually write the file
 								byte buffer[] = new byte[BUFFER_SIZE];
