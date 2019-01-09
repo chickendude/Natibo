@@ -11,8 +11,8 @@
 	<string name="languages">Languages</string>
 	<string name="courses">Courses</string>
 	<string name="opening_file">Opening file…</string>
-	<string name="counting_sentences">Counting sentenceGroups</string>
-	<string name="reading_sentences">Reading sentenceGroups from text file</string>
+	<string name="counting_sentences">Counting sentences</string>
+	<string name="reading_sentences">Reading sentences from text file</string>
 	<string name="extracting_sentence_text">Extracting sentence texts</string>
 	<string name="extracting_sentence_audio">Extracting sentence audio</string>
 	<string name="packs">Packs:</string>
@@ -43,7 +43,7 @@
 	<string name="delete">DELETE</string>
 	<string name="course_settings_not_implemented">Individual course settings have not been implemented yet, sorry!</string>
 	<string name="time_in_milliseconds">The amount of time in milliseconds to wait between each sentence.</string>
-	<string name="pause_between_sentences">Pause between sentenceGroups</string>
+	<string name="pause_between_sentences">Pause between sentences</string>
 	<string name="add_book_first">Please add a book to your course first by clicking on it!</string>
 	<string name="books">Books</string>
 	<string name="where_to_start">Select where in the course you\'d like to start from if you\'ve previously studied the course or are familiar with the language.</string>
