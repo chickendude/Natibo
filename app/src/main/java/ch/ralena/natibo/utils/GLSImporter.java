@@ -151,7 +151,7 @@ public class GLSImporter {
 							if (entryName.contains(".mp3")) {
 								File folder = new File(activity.getFilesDir() + "/" + language + "/" + book);
 								if (!folder.isDirectory()) {
-									folder.mkdir();
+									folder.mkdirs();
 								}
 
 								// set up file path
