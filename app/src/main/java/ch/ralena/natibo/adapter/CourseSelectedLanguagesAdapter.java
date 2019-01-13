@@ -93,7 +93,6 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 		ViewHolder(View view) {
 			super(view);
 			this.view = view;
-			languageName = view.findViewById(R.id.languageLabel);
 			flagImage = view.findViewById(R.id.flagImageView);
 			handleImage = view.findViewById(R.id.handleImage);
 			handleImage.setOnTouchListener((v, event) -> {
@@ -107,10 +106,6 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 
 		void bindView(Language language, int position) {
 			this.language = language;
-			if (position == 0)
-				languageName.setText(String.format(Locale.getDefault(), view.getResources().getString(R.string.base), language.getLongName()));
-			else
-				languageName.setText(String.format(Locale.getDefault(), view.getResources().getString(R.string.target), language.getLongName(), position));
 			flagImage.setImageResource(language.getLanguageType().getDrawable());
 		}
 	}

@@ -16,42 +16,6 @@
 		tools:src="@drawable/flag_armenian"/>
 
 	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_alignBottom="@id/flagImageView"
-		android:alpha="0.9"
-		android:background="@color/colorPrimary"
-		android:orientation="horizontal">
-
-		<TextView
-			android:id="@+id/languageLabel"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center"
-			android:layout_weight="1"
-			android:textAlignment="center"
-			android:textColor="@color/colorTextWhite"
-			android:textSize="20sp"
-			tools:text="Armenian"/>
-
-		<ImageView
-			android:id="@+id/deleteIcon"
-			android:layout_width="40dp"
-			android:layout_height="40dp"
-			android:scaleType="center"
-			android:src="@drawable/ic_delete"
-			android:tint="@color/colorTextWhite"/>
-
-		<ImageView
-			android:id="@+id/settingsIcon"
-			android:layout_width="40dp"
-			android:layout_height="40dp"
-			android:scaleType="center"
-			android:src="@drawable/ic_settings"
-			android:tint="@color/colorTextWhite"/>
-	</LinearLayout>
-
-	<LinearLayout
 		android:id="@+id/recyclerView"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
@@ -112,6 +76,29 @@
 					android:textSize="22sp"
 					tools:text="500"/>
 			</LinearLayout>
+
+			<LinearLayout
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:orientation="vertical">
+
+				<ImageView
+					android:id="@+id/settingsIcon"
+					android:layout_width="40dp"
+					android:layout_height="40dp"
+					android:scaleType="center"
+					android:src="@drawable/ic_settings"
+					android:tint="@color/colorTextWhite"/>
+
+				<ImageView
+					android:id="@+id/deleteIcon"
+					android:layout_width="40dp"
+					android:layout_height="40dp"
+					android:scaleType="center"
+					android:src="@drawable/ic_delete"
+					android:tint="@color/colorTextWhite"/>
+			</LinearLayout>
+
 		</LinearLayout>
 
 		<LinearLayout
