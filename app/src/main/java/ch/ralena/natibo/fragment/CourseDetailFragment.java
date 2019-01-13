@@ -111,10 +111,6 @@ public class CourseDetailFragment extends Fragment {
 		// load flag image
 		ImageView flagImage = view.findViewById(R.id.flagImageView);
 		flagImage.setImageResource(course.getLanguages().last().getLanguageType().getDrawable());
-
-		// load language name
-		TextView languageLabel = view.findViewById(R.id.languageLabel);
-		languageLabel.setText(targetLanguage.getLanguageType().getName());
 	}
 
 	private void prepareDeleteCourseIcon(View view, MainActivity activity) {
