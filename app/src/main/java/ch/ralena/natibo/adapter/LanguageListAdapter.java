@@ -58,7 +58,6 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 		ViewHolder(View view) {
 			super(view);
 			this.view = view;
-			languageName = view.findViewById(R.id.languageLabel);
 			numPacks = view.findViewById(R.id.numPacksLabel);
 			numSentences = view.findViewById(R.id.numSentencesLabel);
 			flagImage = view.findViewById(R.id.flagImageView);
@@ -67,7 +66,6 @@ public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapte
 
 		void bindView(Language language) {
 			this.language = language;
-			languageName.setText(language.getLongName());
 			numPacks.setText("" + language.getPacks().size());
 			numSentences.setText("" + language.getSentenceCount());
 			flagImage.setImageResource(language.getLanguageType().getDrawable());
