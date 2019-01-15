@@ -530,10 +530,10 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 			if (!requestAudioFocus())
 				stopSelf();
 
-			if (day.isCompleted()) {
+			// if the app is playing, we don't need to reload the sentence.
+			// if nothing is playing, we'll need to load the sentence and start it.
+			if (playbackStatus != PlaybackStatus.PLAYING) {
 				loadSentence();
-				stop();
-				mediaPlayer.reset();
 				play();
 			}
 		}

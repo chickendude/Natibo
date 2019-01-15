@@ -319,6 +319,8 @@ public class MainActivity extends AppCompatActivity {
 		storage.putCourseId(course.getId());
 		storage.putDayId(course.getCurrentDay().getId());
 
+		// if we aren't bound to the service, start it if necessary and bind to it so that we can interact with it.
+		// if we are bound to it, we need to tell it to start a new session
 		if (!isServiceBound) {
 			Intent intent = new Intent(this, StudySessionService.class);
 			startService(intent);
