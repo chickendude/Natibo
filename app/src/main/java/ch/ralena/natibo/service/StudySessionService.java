@@ -457,13 +457,10 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 				pauseAndRelease();
 				break;
 			case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:    // we've lost focus for a short amount of time, e.g. Google Maps announcing directions
-				isPlaying = playbackStatus == PlaybackStatus.PLAYING;
-				stop();
-				break;
 			case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:    // we've lost focus for a short amount of time but we can still play audio in bg
-				setVolume(0.1f);
+				isPlaying = playbackStatus == PlaybackStatus.PLAYING;
+				pause();
 				break;
-
 		}
 	}
 
