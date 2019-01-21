@@ -24,6 +24,7 @@ import ch.ralena.natibo.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.adapter.PickSentenceAdapter;
 import ch.ralena.natibo.object.Course;
+import ch.ralena.natibo.object.Day;
 import ch.ralena.natibo.object.Language;
 import ch.ralena.natibo.object.Pack;
 import ch.ralena.natibo.object.Sentence;
@@ -157,7 +158,10 @@ public class CoursePickSentenceFragment extends Fragment {
 	}
 
 	private void setStartingSentence() {
-		if (course.getCurrentDay() != null && course.getCurrentDay().getTotalReviews() != course.getCurrentDay().getNumReviewsLeft()) {
+		Day curDay = course.getCurrentDay();
+		if (curDay != null
+				&& !curDay.isCompleted()
+				&& curDay.getTotalReviews() != curDay.getNumReviewsLeft()) {
 			AlertDialog inProgressDialog = new AlertDialog.Builder(getContext())
 					.setTitle(R.string.session_in_progress)
 					.setMessage(R.string.reset_session)
@@ -165,7 +169,6 @@ public class CoursePickSentenceFragment extends Fragment {
 					.setNegativeButton(android.R.string.no, ((dialog, which) -> {
 					}))
 					.create();
-
 			inProgressDialog.show();
 		} else {
 			updateStartingCourse();

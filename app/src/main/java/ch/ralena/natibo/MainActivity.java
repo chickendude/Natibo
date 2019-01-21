@@ -89,19 +89,21 @@ public class MainActivity extends AppCompatActivity {
 
 		// set up nav drawer
 		setupNavigationDrawer();
-		loadCourseListFragment();
+
+		// if the device wasn't rotated, load the starting page
+		if (savedInstanceState == null)
+			loadCourseListFragment();
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putBoolean(KEY_SERVICE_BOUND, isServiceBound);
-	}
+ 	}
 
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-		isServiceBound = savedInstanceState.getBoolean(KEY_SERVICE_BOUND, false);
+//		isServiceBound = savedInstanceState.getBoolean(KEY_SERVICE_BOUND, false);
 	}
 
 	@Override
@@ -117,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (isServiceBound) {
+		if (isServiceBound && studySessionService != null) {
 			studySessionService.removeNotification();
 		}
 	}
