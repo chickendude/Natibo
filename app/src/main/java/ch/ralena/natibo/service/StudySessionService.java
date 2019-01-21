@@ -532,9 +532,14 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 			// if the app is playing, we don't need to reload the sentence.
 			// if nothing is playing, we'll need to load the sentence and start it.
-			if (playbackStatus != PlaybackStatus.PLAYING) {
+			if (playbackStatus != PlaybackStatus.PLAYING && !day.isCompleted()) {
 				loadSentence();
 				play();
+			}
+
+			// when returning to the screen, make sure the sentences are updated
+			if (sentenceGroup != null) {
+				sentencePublish.onNext(sentenceGroup);
 			}
 		}
 	}

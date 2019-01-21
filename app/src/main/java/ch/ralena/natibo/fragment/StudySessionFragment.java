@@ -24,12 +24,10 @@ import ch.ralena.natibo.R;
 import ch.ralena.natibo.adapter.SentenceGroupAdapter;
 import ch.ralena.natibo.object.Course;
 import ch.ralena.natibo.object.Day;
-import ch.ralena.natibo.object.Sentence;
 import ch.ralena.natibo.object.SentenceGroup;
 import ch.ralena.natibo.service.StudySessionService;
 import io.reactivex.disposables.Disposable;
 import io.realm.Realm;
-import io.realm.RealmList;
 
 public class StudySessionFragment extends Fragment {
 	private static final String TAG = StudySessionFragment.class.getSimpleName();
@@ -120,11 +118,11 @@ public class StudySessionFragment extends Fragment {
 
 	private void connectToService() {
 		serviceDisposable = activity.getSessionPublish().subscribe(service -> {
+			studySessionService = service;
 			if (course.getCurrentDay().getCurrentSentenceGroup() != null)
 				nextSentence(course.getCurrentDay().getCurrentSentenceGroup());
 			else
 				sessionFinished(course.getCurrentDay());
-			studySessionService = service;
 			sentenceDisposable = studySessionService.sentenceObservable().subscribe(this::nextSentence);
 			finishDisposable = studySessionService.finishObservable().subscribe(this::sessionFinished);
 			setPaused(studySessionService.getPlaybackStatus() == null || studySessionService.getPlaybackStatus() == StudySessionService.PlaybackStatus.PAUSED);
@@ -178,8 +176,8 @@ public class StudySessionFragment extends Fragment {
 	}
 
 	private void nextSentence(SentenceGroup sentenceGroup) {
+		updatePlayPauseImage();
 		sentencesLayout.setVisibility(View.VISIBLE);
-		RealmList<Sentence> sentences = sentenceGroup.getSentences();
 		adapter.updateSentenceGroup(sentenceGroup);
 
 		// update number of reps remaining
