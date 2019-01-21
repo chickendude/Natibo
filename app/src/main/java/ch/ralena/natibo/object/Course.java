@@ -125,10 +125,13 @@ public class Course extends RealmObject {
 	// --- helper methods ---
 
 	public void setStartingSentenceForAllSchedules(Realm realm, Sentence sentence) {
-		// remember, the sentence index starts at 1, not 0!
 		realm.executeTransaction(r -> {
+			// remember, the sentence index starts at 1, not 0!
 			schedule.setSentenceIndex(sentence.getIndex() - 1);
 		});
+		if (currentDay != null)
+			currentDay.resetReviews(realm);
+		prepareNextDay(realm);
 	}
 
 	public void addReps(int reps) {
@@ -146,7 +149,7 @@ public class Course extends RealmObject {
 			Day day = r.createObject(Day.class, UUID.randomUUID().toString());
 
 			// add the sentence sets from the current day to the next day
-			if (currentDay != null) {
+			if (currentDay != null && currentDay.isCompleted()) {
 				day.getSentenceSets().addAll(currentDay.getSentenceSets());
 
 				// move yesterday's new words to the front of the reviews

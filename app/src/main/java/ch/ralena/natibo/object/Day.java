@@ -130,14 +130,6 @@ public class Day extends RealmObject {
 		});
 	}
 
-	public int getNumReps() {
-		int numReps = 0;
-		for (SentenceSet sentenceSet : sentenceSets) {
-			numReps += sentenceSet.getSentenceGroups().size();
-		}
-		return numReps;
-	}
-
 	private List<Sentence> getRemainingSentences() {
 		List<Sentence> sentences = new ArrayList<>();
 		for (int i = curSentenceSetId; i < sentenceSets.size(); i++) {

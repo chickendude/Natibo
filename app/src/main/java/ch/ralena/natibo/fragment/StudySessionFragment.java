@@ -163,7 +163,7 @@ public class StudySessionFragment extends Fragment {
 	private void sessionFinished(Day day) {
 		// mark day as completed
 		realm.executeTransaction(r -> {
-			course.addReps(course.getCurrentDay().getNumReps());
+			course.addReps(course.getCurrentDay().getTotalReviews());
 			day.setCompleted(true);
 		});
 

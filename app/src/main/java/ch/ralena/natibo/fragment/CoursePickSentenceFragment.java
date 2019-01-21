@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -156,6 +157,23 @@ public class CoursePickSentenceFragment extends Fragment {
 	}
 
 	private void setStartingSentence() {
+		if (course.getCurrentDay() != null && course.getCurrentDay().getTotalReviews() != course.getCurrentDay().getNumReviewsLeft()) {
+			AlertDialog inProgressDialog = new AlertDialog.Builder(getContext())
+					.setTitle(R.string.session_in_progress)
+					.setMessage(R.string.reset_session)
+					.setPositiveButton(android.R.string.yes, ((dialog, which) -> updateStartingCourse()))
+					.setNegativeButton(android.R.string.no, ((dialog, which) -> {
+					}))
+					.create();
+
+			inProgressDialog.show();
+		} else {
+			updateStartingCourse();
+		}
+
+	}
+
+	private void updateStartingCourse() {
 		course.setStartingSentenceForAllSchedules(realm, curSentence);
 		String book = "";
 		for (Pack pack : course.getPacks()) {

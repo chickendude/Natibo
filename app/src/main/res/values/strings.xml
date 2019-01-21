@@ -53,4 +53,6 @@
 	<string name="drag_handle">Drag Handle</string>
 	<string name="base">%s - base</string>
 	<string name="target">%s - target %d</string>
+	<string name="session_in_progress">Session in progress!</string>
+	<string name="reset_session">This will reset your current session, are you sure?</string>
 </resources>
