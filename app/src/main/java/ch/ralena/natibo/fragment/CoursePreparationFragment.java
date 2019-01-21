@@ -222,13 +222,19 @@ public class CoursePreparationFragment extends Fragment {
 		int numSentencesPerDay = Integer.parseInt(sentencesPerDayEdit.getText().toString());
 
 		// "base-target-target" if chorus enabled, otherwise "base-target"
-		String order = chorusCheckBox.isChecked() ? "BTT" : "BT";
+		StringBuilder order = new StringBuilder();
+
+		for (int i = 0; i < languages.size(); i++) {
+			if ((i > 0 || languages.size() == 1) && chorusCheckBox.isChecked())
+				order.append(i);
+			order.append(i);
+		}
 
 		// --- begin transaction
 		realm.beginTransaction();
 		// create sentence schedule
 		Schedule schedule = realm.createObject(Schedule.class, UUID.randomUUID().toString());
-		schedule.setOrder(order);
+		schedule.setOrder(order.toString());
 		schedule.setNumSentences(numSentencesPerDay);
 		for (String review : dailyReviews) {
 			schedule.getReviewPattern().add(Integer.parseInt(review));

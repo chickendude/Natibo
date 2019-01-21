@@ -76,12 +76,8 @@ public class Day extends RealmObject {
 			return null;
 		SentenceSet sentenceSet = sentenceSets.get(curSentenceSetId);
 		SentenceGroup sentenceGroup = sentenceSet.getSentenceGroups().get(curSentenceId);
-		Sentence sentence;
-		if (sentenceSet.getOrder().charAt(patternIndex) == 'B')
-			sentence = sentenceGroup.getSentences().first();
-		else
-			sentence = sentenceGroup.getSentences().last();
-		return sentence;
+		int index = Integer.parseInt(sentenceSet.getOrder().charAt(patternIndex) + "");
+		return sentenceGroup.getSentences().get(index);
 	}
 
 	/**
@@ -144,10 +140,8 @@ public class Day extends RealmObject {
 
 				// first sentence pair will possible have fewer sentences depending on whether the base sentence has been played or not
 				for (int j = patternIndex; j < order.length(); j++) {
-					if (order.charAt(j) == 'B')
-						sentences.add(tempSentenceGroups.get(0).getSentences().first());
-					else if (order.charAt(j) == 'T')
-						sentences.add(tempSentenceGroups.get(0).getSentences().last());
+					int index = Integer.parseInt(sentenceSet.getOrder().charAt(j) + "");
+					sentences.add(tempSentenceGroups.get(0).getSentences().get(index));
 				}
 				tempSentenceGroups.remove(0);
 			} else {
@@ -157,10 +151,8 @@ public class Day extends RealmObject {
 			// add all sentences according to the order to the list of sentences
 			for (SentenceGroup sentencePair : tempSentenceGroups) {
 				for (char c : order.toCharArray()) {
-					if (c == 'B')
-						sentences.add(sentencePair.getSentences().first());
-					else if (c == 'T')
-						sentences.add(sentencePair.getSentences().last());
+					int index = Integer.parseInt(c + "");
+					sentences.add(tempSentenceGroups.get(0).getSentences().get(index));
 				}
 			}
 		}
@@ -176,6 +168,7 @@ public class Day extends RealmObject {
 		}
 		return numReviews;
 	}
+
 	public int getTotalReviews() {
 		int totalReviews = 0;
 		for (SentenceSet sentenceSet : sentenceSets) {

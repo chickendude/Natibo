@@ -101,7 +101,7 @@ public class SentenceSet extends RealmObject {
 				for (int i = 0; i < sentenceGroups.size(); i++) {
 					int size = sentenceGroups.size();
 					Random rand = new Random();
-					if (i + 1 < size && sentenceGroups.get(i).getSentences().get(1).getIndex() == sentenceGroups.get(i + 1).getSentences().get(1).getIndex()) {
+					if (i + 1 < size && sentenceGroups.get(i).getSentences().get(0).getIndex() == sentenceGroups.get(i + 1).getSentences().get(0).getIndex()) {
 						int swap = rand.nextInt(size);
 						Collections.swap(sentenceGroups, i, swap);
 						i = -1;
