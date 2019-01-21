@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Locale;
 
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.callback.ItemTouchHelperCallback;
@@ -47,7 +46,7 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-		holder.bindView(languages.get(position), position);
+		holder.bindView(languages.get(position));
 	}
 
 	@Override
@@ -93,6 +92,7 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 		ViewHolder(View view) {
 			super(view);
 			this.view = view;
+			languageName = view.findViewById(R.id.languageLabel);
 			flagImage = view.findViewById(R.id.flagImageView);
 			handleImage = view.findViewById(R.id.handleImage);
 			handleImage.setOnTouchListener((v, event) -> {
@@ -104,8 +104,9 @@ public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseS
 			this.view.setOnClickListener(v -> languageSubject.onNext(language));
 		}
 
-		void bindView(Language language, int position) {
+		void bindView(Language language) {
 			this.language = language;
+			languageName.setText(language.getLongName());
 			flagImage.setImageResource(language.getLanguageType().getDrawable());
 		}
 	}

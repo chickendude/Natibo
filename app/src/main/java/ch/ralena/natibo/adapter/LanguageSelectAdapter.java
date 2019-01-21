@@ -53,6 +53,7 @@ public class LanguageSelectAdapter extends RecyclerView.Adapter<LanguageSelectAd
 		LanguageViewHolder(View itemView) {
 			super(itemView);
 			flag = itemView.findViewById(R.id.flagImageView);
+			languageName = itemView.findViewById(R.id.languageLabel);
 		}
 
 		private void bindView(LanguageType language) {
@@ -67,6 +68,7 @@ public class LanguageSelectAdapter extends RecyclerView.Adapter<LanguageSelectAd
 				observable.onNext(language);
 			});
 			flag.setImageResource(language.getDrawable());
+			languageName.setText(language.getName());
 		}
 	}
 }

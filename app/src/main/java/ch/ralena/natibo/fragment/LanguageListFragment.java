@@ -18,7 +18,6 @@ import ch.ralena.natibo.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.adapter.LanguageListAdapter;
 import ch.ralena.natibo.object.Language;
-import io.reactivex.functions.Consumer;
 import io.realm.Realm;
 import io.realm.RealmList;
 
@@ -61,13 +60,6 @@ public class LanguageListFragment extends Fragment {
 			recyclerView.setLayoutManager(layoutManager);
 
 			adapter.asObservable().subscribe(this::loadLanguageDetailFragment);
-
-			adapter.asObservable().subscribe(new Consumer<Language>() {
-				@Override
-				public void accept(Language language) throws Exception {
-
-				}
-			});
 		}
 
 		// set up FAB

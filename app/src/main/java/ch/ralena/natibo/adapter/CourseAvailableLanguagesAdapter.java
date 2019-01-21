@@ -59,6 +59,7 @@ public class CourseAvailableLanguagesAdapter extends RecyclerView.Adapter<Course
 		ViewHolder(View view) {
 			super(view);
 			this.view = view;
+			languageName = view.findViewById(R.id.languageLabel);
 			flagImage = view.findViewById(R.id.flagImageView);
 			checkedImage = view.findViewById(R.id.checkedImage);
 			this.view.setOnClickListener(v -> {
@@ -80,6 +81,7 @@ public class CourseAvailableLanguagesAdapter extends RecyclerView.Adapter<Course
 			} else {
 				checkedImage.animate().scaleX(0f).setDuration(200).start();
 			}
+			languageName.setText(language.getLongName());
 			flagImage.setImageResource(language.getLanguageType().getDrawable());
 		}
 	}
