@@ -2,6 +2,7 @@ package ch.ralena.natibo.utils;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.util.Log;
@@ -137,6 +138,9 @@ public class GLSImporter {
 					is = getInputStream(uri);
 					zis = new ZipInputStream(new BufferedInputStream(is));
 
+					// used to calculate length of mp3 file
+					MediaMetadataRetriever metadataRetriever = new MediaMetadataRetriever();
+
 					// loop through files in the .gls zip
 					int fileNumber = 0;
 					while ((zipEntry = zis.getNextEntry()) != null) {
@@ -173,8 +177,14 @@ public class GLSImporter {
 								// now set up database objects which we will fill in after extracting all mp3s
 								int index = Integer.parseInt(number.replace(".mp3", ""));
 								Language lang = realm.where(Language.class).equalTo("languageId", language).findFirst();
+
+								// calculate mp3s length
+								String mp3Uri = audioFile.getAbsolutePath();
+								metadataRetriever.setDataSource(mp3Uri);
+
+								int mp3Length = Integer.parseInt(metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
 								Pack pack = lang.getPack(book);
-								pack.createSentenceOrUpdate(realm, index, null, null, null, audioFile.getAbsolutePath());
+								pack.createSentenceOrUpdate(realm, index, null, null, null, mp3Uri, mp3Length);
 							} else {
 								Log.d(TAG, "Skipping: " + entryName);
 							}
@@ -331,8 +341,8 @@ public class GLSImporter {
 
 			// create or update target and base sentences
 			if (!targetLanguage.equals(""))
-				targetPack.createSentenceOrUpdate(realm, index, translation, ipa, romanization, null);
-			basePack.createSentenceOrUpdate(realm, index, sentence, ipa, romanization, null);
+				targetPack.createSentenceOrUpdate(realm, index, translation, ipa, romanization, null, 0);
+			basePack.createSentenceOrUpdate(realm, index, sentence, ipa, romanization, null, 0);
 		}
 
 		actionSubject.onNext(LanguageImportFragment.ACTION_EXTRACTING_AUDIO);

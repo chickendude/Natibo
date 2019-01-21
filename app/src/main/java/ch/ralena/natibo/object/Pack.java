@@ -41,7 +41,7 @@ public class Pack extends RealmObject {
 		return null;
 	}
 
-	public void createSentenceOrUpdate(Realm realm, int index, String sentence, String ipa, String romanization, String uri) {
+	public void createSentenceOrUpdate(Realm realm, int index, String sentence, String ipa, String romanization, String uri, int mp3Length) {
 		realm.executeTransaction(r -> {
 			Sentence newSentence = getSentenceWithIndex(index);
 			if (newSentence == null) {
@@ -55,8 +55,10 @@ public class Pack extends RealmObject {
 				newSentence.setIpa(ipa);
 			if (romanization != null)
 				newSentence.setRomanization(romanization);
-			if (uri != null)
+			if (uri != null) {
 				newSentence.setUri(uri);
+				newSentence.setTimeInMillis(mp3Length);
+			}
 		});
 	}
 }

@@ -1,7 +1,5 @@
 package ch.ralena.natibo.object;
 
-import android.media.MediaMetadataRetriever;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -187,12 +185,9 @@ public class Day extends RealmObject {
 	}
 
 	public int getTimeLeft() {
-		MediaMetadataRetriever metadataRetriever = new MediaMetadataRetriever();
-
 		int millisecondsLeft = 0;
 		for (Sentence sentence : getRemainingSentences()) {
-			metadataRetriever.setDataSource(sentence.getUri());
-			millisecondsLeft += Integer.parseInt(metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) + pauseMillis;
+			millisecondsLeft += sentence.getTimeInMillis() + pauseMillis;
 		}
 
 		return millisecondsLeft;

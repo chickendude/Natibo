@@ -18,6 +18,7 @@ public class Sentence extends RealmObject {
 	private String romanization;
 	private String ipa;
 	private String uri;            // mp3 location
+	private int timeInMillis;            // timeInMillis of mp3 in ms
 
 	public int getIndex() {
 		return index;
@@ -65,5 +66,13 @@ public class Sentence extends RealmObject {
 
 	public void setUri(String uri) {
 		this.uri = uri;
+	}
+
+	public int getTimeInMillis() {
+		return timeInMillis;
+	}
+
+	public void setTimeInMillis(int timeInMillis) {
+		this.timeInMillis = timeInMillis;
 	}
 }
