@@ -27,7 +27,7 @@
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:background="@color/colorPrimary"
+			android:background="@color/colorBackgroundDark"
 			android:gravity="center"
 			android:orientation="horizontal">
 
@@ -43,13 +43,13 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/total_reps"
-					android:textColor="@color/colorTextWhite"/>
+					android:textColor="@color/colorTextDark"/>
 
 				<TextView
 					android:id="@+id/totalRepsText"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="@color/colorTextWhite"
+					android:textColor="@color/colorTextDark"
 					android:textSize="22sp"
 					tools:text="9642"/>
 			</LinearLayout>
@@ -66,13 +66,13 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/sentences_seen"
-					android:textColor="@color/colorTextWhite"/>
+					android:textColor="@color/colorTextDark"/>
 
 				<TextView
 					android:id="@+id/totalSentencesSeenText"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="@color/colorTextWhite"
+					android:textColor="@color/colorTextDark"
 					android:textSize="22sp"
 					tools:text="500"/>
 			</LinearLayout>
@@ -88,7 +88,7 @@
 					android:layout_height="40dp"
 					android:scaleType="center"
 					android:src="@drawable/ic_settings"
-					android:tint="@color/colorTextWhite"/>
+					android:tint="@color/colorTextDark"/>
 
 				<ImageView
 					android:id="@+id/deleteIcon"
@@ -96,7 +96,7 @@
 					android:layout_height="40dp"
 					android:scaleType="center"
 					android:src="@drawable/ic_delete"
-					android:tint="@color/colorTextWhite"/>
+					android:tint="@color/colorTextDark"/>
 			</LinearLayout>
 
 		</LinearLayout>
