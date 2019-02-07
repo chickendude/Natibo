@@ -12,13 +12,16 @@
 		android:layout_height="wrap_content"
 		android:textAlignment="center"
 		android:textSize="20sp"
+		android:layout_marginTop="8dp"
+		android:layout_marginBottom="4dp"
 		tools:text="Armenian"/>
 
 
 	<TextView
-		android:layout_width="wrap_content"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:textSize="16sp"
+		android:textAlignment="center"
 		android:text="Sentences Studied"/>
 
 	<android.support.v7.widget.RecyclerView
