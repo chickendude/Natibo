@@ -40,7 +40,7 @@ public class LanguageData {
 		languages.add(new LanguageType("","Czech", R.drawable.flag_czech));
 		languages.add(new LanguageType("NL","Dutch", R.drawable.flag_dutch));
 		languages.add(new LanguageType("EN", "English (US)", R.drawable.flag_english_us));
-		languages.add(new LanguageType("","Estonian", R.drawable.flag_estonian));
+		languages.add(new LanguageType("EST","Estonian", R.drawable.flag_estonian));
 		languages.add(new LanguageType("","Finnish", R.drawable.flag_finnish));
 		languages.add(new LanguageType("FR","French", R.drawable.flag_french));
 		languages.add(new LanguageType("DE","German", R.drawable.flag_german));
