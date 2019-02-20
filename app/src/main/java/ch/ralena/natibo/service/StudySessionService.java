@@ -108,9 +108,6 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 			stopSelf();
 
 		if (mediaPlayer == null) {
-			mediaPlayer = new MediaPlayer();
-			mediaPlayer.setOnCompletionListener(this);
-			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			loadSentence();
 			play();
 		}
@@ -169,6 +166,11 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		} else {
 			sentencePublish.onNext(sentenceGroup);
 			sentence = day.getCurrentSentence();
+			if (mediaPlayer == null) {
+				mediaPlayer = new MediaPlayer();
+				mediaPlayer.setOnCompletionListener(this);
+				mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+			}
 			try {
 				mediaPlayer.stop();
 				mediaPlayer.reset();
@@ -269,7 +271,8 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
 			mediaPlayer.start();
 		} else {
-			nextSentence();
+			loadSentence();
+			play();
 		}
 	}
 
@@ -453,8 +456,9 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 					restartPlaying();
 				break;
 			case AudioManager.AUDIOFOCUS_LOSS:        // we've lost focus indefinitely
-				isPlaying = playbackStatus == PlaybackStatus.PLAYING;
+				isPlaying = false;
 				pauseAndRelease();
+				buildNotification();
 				break;
 			case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:    // we've lost focus for a short amount of time, e.g. Google Maps announcing directions
 			case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:    // we've lost focus for a short amount of time but we can still play audio in bg
