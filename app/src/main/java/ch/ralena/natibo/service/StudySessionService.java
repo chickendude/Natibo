@@ -267,12 +267,14 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 	}
 
 	public void resume() {
-		playbackStatus = PlaybackStatus.PLAYING;
-		if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
-			mediaPlayer.start();
-		} else {
-			loadSentence();
-			play();
+		if (requestAudioFocus()) {
+			playbackStatus = PlaybackStatus.PLAYING;
+			if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
+				mediaPlayer.start();
+			} else {
+				loadSentence();
+				play();
+			}
 		}
 	}
 
