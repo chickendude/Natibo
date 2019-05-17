@@ -93,6 +93,10 @@ public class StudySessionFragment extends Fragment {
 		// handle playing/pausing
 		playPauseImage.setOnClickListener(this::playPause);
 
+		// connect to the studySessionService and start the session
+		connectToService();
+		activity.startSession(course);
+
 		return view;
 	}
 
@@ -132,7 +136,6 @@ public class StudySessionFragment extends Fragment {
 			updateTime();
 			updatePlayPauseImage();
 		});
-		activity.startSession(course);
 	}
 
 	private void playPause(View view) {
@@ -191,6 +194,10 @@ public class StudySessionFragment extends Fragment {
 	private void startTimer() {
 		millisLeft = millisLeft - millisLeft % 1000 - 1;
 		updateTime();
+		// Make sure no two active timers are displayed at the same time
+		if (countDownTimer != null) {
+			countDownTimer.cancel();
+		}
 		countDownTimer = new CountDownTimer(millisLeft, 100) {
 			@Override
 			public void onTick(long millisUntilFinished) {
