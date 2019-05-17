@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -111,6 +112,10 @@ public class SentenceListFragment extends Fragment {
 	}
 
 	private void playSentence(Sentence sentence) {
+		if (sentence.getUri() == null) {
+			Toast.makeText(getContext(), String.format("Audio file not found for '%s'", sentence.getText()), Toast.LENGTH_SHORT).show();
+			return;
+		}
 		try {
 			mediaPlayer.reset();
 			mediaPlayer.setDataSource(sentence.getUri());
