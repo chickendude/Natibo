@@ -44,7 +44,7 @@ dependencies {
 	implementation 'com.android.support:design:27.1.1'
 	testImplementation 'junit:junit:4.12'
 	// Google
-	implementation 'com.google.android:flexbox:0.3.1'
+	implementation 'com.google.android:flexbox:0.3.1' // todo: remove this dependency?
 	// rxJava
 	implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
 	implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
