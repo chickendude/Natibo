@@ -20,6 +20,7 @@ Settings:
 public class CourseSettingsFragment extends PreferenceFragmentCompat {
 	public static final String PREF_PAUSE = "pref_pause";
 	public static final String PREF_START = "pref_start";
+	public static final String PREF_SPEED = "pref_playback_speed";
 	public static final String KEY_ID = "key_id";
 
 	private SharedPreferences prefs;
@@ -33,6 +34,16 @@ public class CourseSettingsFragment extends PreferenceFragmentCompat {
 				case PREF_PAUSE:
 					realm.executeTransaction(r -> {
 						course.setPauseMillis(Integer.parseInt(sharedPreferences.getString(PREF_PAUSE, "1000")));
+					});
+					break;
+				case PREF_SPEED:
+					realm.executeTransaction(r -> {
+						float speed = Float.parseFloat(sharedPreferences.getString(getString(R.string.playback_speed_key), getString(R.string.playback_speed_default)));
+						// Set speed to the allowed range between 0.5 and 2.5 and round to one decimal place
+						speed = speed < 0.5 ? 0.5f : speed;
+						speed = speed > 2.5 ? 2.5f : speed;
+						speed = Math.round(speed*10) / 10f;
+						course.setPlaybackSpeed(speed);
 					});
 					break;
 			}
@@ -73,6 +84,7 @@ public class CourseSettingsFragment extends PreferenceFragmentCompat {
 		// load preferences from course into our shared preferences
 		prefs.edit()
 				.putString(PREF_PAUSE, course.getPauseMillis() + "")
+				.putString(PREF_SPEED, course.getPlaybackSpeed() + "")
 				.apply();
 		prefs.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
 

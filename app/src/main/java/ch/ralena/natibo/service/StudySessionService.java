@@ -176,6 +176,17 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 				mediaPlayer.reset();
 				// load sentence path into mediaplayer to be played
 				mediaPlayer.setDataSource(sentence.getUri());
+
+				// Set playback speed for the target language according to preferences
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					// Only change playback speed for the target language
+					if (sentence.getId().equals(sentenceGroup.getSentences().get(1).getId())) {
+						mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(course.getPlaybackSpeed()));
+					} else {
+						mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(1f));
+					}
+				}
+
 				mediaPlayer.prepare();
 			} catch (IOException | IllegalStateException e) {
 				e.printStackTrace();

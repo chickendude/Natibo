@@ -20,6 +20,8 @@ public class Sentence extends RealmObject {
 	private String uri;            // mp3 location
 	private int timeInMillis;            // timeInMillis of mp3 in ms
 
+	public String getId() { return id; }
+
 	public int getIndex() {
 		return index;
 	}

@@ -46,6 +46,7 @@ public class Course extends RealmObject {
 	private Day currentDay;
 	private int numReps;
 	private int pauseMillis;
+	private float playbackSpeed = 1;
 	private RealmList<Day> pastDays = new RealmList<>();
 	private Schedule schedule = new Schedule();    // the different pieces that make up the study routine for each day
 	private RealmList<Sentence> sentencesSeen = new RealmList<>();    // keep track of which sentences have been seen and which haven't
@@ -101,6 +102,17 @@ public class Course extends RealmObject {
 		if (currentDay != null)
 			currentDay.setPauseMillis(pauseMillis);
 	}
+
+	public float getPlaybackSpeed() {
+	    return playbackSpeed;
+    }
+
+    public void setPlaybackSpeed(float playbackSpeed) {
+	    this.playbackSpeed = playbackSpeed;
+	    if (currentDay != null) {
+	        currentDay.setPlaybackSpeed(playbackSpeed);
+        }
+    }
 
 	public RealmList<Day> getPastDays() {
 		return pastDays;
@@ -173,6 +185,7 @@ public class Course extends RealmObject {
 			day.getSentenceSets().add(sentenceSet);
 			day.setCompleted(false);
 			day.setPauseMillis(pauseMillis);
+			day.setPlaybackSpeed(playbackSpeed);
 			currentDay = day;
 		});
 		List<SentenceSet> emptySentenceSets = new ArrayList<>();

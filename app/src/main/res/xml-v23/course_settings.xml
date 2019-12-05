@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<PreferenceCategory
+		android:title="Course Settings">
+
+		<EditTextPreference
+			android:defaultValue="1000"
+			android:inputType="number"
+			android:key="pref_pause"
+			android:summary="@string/time_in_milliseconds"
+			android:title="@string/pause_between_sentences"/>
+
+		<EditTextPreference
+			android:defaultValue="@string/playback_speed_default"
+			android:inputType="numberDecimal"
+			android:key="@string/playback_speed_key"
+			android:summary="@string/playback_speed_summary"
+			android:title="@string/playback_speed"/>
+
+	</PreferenceCategory>
+	<PreferenceCategory
+		android:title="Progress">
+
+		<Preference
+			android:key="pref_start"
+			android:summary="@string/where_to_start"
+			android:title="@string/change_starting_point"/>
+
+	</PreferenceCategory>
+</PreferenceScreen>

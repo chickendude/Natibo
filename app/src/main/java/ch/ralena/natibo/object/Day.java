@@ -18,6 +18,7 @@ public class Day extends RealmObject {
 	private RealmList<SentenceSet> sentenceSets = new RealmList<>();
 	private boolean isCompleted;
 	private int pauseMillis;
+	private float playbackSpeed;
 
 	// internal fields
 	private int curSentenceSetId;
@@ -53,6 +54,8 @@ public class Day extends RealmObject {
 	public void setPauseMillis(int pauseMillis) {
 		this.pauseMillis = pauseMillis;
 	}
+
+	public void setPlaybackSpeed(float playbackSpeed) { this.playbackSpeed = playbackSpeed; }
 
 	// --- helper methods ---
 
@@ -180,7 +183,11 @@ public class Day extends RealmObject {
 	public int getTimeLeft() {
 		int millisecondsLeft = 0;
 		for (Sentence sentence : getRemainingSentences()) {
-			millisecondsLeft += sentence.getTimeInMillis() + pauseMillis;
+			if (true) {  // TODO: condition should evaluate to true if the sentence is from the base language
+				millisecondsLeft += sentence.getTimeInMillis() + pauseMillis;
+			} else {
+				millisecondsLeft += sentence.getTimeInMillis() * playbackSpeed + pauseMillis;
+			}
 		}
 
 		return millisecondsLeft;
