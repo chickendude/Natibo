@@ -55,7 +55,9 @@ public class Day extends RealmObject {
 		this.pauseMillis = pauseMillis;
 	}
 
-	public void setPlaybackSpeed(float playbackSpeed) { this.playbackSpeed = playbackSpeed; }
+	public void setPlaybackSpeed(float playbackSpeed) {
+		this.playbackSpeed = playbackSpeed;
+	}
 
 	// --- helper methods ---
 
@@ -127,39 +129,9 @@ public class Day extends RealmObject {
 		});
 	}
 
-	private List<Sentence> getRemainingSentences() {
-		List<Sentence> sentences = new ArrayList<>();
-		for (int i = curSentenceSetId; i < sentenceSets.size(); i++) {
-			SentenceSet sentenceSet = sentenceSets.get(i);
-
-			List<SentenceGroup> tempSentenceGroups = new ArrayList<>();
-			RealmList<SentenceGroup> setSentenceGroups = sentenceSet.getSentenceGroups();
-
-			String order = sentenceSet.getOrder();
-
-			// only get subsection of SentenceGroups if it's the first sentence set
-			if (i == curSentenceSetId) {
-				tempSentenceGroups.addAll(setSentenceGroups.subList(curSentenceId, setSentenceGroups.size()));
-
-				// first sentence pair will possible have fewer sentences depending on whether the base sentence has been played or not
-				for (int j = patternIndex; j < order.length(); j++) {
-					int index = Integer.parseInt(sentenceSet.getOrder().charAt(j) + "");
-					sentences.add(tempSentenceGroups.get(0).getSentences().get(index));
-				}
-				tempSentenceGroups.remove(0);
-			} else {
-				tempSentenceGroups.addAll(setSentenceGroups);
-			}
-
-			// add all sentences according to the order to the list of sentences
-			for (SentenceGroup sentencePair : tempSentenceGroups) {
-				for (char c : order.toCharArray()) {
-					int index = Integer.parseInt(c + "");
-					sentences.add(tempSentenceGroups.get(0).getSentences().get(index));
-				}
-			}
-		}
-		return sentences;
+	private float getSentenceTime(Sentence sentence, int index) {
+		float offset = index > 0 ? playbackSpeed : 1;
+		return sentence.getTimeInMillis() / offset + pauseMillis;
 	}
 
 	public int getNumReviewsLeft() {
@@ -181,15 +153,42 @@ public class Day extends RealmObject {
 	}
 
 	public int getTimeLeft() {
-		int millisecondsLeft = 0;
-		for (Sentence sentence : getRemainingSentences()) {
-			if (true) {  // TODO: condition should evaluate to true if the sentence is from the base language
-				millisecondsLeft += sentence.getTimeInMillis() + pauseMillis;
+		int timeLeftMillis = 0;
+		List<Sentence> sentences = new ArrayList<>();
+		for (int i = curSentenceSetId; i < sentenceSets.size(); i++) {
+			SentenceSet sentenceSet = sentenceSets.get(i);
+
+			List<SentenceGroup> tempSentenceGroups = new ArrayList<>();
+			RealmList<SentenceGroup> setSentenceGroups = sentenceSet.getSentenceGroups();
+
+			String order = sentenceSet.getOrder();
+
+			// only get subsection of SentenceGroups if it's the first sentence set
+			if (i == curSentenceSetId) {
+				tempSentenceGroups.addAll(setSentenceGroups.subList(curSentenceId, setSentenceGroups.size()));
+
+				// first sentence pair will possible have fewer sentences depending on whether the base sentence has been played or not
+				for (int j = patternIndex; j < order.length(); j++) {
+					int index = Integer.parseInt(sentenceSet.getOrder().charAt(j) + "");
+					Sentence sentence = tempSentenceGroups.get(0).getSentences().get(index);
+					sentences.add(sentence);
+					timeLeftMillis += getSentenceTime(sentence, index);
+				}
+				tempSentenceGroups.remove(0);
 			} else {
-				millisecondsLeft += sentence.getTimeInMillis() * playbackSpeed + pauseMillis;
+				tempSentenceGroups.addAll(setSentenceGroups);
+			}
+
+			// add all sentences according to the order to the list of sentences
+			for (SentenceGroup sentencePair : tempSentenceGroups) {
+				for (char c : order.toCharArray()) {
+					int index = Integer.parseInt(c + "");
+					Sentence sentence = tempSentenceGroups.get(0).getSentences().get(index);
+					sentences.add(sentence);
+					timeLeftMillis += getSentenceTime(sentence, index);
+				}
 			}
 		}
-
-		return millisecondsLeft;
+		return timeLeftMillis;
 	}
 }
