@@ -3,6 +3,8 @@ package ch.ralena.natibo.fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.math.MathUtils;
+import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.Preference;
 
 import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
@@ -20,8 +22,11 @@ Settings:
 public class CourseSettingsFragment extends PreferenceFragmentCompat {
 	public static final String PREF_PAUSE = "pref_pause";
 	public static final String PREF_START = "pref_start";
-	public static final String PREF_SPEED = "pref_playback_speed";
+	public static final String PREF_PLAYBACK_SPEED = "pref_playback_speed";
 	public static final String KEY_ID = "key_id";
+
+	private static final float PLAYBACK_MIN_SPEED = 0.5f;
+	private static final float PLAYBACK_MAX_SPEED = 2.5f;
 
 	private SharedPreferences prefs;
 	private Realm realm;
@@ -32,17 +37,11 @@ public class CourseSettingsFragment extends PreferenceFragmentCompat {
 		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 			switch (key) {
 				case PREF_PAUSE:
-					realm.executeTransaction(r -> {
-						course.setPauseMillis(Integer.parseInt(sharedPreferences.getString(PREF_PAUSE, "1000")));
-					});
+					realm.executeTransaction(r -> course.setPauseMillis(Integer.parseInt(sharedPreferences.getString(PREF_PAUSE, "1000"))));
 					break;
-				case PREF_SPEED:
+				case PREF_PLAYBACK_SPEED:
 					realm.executeTransaction(r -> {
 						float speed = Float.parseFloat(sharedPreferences.getString(getString(R.string.playback_speed_key), getString(R.string.playback_speed_default)));
-						// Set speed to the allowed range between 0.5 and 2.5 and round to one decimal place
-						speed = speed < 0.5 ? 0.5f : speed;
-						speed = speed > 2.5 ? 2.5f : speed;
-						speed = Math.round(speed*10) / 10f;
 						course.setPlaybackSpeed(speed);
 					});
 					break;
@@ -79,26 +78,39 @@ public class CourseSettingsFragment extends PreferenceFragmentCompat {
 		// unregister SharedPreferencesChangedListener so that we don't unnecessarily trigger
 		// it when we load the default value from the course
 		prefs = getPreferenceManager().getSharedPreferences();
-		prefs.unregisterOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
+		unregisterChangeListener();
 
 		// load preferences from course into our shared preferences
 		prefs.edit()
 				.putString(PREF_PAUSE, course.getPauseMillis() + "")
-				.putString(PREF_SPEED, course.getPlaybackSpeed() + "")
+				.putString(PREF_PLAYBACK_SPEED, course.getPlaybackSpeed() + "")
 				.apply();
-		prefs.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
+		registerChangeListener();
 
 		addPreferencesFromResource(R.xml.course_settings);
 
 		// check if you should be able to choose the starting sentence or not
 		Preference start = findPreference(PREF_START);
 		start.setEnabled(course.getPacks().size() > 0);
+
+		EditTextPreference playbackSpeed = (EditTextPreference) findPreference(PREF_PLAYBACK_SPEED);
+		playbackSpeed.setOnPreferenceChangeListener((preference, newValue) -> {
+			float newSpeed = Float.parseFloat((String) newValue);
+			// Set speed to the allowed range between 0.5 and 2.5 and round to one decimal place
+			float speed = ((int) (newSpeed * 10)) / 10f;
+			speed = MathUtils.clamp(speed, PLAYBACK_MIN_SPEED, PLAYBACK_MAX_SPEED);
+			if (newSpeed != speed) {
+				playbackSpeed.setText(speed + "");
+				return false;
+			}
+			return true;
+		});
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
-		prefs.unregisterOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
+		unregisterChangeListener();
 	}
 
 	private void loadCourseBookListFragment() {
@@ -115,5 +127,13 @@ public class CourseSettingsFragment extends PreferenceFragmentCompat {
 				.replace(R.id.fragmentPlaceHolder, fragment)
 				.addToBackStack(null)
 				.commit();
+	}
+
+	private void registerChangeListener() {
+		prefs.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
+	}
+
+	private void unregisterChangeListener() {
+		prefs.unregisterOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
 	}
 }
