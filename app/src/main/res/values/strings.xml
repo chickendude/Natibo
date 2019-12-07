@@ -57,6 +57,6 @@
 	<string name="reset_session">This will reset your current session, are you sure?</string>
     <string name="playback_speed">Playback speed</string>
     <string name="playback_speed_key" translatable="false">pref_playback_speed</string>
-	<string name="playback_speed_summary">The playback speed for the target language. Maximum value is normal speed.</string>
+	<string name="playback_speed_summary">The playback speed for the target language. Range from 0.5 to 2.5.</string>
 	<string name="playback_speed_default" translatable="false">1.0</string>
 </resources>
