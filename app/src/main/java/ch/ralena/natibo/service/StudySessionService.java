@@ -11,20 +11,21 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.session.MediaController;
+import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
 import java.io.IOException;
 
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import ch.ralena.natibo.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.object.Course;
@@ -51,8 +52,8 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	// Media Session
 	private MediaSessionManager mediaSessionManager;
-	private MediaSessionCompat mediaSession;
-	private MediaControllerCompat.TransportControls transportControls;
+	private MediaSession mediaSession;
+	private MediaController.TransportControls transportControls;
 
 	public enum PlaybackStatus {
 		PLAYING, PAUSED
@@ -205,11 +206,11 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			mediaSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
 		}
-		mediaSession = new MediaSessionCompat(getApplicationContext(), "Natibo");
+		mediaSession = new MediaSession(getApplicationContext(), "Natibo");
 		transportControls = mediaSession.getController().getTransportControls();
 		mediaSession.setActive(true);
-		mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-		mediaSession.setCallback(new MediaSessionCompat.Callback() {
+		mediaSession.setFlags(MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+		mediaSession.setCallback(new MediaSession.Callback() {
 			@Override
 			public void onPlay() {
 				super.onPlay();
@@ -357,8 +358,8 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 				.setSmallIcon(R.drawable.ic_logo)
 				.setColorized(false)
 				.setStyle(
-						new android.support.v4.media.app.NotificationCompat.MediaStyle()
-								.setMediaSession(mediaSession.getSessionToken())
+						new androidx.media.app.NotificationCompat.MediaStyle()
+								.setMediaSession(MediaSessionCompat.Token.fromToken(mediaSession.getSessionToken()))
 								.setShowActionsInCompactView(1)
 				)
 				.setContentText(sentenceGroup.getSentences().first().getText())

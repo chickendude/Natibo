@@ -36,7 +36,7 @@
 				android:padding="8dp"
 				android:textColor="@color/colorTextDark"
 				android:textSize="16sp"
-				tools:text="Look, there's my friend! But why is my friend at school and not with me?"/>
+				tools:text="Look, there's my friend! But why is my friend at school and not with me?\nHello" />
 		</LinearLayout>
 
 		<LinearLayout

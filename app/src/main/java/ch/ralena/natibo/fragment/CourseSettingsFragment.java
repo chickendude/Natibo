@@ -2,10 +2,10 @@ package ch.ralena.natibo.fragment;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.math.MathUtils;
-import android.support.v7.preference.EditTextPreference;
-import android.support.v7.preference.Preference;
+import androidx.annotation.Nullable;
+import androidx.core.math.MathUtils;
+import androidx.preference.EditTextPreference;
+import androidx.preference.Preference;
 
 import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 

@@ -2,7 +2,7 @@ package ch.ralena.natibo.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 
 public class Utils {
 	public static void alert(Context context, String title, String message) {
