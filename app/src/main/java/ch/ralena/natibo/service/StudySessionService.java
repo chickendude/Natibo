@@ -26,7 +26,7 @@ import java.io.IOException;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import ch.ralena.natibo.MainActivity;
+import ch.ralena.natibo.ui.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.object.Course;
 import ch.ralena.natibo.object.Day;

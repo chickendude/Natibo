@@ -1,16 +1,21 @@
-apply plugin: 'com.android.application'
-apply plugin: 'realm-android'
-apply plugin: 'kotlin-android'
+plugins {
+	id 'com.android.application'
+	id 'kotlin-android'
+	id 'kotlin-kapt'
+	id 'kotlin-parcelize'
+	id 'realm-android'
+}
 
 android {
-	compileSdkVersion 29
-	buildToolsVersion '29.0.2'
+	compileSdkVersion 30
+	buildToolsVersion '30.0.3'
 	defaultConfig {
 		applicationId "ch.ralena.natibo"
 		minSdkVersion 21
-		targetSdkVersion 29
-		versionCode 33
-		versionName "0.3.3"
+		targetSdkVersion 30
+		versionCode 34
+		versionName "0.4"
+
 		testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 	}
 	compileOptions {
@@ -27,6 +32,9 @@ android {
 			versionNameSuffix '-DEBUG '
 		}
 	}
+	kotlinOptions {
+		jvmTarget = '1.8'
+	}
 }
 
 dependencies {
@@ -35,8 +43,11 @@ dependencies {
 	androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
 		exclude group: 'com.android.support', module: 'support-annotations'
 	})
+
+	// Testing
 	testImplementation 'junit:junit:4.12'
 	testImplementation 'org.mockito:mockito-core:2.13.0'
+
 	// Android
 	implementation 'androidx.appcompat:appcompat:1.2.0'
 	implementation 'androidx.recyclerview:recyclerview:1.1.0'
@@ -44,11 +55,23 @@ dependencies {
 	implementation "androidx.media:media:1.1.0"
 	implementation 'com.google.android.material:material:1.2.1'
 	testImplementation 'junit:junit:4.12'
+
 	// Google
 	implementation 'com.google.android:flexbox:0.3.1' // todo: remove this dependency?
+
+	// Dagger
+	implementation "com.google.dagger:dagger:$dagger_version"
+	kapt "com.google.dagger:dagger-compiler:$dagger_version"
+
+	// Room
+	implementation "androidx.room:room-runtime:$room_version"
+	implementation "androidx.room:room-ktx:$room_version"
+	kapt "androidx.room:room-compiler:$room_version"
+
 	// rxJava
 	implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
 	implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
 	// 3rd party
 	implementation 'com.takisoft.fix:preference-v7:27.1.1.1'
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

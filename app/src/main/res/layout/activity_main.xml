@@ -12,7 +12,7 @@
 		android:id="@+id/drawerLayout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		tools:context="ch.ralena.natibo.MainActivity">
+		tools:context="ch.ralena.natibo.ui.MainActivity">
 
 		<LinearLayout
 			android:layout_width="match_parent"
