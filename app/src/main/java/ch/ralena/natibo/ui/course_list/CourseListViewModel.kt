@@ -11,10 +11,18 @@ class CourseListViewModel @Inject constructor(
 		private val realm: Realm
 ) : BaseViewModel<CourseListViewModel.Listener>() {
 	interface Listener {
-
+		fun showCourses()
+		fun showNoCourses()
 	}
 
-	fun fetchCourses(): RealmResults<Course> =
-			realm.where(Course::class.java).findAll()
-
+	fun fetchCourses(): RealmResults<Course> {
+		val courses = realm.where(Course::class.java).findAll()
+		if (courses.size > 0)
+			for (listener in listeners)
+				listener.showCourses()
+		else
+			for (listener in listeners)
+				listener.showNoCourses()
+		return courses
+	}
 }

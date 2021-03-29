@@ -1,36 +1,28 @@
 package ch.ralena.natibo.ui.course_list
 
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.`object`.Course
-import ch.ralena.natibo.`object`.Language
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.adapter.CourseListAdapter
 import ch.ralena.natibo.ui.base.BaseFragment
-import ch.ralena.natibo.ui.fragment.CourseDetailFragment
-import ch.ralena.natibo.ui.fragment.CoursePickLanguageFragment
 import ch.ralena.natibo.utils.ScreenNavigator
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import io.reactivex.functions.Consumer
-import io.realm.Realm
 import io.realm.RealmResults
 import javax.inject.Inject
 
-class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseListViewModel>() {
+class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseListViewModel>(), CourseListViewModel.Listener {
 	@Inject
 	lateinit var screenNavigator: ScreenNavigator
 
-	var courses: RealmResults<Course>? = null
-	private var realm: Realm? = null
-//	private var activity: MainActivity? = null
+	private lateinit var recyclerView: RecyclerView
+	private lateinit var noCoursesText: TextView
+
+	private var courses: RealmResults<Course>? = null
 
 	companion object {
 		private val TAG = CourseListFragment::class.java.simpleName
@@ -41,6 +33,9 @@ class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseList
 	override fun provideLayoutId() = R.layout.fragment_course_list
 
 	override fun setupViews(view: View) {
+		// load views
+		noCoursesText = view.findViewById(R.id.noCoursesText)
+		recyclerView = view.findViewById(R.id.recyclerView)
 
 		// load schedules from database
 		courses = viewModel.fetchCourses()
@@ -49,40 +44,43 @@ class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseList
 		arguments?.let {
 			val courseId = it.getString(TAG_COURSE_ID)
 			screenNavigator.toCourseDetailFragment(courseId)
-			arguments = null
 		}
 
-		// load views
-		val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-		val noCoursesText = view.findViewById<TextView>(R.id.noCoursesText)
-		val fab: FloatingActionButton = view.findViewById(R.id.fab)
-		if (courses!!.size == 0) {
-			noCoursesText.setVisibility(View.VISIBLE)
-			recyclerView.setVisibility(View.GONE)
-		} else {
-			// hide "No Courses" text
-			noCoursesText.setVisibility(View.GONE)
-			recyclerView.setVisibility(View.VISIBLE)
-
-			// set up recyclerlist and adapter
-			val adapter = CourseListAdapter(courses)
-			recyclerView.setAdapter(adapter)
-			val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(context)
-			recyclerView.setLayoutManager(layoutManager)
-			adapter.asObservable().subscribe { course: Course? -> screenNavigator.toCourseDetailFragment(course?.id) }
+		view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
+			screenNavigator.toCourseCreateFragment()
 		}
-
-		// set up FAB
-		fab.setOnClickListener { v: View? -> screenNavigator.toCourseCreateFragment() }
 	}
 
 	override fun injectDependencies(injector: PresentationComponent) {
 		injector.inject(this)
+		viewModel.registerListener(this)
 	}
 
 	override fun onStart() {
 		super.onStart()
-		(getActivity() as MainActivity?)!!.setNavigationDrawerItemChecked(R.id.nav_courses)
-		getActivity()!!.title = getString(R.string.courses)
+		// TODO: See if we can't remove the activity references once MainActivity has been cleaned up.
+		(activity as MainActivity).setNavigationDrawerItemChecked(R.id.nav_courses)
+		activity!!.title = getString(R.string.courses)
+		viewModel.registerListener(this)
+	}
+
+	override fun onStop() {
+		super.onStop()
+		viewModel.unregisterListener(this)
+	}
+
+	override fun showCourses() {
+		recyclerView.apply {
+			visibility = View.VISIBLE
+
+			val courseListAdapter = CourseListAdapter(courses)
+			adapter = courseListAdapter
+			layoutManager = LinearLayoutManager(context)
+			courseListAdapter.asObservable().subscribe { course: Course? -> screenNavigator.toCourseDetailFragment(course?.id) }
+		}
+	}
+
+	override fun showNoCourses() {
+		noCoursesText.visibility = View.VISIBLE
 	}
 }
