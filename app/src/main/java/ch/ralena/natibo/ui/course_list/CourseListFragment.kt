@@ -40,6 +40,7 @@ class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseList
 		noCoursesText = view.findViewById(R.id.noCoursesText)
 		recyclerView = view.findViewById(R.id.recyclerView)
 		mainActivity.disableBackButton()
+		mainActivity.setMenuToCourses()
 
 		// check if a course id was passed in, if so move to CourseDetailFragment and add to back stack
 		arguments?.let {

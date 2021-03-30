@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.os.IBinder
 import android.view.MenuItem
 import android.view.View
+import androidx.annotation.IdRes
+import androidx.annotation.MenuRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -23,6 +25,7 @@ import ch.ralena.natibo.ui.fragment.LanguageImportFragment
 import ch.ralena.natibo.ui.fragment.LanguageListFragment
 import ch.ralena.natibo.ui.fragment.MainSettingsFragment
 import ch.ralena.natibo.ui.fragment.StudySessionFragment
+import ch.ralena.natibo.utils.ScreenNavigator
 import ch.ralena.natibo.utils.Utils
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -37,8 +40,6 @@ class MainActivity : AppCompatActivity(), MainActivityViewModel.Listener {
 	companion object {
 		private val TAG = MainActivity::class.java.simpleName
 		private const val KEY_SERVICE_BOUND = "key_service_bound"
-		private const val ACTION_OPEN_DRAWER = 0
-		private const val ACTION_BACK = 1
 		private const val REQUEST_PICK_GLS = 1
 		const val REQUEST_LOAD_SESSION = 2
 	}
@@ -46,7 +47,11 @@ class MainActivity : AppCompatActivity(), MainActivityViewModel.Listener {
 	@Inject
 	lateinit var viewModel: MainActivityViewModel
 
+	@Inject
+	lateinit var screenNavigator: ScreenNavigator
+
 	// fields
+	private lateinit var bottomNavigationView: BottomNavigationView
 	private var studySessionService: StudySessionService? = null
 	private var isServiceBound = false
 	val sessionPublish = PublishSubject.create<StudySessionService?>()
@@ -75,19 +80,19 @@ class MainActivity : AppCompatActivity(), MainActivityViewModel.Listener {
 		val toolbar = findViewById<Toolbar>(R.id.toolbar)
 		setSupportActionBar(toolbar)
 
-		val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+		bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 		bottomNavigationView.setOnNavigationItemSelectedListener {
 			when (it.itemId) {
 				R.id.menu_course -> {
-					loadCourseListFragment()
+					screenNavigator.toCourseListFragment()
 					true
 				}
 				R.id.menu_languages -> {
-					loadFragment(LanguageListFragment(), LanguageListFragment.TAG)
+					screenNavigator.toLanguageListFragment()
 					true
 				}
 				R.id.menu_settings -> {
-					loadFragment(MainSettingsFragment(), MainSettingsFragment.TAG)
+					screenNavigator.toMainSettingsFragment()
 					true
 				}
 				else -> false
@@ -125,52 +130,19 @@ class MainActivity : AppCompatActivity(), MainActivityViewModel.Listener {
 	 * Opens a file browser to search for a language pack to import into the app.
 	 */
 	fun importLanguagePack() {
-		clearBackStack()
+		screenNavigator.clearBackStack()
 		val mediaIntent = Intent(Intent.ACTION_GET_CONTENT)
 		mediaIntent.type = "application/*"
 		startActivityForResult(mediaIntent, REQUEST_PICK_GLS)
 	}
 
-	// --- Loading Fragments ---
-
-	private fun loadFragment(fragment: Fragment, name: String) {
-		val transaction = supportFragmentManager
-				.beginTransaction()
-				.replace(R.id.fragmentPlaceHolder, fragment)
-
-		// make sure fragment isn't added twice
-		val backStackCount = supportFragmentManager.backStackEntryCount
-		if (backStackCount > 0) {
-			val entry = supportFragmentManager.getBackStackEntryAt(backStackCount - 1)
-			if (entry.name != name)
-				transaction.addToBackStack(name)
-		} else if (name != CourseListFragment.TAG)
-			transaction.addToBackStack(name)
-
-		transaction.commit()
-
-	}
-
 	/**
 	 * Loads the CourseListFragment fragment.
 	 */
+	// TODO: Delete when everything is using ScreenNavigator
 	@JvmOverloads
 	fun loadCourseListFragment(courseId: String? = null) {
-		val fragment = CourseListFragment()
-		courseId?.let {
-			clearBackStack()
-			val bundle = Bundle()
-			bundle.putString(CourseListFragment.TAG_COURSE_ID, courseId)
-			fragment.arguments = bundle
-		}
-		loadFragment(fragment, CourseListFragment.TAG)
-	}
-
-	private fun clearBackStack() {
-		if (supportFragmentManager.backStackEntryCount > 0) {
-			val entryId = supportFragmentManager.getBackStackEntryAt(0).id
-			supportFragmentManager.popBackStackImmediate(entryId, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-		}
+		screenNavigator.toCourseListFragment(courseId)
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -203,8 +175,17 @@ class MainActivity : AppCompatActivity(), MainActivityViewModel.Listener {
 	}
 
 	// public methods
-	fun setNavigationDrawerItemChecked(itemNum: Int) {
-		//navigationView.setCheckedItem(itemNum);
+
+	fun setMenuToCourses() {
+		bottomNavigationView.menu.findItem(R.id.menu_course).isChecked = true
+	}
+
+	fun setMenuToLanguages() {
+		bottomNavigationView.menu.findItem(R.id.menu_languages).isChecked = true
+	}
+
+	fun setMenuToSettings() {
+		bottomNavigationView.menu.findItem(R.id.menu_settings).isChecked = true
 	}
 
 	fun enableBackButton() {

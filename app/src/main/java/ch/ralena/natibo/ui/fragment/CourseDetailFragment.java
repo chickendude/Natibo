@@ -28,7 +28,7 @@ import io.realm.RealmList;
 
 // TODO: 13/04/18 if no sentence sets have been chosen, prompt to select sentence packs.
 public class CourseDetailFragment extends Fragment {
-	private static final String TAG = CourseDetailFragment.class.getSimpleName();
+	public static final String TAG = CourseDetailFragment.class.getSimpleName();
 	public static final String TAG_COURSE_ID = "language_id";
 
 	Course course;
@@ -51,6 +51,7 @@ public class CourseDetailFragment extends Fragment {
 		MainActivity activity = (MainActivity) getActivity();
 		activity.setTitle(course.getTitle());
 		activity.enableBackButton();
+		activity.setMenuToCourses();
 
 		loadCourseInfo(view, targetLanguage);
 

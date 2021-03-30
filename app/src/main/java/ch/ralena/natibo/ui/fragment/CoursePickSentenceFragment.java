@@ -192,7 +192,7 @@ public class CoursePickSentenceFragment extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		((MainActivity) getActivity()).setNavigationDrawerItemChecked(R.id.nav_languages);
+		((MainActivity) getActivity()).setMenuToLanguages();
 	}
 
 	private void onSentenceClicked(Sentence sentence) {

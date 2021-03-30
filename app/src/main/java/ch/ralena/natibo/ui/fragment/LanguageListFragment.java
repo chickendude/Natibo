@@ -88,7 +88,7 @@ public class LanguageListFragment extends Fragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-		((MainActivity) getActivity()).setNavigationDrawerItemChecked(R.id.nav_languages);
+		((MainActivity) getActivity()).setMenuToLanguages();
 		getActivity().setTitle(getString(R.string.languages));
 	}
 

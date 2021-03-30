@@ -26,7 +26,7 @@ import ch.ralena.natibo.object.Language;
 import io.realm.Realm;
 
 public class CoursePickLanguageFragment extends Fragment implements CourseSelectedLanguagesAdapter.OnDragListener {
-	private static final String TAG = CoursePickLanguageFragment.class.getSimpleName();
+	public static final String TAG = CoursePickLanguageFragment.class.getSimpleName();
 	public static final String TAG_COURSE_ID = "language_id";
 
 	ArrayList<Language> availableLanguages;
