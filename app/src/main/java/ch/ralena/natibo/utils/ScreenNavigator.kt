@@ -18,9 +18,7 @@ class ScreenNavigator @Inject constructor(
 		private val activity: MainActivity
 ) {
 	fun toCourseDetailFragment(courseId: String?) {
-		activity.enableHomeButton()
-
-		val course: Course? = realm.where<Course>(Course::class.java).equalTo("id", courseId).findFirst()
+		val course = realm.where(Course::class.java).equalTo("id", courseId).findFirst()
 		course?.run {
 			val fragment = CourseDetailFragment()
 			val bundle = Bundle()

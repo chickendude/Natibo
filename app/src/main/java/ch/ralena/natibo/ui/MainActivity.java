@@ -8,16 +8,11 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 
 import ch.ralena.natibo.MainApplication;
@@ -33,7 +28,6 @@ import ch.ralena.natibo.object.Course;
 import ch.ralena.natibo.service.StudySessionService;
 import ch.ralena.natibo.utils.Utils;
 import io.reactivex.subjects.PublishSubject;
-import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity {
 	private static final String TAG = MainActivity.class.getSimpleName();
@@ -45,18 +39,11 @@ public class MainActivity extends AppCompatActivity {
 
 	public ActivityComponent activityComponent;
 
-	// views
-	DrawerLayout drawerLayout;
-	NavigationView navigationView;
 	private FragmentManager fragmentManager;
-	ActionBarDrawerToggle drawerToggle;
 
 	// fields
-	int homeAction;
 	private StudySessionService studySessionService;
 	private boolean isServiceBound = false;
-
-	private Realm realm;
 
 	private PublishSubject<StudySessionService> sessionPublish = PublishSubject.create();
 
@@ -83,22 +70,11 @@ public class MainActivity extends AppCompatActivity {
 
 		activityComponent = ((MainApplication) getApplication()).getAppComponent().newActivityComponent(new ActivityModule(this));
 
-		homeAction = ACTION_OPEN_DRAWER;
-
-		drawerLayout = findViewById(R.id.drawerLayout);
-		navigationView = findViewById(R.id.navigationView);
-
 		// set up toolbar
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
 		fragmentManager = getSupportFragmentManager();
-
-		// load schedules from database
-		realm = Realm.getDefaultInstance();
-
-		// set up nav drawer
-		setupNavigationDrawer();
 
 		// if the device wasn't rotated, load the starting page
 		if (savedInstanceState == null)
@@ -140,52 +116,6 @@ public class MainActivity extends AppCompatActivity {
 		if (isServiceBound) {
 			studySessionService.buildNotification();
 		}
-	}
-
-	/**
-	 * Setup the Action Bar, the hamburger button to toggle the navigation drawer, and prepare the
-	 * navigation view and act on menu selections.
-	 */
-	private void setupNavigationDrawer() {
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActionBar().setHomeButtonEnabled(true);
-		drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close) {
-			public void onDrawerClosed(View drawerView) {
-				super.onDrawerClosed(drawerView);
-				invalidateOptionsMenu();
-			}
-
-			public void onDrawerOpened(View drawerView) {
-			}
-		};
-		drawerToggle.syncState();
-		drawerToggle.setDrawerIndicatorEnabled(true);
-		drawerLayout.addDrawerListener(drawerToggle);
-
-		navigationView.setNavigationItemSelectedListener(
-				menuItem -> {
-					menuItem.setCheckable(true);
-					navigationView.setCheckedItem(menuItem.getItemId());
-					drawerLayout.closeDrawers();
-
-					switch (menuItem.getItemId()) {
-						case R.id.nav_languages:
-							loadLanguageListFragment();
-							break;
-						case R.id.nav_courses:
-							loadCourseListFragment();
-							break;
-						case R.id.nav_settings:
-							loadMainSettingsFragment();
-							break;
-						case R.id.nav_import:
-							importLanguagPack();
-							break;
-					}
-
-					return true;
-				});
-		navigationView.setCheckedItem(R.id.nav_courses);
 	}
 
 	/**
@@ -277,41 +207,27 @@ public class MainActivity extends AppCompatActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				homeButtonPressed();
-				return true;
+		if (item.getItemId() == android.R.id.home) {
+			onBackPressed();
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	private void homeButtonPressed() {
-		switch (homeAction) {
-			case ACTION_OPEN_DRAWER:
-				drawerLayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
-				break;
-			case ACTION_BACK:
-				onBackPressed();
-				break;
-		}
 	}
 
 	// public methods
 
 	public void setNavigationDrawerItemChecked(int itemNum) {
-		navigationView.setCheckedItem(itemNum);
+		//navigationView.setCheckedItem(itemNum);
 	}
 
 	public void enableBackButton() {
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		drawerToggle.setDrawerIndicatorEnabled(false);
-		homeAction = ACTION_BACK;
 	}
 
-	public void enableHomeButton() {
-		drawerToggle.setDrawerIndicatorEnabled(true);
-		homeAction = ACTION_OPEN_DRAWER;
+	public void disableBackButton() {
+		getSupportActionBar().setDisplayShowHomeEnabled(false);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 	}
 
 	public void snackBar(int stringId) {

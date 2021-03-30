@@ -50,7 +50,7 @@ public class CourseDetailFragment extends Fragment {
 
 		MainActivity activity = (MainActivity) getActivity();
 		activity.setTitle(course.getTitle());
-		activity.enableHomeButton();
+		activity.enableBackButton();
 
 		loadCourseInfo(view, targetLanguage);
 

@@ -19,6 +19,9 @@ class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseList
 	@Inject
 	lateinit var screenNavigator: ScreenNavigator
 
+	@Inject
+	lateinit var mainActivity: MainActivity
+
 	private lateinit var recyclerView: RecyclerView
 	private lateinit var noCoursesText: TextView
 
@@ -36,13 +39,12 @@ class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseList
 		// load views
 		noCoursesText = view.findViewById(R.id.noCoursesText)
 		recyclerView = view.findViewById(R.id.recyclerView)
-
-		// load schedules from database
-		courses = viewModel.fetchCourses()
+		mainActivity.disableBackButton()
 
 		// check if a course id was passed in, if so move to CourseDetailFragment and add to back stack
 		arguments?.let {
 			val courseId = it.getString(TAG_COURSE_ID)
+			arguments = null
 			screenNavigator.toCourseDetailFragment(courseId)
 		}
 
@@ -58,10 +60,9 @@ class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseList
 
 	override fun onStart() {
 		super.onStart()
-		// TODO: See if we can't remove the activity references once MainActivity has been cleaned up.
-		(activity as MainActivity).setNavigationDrawerItemChecked(R.id.nav_courses)
-		activity!!.title = getString(R.string.courses)
+		mainActivity.title = getString(R.string.courses)
 		viewModel.registerListener(this)
+		viewModel.fetchCourses()
 	}
 
 	override fun onStop() {
@@ -69,10 +70,12 @@ class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseList
 		viewModel.unregisterListener(this)
 	}
 
-	override fun showCourses() {
+	override fun showCourses(courses: RealmResults<Course>) {
+		this.courses = courses
 		recyclerView.apply {
 			visibility = View.VISIBLE
 
+			// TODO: Switch to dependency injection and use method to update courses
 			val courseListAdapter = CourseListAdapter(courses)
 			adapter = courseListAdapter
 			layoutManager = LinearLayoutManager(context)
