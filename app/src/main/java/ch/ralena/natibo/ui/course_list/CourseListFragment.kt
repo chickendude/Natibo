@@ -28,7 +28,7 @@ class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseList
 	private var courses: RealmResults<Course>? = null
 
 	companion object {
-		private val TAG = CourseListFragment::class.java.simpleName
+		val TAG: String = CourseListFragment::class.java.simpleName
 		const val TAG_COURSE_ID = "tag_course_id"
 		const val TAG_START_SESSION = "tag_start_session"
 	}

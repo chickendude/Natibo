@@ -22,7 +22,7 @@ import io.realm.Realm;
 import io.realm.RealmList;
 
 public class LanguageListFragment extends Fragment {
-	private static final String TAG = LanguageListFragment.class.getSimpleName();
+	public static final String TAG = LanguageListFragment.class.getSimpleName();
 
 	ArrayList<Language> languages;
 
@@ -63,7 +63,7 @@ public class LanguageListFragment extends Fragment {
 		}
 
 		// set up FAB
-		fab.setOnClickListener(v -> ((MainActivity) getActivity()).importLanguagPack());
+		fab.setOnClickListener(v -> ((MainActivity) getActivity()).importLanguagePack());
 
 		return view;
 	}
