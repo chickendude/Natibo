@@ -39,6 +39,7 @@ class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseList
 		// load views
 		noCoursesText = view.findViewById(R.id.noCoursesText)
 		recyclerView = view.findViewById(R.id.recyclerView)
+		mainActivity.title = getString(R.string.courses)
 		mainActivity.disableBackButton()
 		mainActivity.setMenuToCourses()
 
@@ -61,7 +62,6 @@ class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseList
 
 	override fun onStart() {
 		super.onStart()
-		mainActivity.title = getString(R.string.courses)
 		viewModel.registerListener(this)
 		viewModel.fetchCourses()
 	}
