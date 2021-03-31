@@ -1,5 +1,6 @@
 package ch.ralena.natibo.ui.course_list
 
+import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.ui.base.BaseViewModel
 import io.realm.Realm
@@ -7,7 +8,7 @@ import io.realm.RealmResults
 import javax.inject.Inject
 
 class CourseListViewModel @Inject constructor(
-		private val realm: Realm
+		private val courseRepository: CourseRepository
 ) : BaseViewModel<CourseListViewModel.Listener>() {
 	interface Listener {
 		fun showCourses(courses: RealmResults<Course>)
@@ -15,7 +16,7 @@ class CourseListViewModel @Inject constructor(
 	}
 
 	fun fetchCourses() {
-		val courses = realm.where(Course::class.java).findAll()
+		val courses = courseRepository.fetchCourses()
 		if (courses.size > 0)
 			for (listener in listeners)
 				listener.showCourses(courses)
