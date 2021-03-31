@@ -24,7 +24,7 @@ import java.util.zip.ZipInputStream;
 import ch.ralena.natibo.ui.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.data.LanguageData;
-import ch.ralena.natibo.ui.fragment.LanguageImportFragment;
+import ch.ralena.natibo.ui.language.importer.LanguageImportFragment;
 import ch.ralena.natibo.data.room.object.Language;
 import ch.ralena.natibo.data.room.object.Pack;
 import io.reactivex.subjects.PublishSubject;

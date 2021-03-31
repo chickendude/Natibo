@@ -7,10 +7,10 @@ import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.ui.MainActivity
-import ch.ralena.natibo.ui.course_list.CourseListFragment
-import ch.ralena.natibo.ui.fragment.CourseDetailFragment
-import ch.ralena.natibo.ui.fragment.CoursePickLanguageFragment
-import ch.ralena.natibo.ui.fragment.LanguageListFragment
+import ch.ralena.natibo.ui.course.list.CourseListFragment
+import ch.ralena.natibo.ui.course.detail.CourseDetailFragment
+import ch.ralena.natibo.ui.course.create.CoursePickLanguageFragment
+import ch.ralena.natibo.ui.language.list.LanguageListFragment
 import ch.ralena.natibo.ui.fragment.MainSettingsFragment
 import io.realm.Realm
 import javax.inject.Inject

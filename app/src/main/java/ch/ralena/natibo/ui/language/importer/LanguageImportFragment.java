@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.fragment;
+package ch.ralena.natibo.ui.language.importer;
 
 import android.annotation.SuppressLint;
 import android.net.Uri;
@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import ch.ralena.natibo.ui.MainActivity;
 import ch.ralena.natibo.R;
+import ch.ralena.natibo.ui.language.list.LanguageListFragment;
 import ch.ralena.natibo.utils.GLSImporter;
 
 public class LanguageImportFragment extends Fragment {

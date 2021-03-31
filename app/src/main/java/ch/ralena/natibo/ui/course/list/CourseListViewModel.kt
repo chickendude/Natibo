@@ -1,9 +1,8 @@
-package ch.ralena.natibo.ui.course_list
+package ch.ralena.natibo.ui.course.list
 
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.ui.base.BaseViewModel
-import io.realm.Realm
 import io.realm.RealmResults
 import javax.inject.Inject
 

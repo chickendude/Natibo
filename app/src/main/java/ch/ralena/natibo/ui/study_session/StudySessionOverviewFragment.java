@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.fragment;
+package ch.ralena.natibo.ui.study_session;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;

@@ -15,8 +15,8 @@ import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.di.module.ActivityModule
 import ch.ralena.natibo.service.StudySessionService
 import ch.ralena.natibo.service.StudySessionService.StudyBinder
-import ch.ralena.natibo.ui.fragment.LanguageImportFragment
-import ch.ralena.natibo.ui.fragment.StudySessionFragment
+import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
+import ch.ralena.natibo.ui.study_session.StudySessionFragment
 import ch.ralena.natibo.utils.ScreenNavigator
 import ch.ralena.natibo.utils.Utils
 import com.google.android.material.bottomnavigation.BottomNavigationView

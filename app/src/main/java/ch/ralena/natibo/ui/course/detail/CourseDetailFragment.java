@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.fragment;
+package ch.ralena.natibo.ui.course.detail;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -23,6 +23,8 @@ import ch.ralena.natibo.ui.adapter.CourseDetailAdapter;
 import ch.ralena.natibo.data.room.object.Course;
 import ch.ralena.natibo.data.room.object.Language;
 import ch.ralena.natibo.data.room.object.Pack;
+import ch.ralena.natibo.ui.fragment.CourseSettingsFragment;
+import ch.ralena.natibo.ui.study_session.StudySessionFragment;
 import io.realm.Realm;
 import io.realm.RealmList;
 

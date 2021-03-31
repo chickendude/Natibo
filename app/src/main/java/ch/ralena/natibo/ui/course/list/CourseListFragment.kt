@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.course_list
+package ch.ralena.natibo.ui.course.list
 
 import android.view.View
 import android.widget.TextView

@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.fragment;
+package ch.ralena.natibo.ui.language.detail;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -17,6 +17,7 @@ import ch.ralena.natibo.R;
 import ch.ralena.natibo.ui.adapter.LanguageDetailAdapter;
 import ch.ralena.natibo.data.room.object.Language;
 import ch.ralena.natibo.data.room.object.Pack;
+import ch.ralena.natibo.ui.fragment.SentenceListFragment;
 import io.realm.Realm;
 import io.realm.RealmList;
 
