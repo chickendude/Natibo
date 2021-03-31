@@ -11,7 +11,7 @@ import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 
 import ch.ralena.natibo.ui.MainActivity;
 import ch.ralena.natibo.R;
-import ch.ralena.natibo.object.Course;
+import ch.ralena.natibo.data.room.object.Course;
 import io.realm.Realm;
 
 

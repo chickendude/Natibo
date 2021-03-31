@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import ch.ralena.natibo.R;
-import ch.ralena.natibo.object.Course;
+import ch.ralena.natibo.data.room.object.Course;
 import io.reactivex.subjects.PublishSubject;
 import io.realm.RealmResults;
 

@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import ch.ralena.natibo.R
-import ch.ralena.natibo.`object`.Course
-import ch.ralena.natibo.`object`.Language
+import ch.ralena.natibo.data.room.`object`.Course
+import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.course_list.CourseListFragment
 import ch.ralena.natibo.ui.fragment.CourseDetailFragment

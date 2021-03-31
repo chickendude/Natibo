@@ -25,9 +25,9 @@ import java.util.UUID;
 
 import ch.ralena.natibo.ui.MainActivity;
 import ch.ralena.natibo.R;
-import ch.ralena.natibo.object.Course;
-import ch.ralena.natibo.object.Language;
-import ch.ralena.natibo.object.Schedule;
+import ch.ralena.natibo.data.room.object.Course;
+import ch.ralena.natibo.data.room.object.Language;
+import ch.ralena.natibo.data.room.object.Schedule;
 import ch.ralena.natibo.utils.Utils;
 import io.realm.Realm;
 import io.realm.RealmList;

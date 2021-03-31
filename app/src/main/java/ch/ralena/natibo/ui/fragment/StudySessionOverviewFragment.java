@@ -17,10 +17,10 @@ import java.util.List;
 import ch.ralena.natibo.ui.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.ui.adapter.StudySessionAdapter;
-import ch.ralena.natibo.object.Course;
-import ch.ralena.natibo.object.Day;
-import ch.ralena.natibo.object.SentenceGroup;
-import ch.ralena.natibo.object.SentenceSet;
+import ch.ralena.natibo.data.room.object.Course;
+import ch.ralena.natibo.data.room.object.Day;
+import ch.ralena.natibo.data.room.object.SentenceGroup;
+import ch.ralena.natibo.data.room.object.SentenceSet;
 import io.realm.Realm;
 
 public class StudySessionOverviewFragment extends Fragment {

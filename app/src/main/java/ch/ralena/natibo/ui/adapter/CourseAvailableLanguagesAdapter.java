@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import ch.ralena.natibo.R;
-import ch.ralena.natibo.object.Language;
+import ch.ralena.natibo.data.room.object.Language;
 import io.reactivex.subjects.PublishSubject;
 
 public class CourseAvailableLanguagesAdapter extends RecyclerView.Adapter<CourseAvailableLanguagesAdapter.ViewHolder> {

@@ -15,7 +15,7 @@ import java.util.Locale;
 
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.ui.callback.ItemTouchHelperCallback;
-import ch.ralena.natibo.object.Language;
+import ch.ralena.natibo.data.room.object.Language;
 import io.reactivex.subjects.PublishSubject;
 
 public class CourseSelectedLanguagesAdapter extends RecyclerView.Adapter<CourseSelectedLanguagesAdapter.ViewHolder> implements ItemTouchHelperCallback.ItemTouchHelperAdapter {

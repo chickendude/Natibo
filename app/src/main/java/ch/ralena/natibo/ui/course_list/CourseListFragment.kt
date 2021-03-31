@@ -5,7 +5,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
-import ch.ralena.natibo.`object`.Course
+import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.adapter.CourseListAdapter

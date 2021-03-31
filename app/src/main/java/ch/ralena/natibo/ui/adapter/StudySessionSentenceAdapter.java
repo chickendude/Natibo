@@ -9,8 +9,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import ch.ralena.natibo.R;
-import ch.ralena.natibo.object.Language;
-import ch.ralena.natibo.object.Sentence;
+import ch.ralena.natibo.data.room.object.Language;
+import ch.ralena.natibo.data.room.object.Sentence;
 import io.reactivex.subjects.PublishSubject;
 import io.realm.RealmList;
 

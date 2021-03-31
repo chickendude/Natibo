@@ -20,9 +20,9 @@ import java.util.Locale;
 import ch.ralena.natibo.ui.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.ui.adapter.CourseDetailAdapter;
-import ch.ralena.natibo.object.Course;
-import ch.ralena.natibo.object.Language;
-import ch.ralena.natibo.object.Pack;
+import ch.ralena.natibo.data.room.object.Course;
+import ch.ralena.natibo.data.room.object.Language;
+import ch.ralena.natibo.data.room.object.Pack;
 import io.realm.Realm;
 import io.realm.RealmList;
 

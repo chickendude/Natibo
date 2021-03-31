@@ -11,7 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import ch.ralena.natibo.R;
-import ch.ralena.natibo.object.Language;
+import ch.ralena.natibo.data.room.object.Language;
 import io.reactivex.subjects.PublishSubject;
 
 public class LanguageListAdapter extends RecyclerView.Adapter<LanguageListAdapter.ViewHolder> {

@@ -22,7 +22,7 @@ import ch.ralena.natibo.R;
 import ch.ralena.natibo.ui.adapter.CourseAvailableLanguagesAdapter;
 import ch.ralena.natibo.ui.adapter.CourseSelectedLanguagesAdapter;
 import ch.ralena.natibo.ui.callback.ItemTouchHelperCallback;
-import ch.ralena.natibo.object.Language;
+import ch.ralena.natibo.data.room.object.Language;
 import io.realm.Realm;
 
 public class CoursePickLanguageFragment extends Fragment implements CourseSelectedLanguagesAdapter.OnDragListener {

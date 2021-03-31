@@ -18,9 +18,9 @@ import java.io.IOException;
 import ch.ralena.natibo.ui.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.ui.adapter.SentenceListAdapter;
-import ch.ralena.natibo.object.Language;
-import ch.ralena.natibo.object.Pack;
-import ch.ralena.natibo.object.Sentence;
+import ch.ralena.natibo.data.room.object.Language;
+import ch.ralena.natibo.data.room.object.Pack;
+import ch.ralena.natibo.data.room.object.Sentence;
 import io.realm.Realm;
 
 public class SentenceListFragment extends Fragment {

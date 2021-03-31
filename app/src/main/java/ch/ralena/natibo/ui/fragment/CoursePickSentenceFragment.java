@@ -23,11 +23,11 @@ import java.util.Locale;
 import ch.ralena.natibo.ui.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.ui.adapter.PickSentenceAdapter;
-import ch.ralena.natibo.object.Course;
-import ch.ralena.natibo.object.Day;
-import ch.ralena.natibo.object.Language;
-import ch.ralena.natibo.object.Pack;
-import ch.ralena.natibo.object.Sentence;
+import ch.ralena.natibo.data.room.object.Course;
+import ch.ralena.natibo.data.room.object.Day;
+import ch.ralena.natibo.data.room.object.Language;
+import ch.ralena.natibo.data.room.object.Pack;
+import ch.ralena.natibo.data.room.object.Sentence;
 import io.realm.Realm;
 import io.realm.RealmList;
 

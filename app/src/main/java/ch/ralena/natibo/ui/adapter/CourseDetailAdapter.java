@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 
 import ch.ralena.natibo.R;
-import ch.ralena.natibo.object.Pack;
+import ch.ralena.natibo.data.room.object.Pack;
 import io.reactivex.subjects.PublishSubject;
 import io.realm.RealmList;
 

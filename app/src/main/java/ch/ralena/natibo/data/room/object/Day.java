@@ -1,4 +1,4 @@
-package ch.ralena.natibo.object;
+package ch.ralena.natibo.data.room.object;
 
 import java.util.ArrayList;
 import java.util.List;

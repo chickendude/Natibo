@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import ch.ralena.natibo.ui.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.ui.adapter.LanguageListAdapter;
-import ch.ralena.natibo.object.Language;
+import ch.ralena.natibo.data.room.object.Language;
 import io.realm.Realm;
 import io.realm.RealmList;
 
