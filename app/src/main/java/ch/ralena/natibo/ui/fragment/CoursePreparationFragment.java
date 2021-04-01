@@ -143,7 +143,7 @@ public class CoursePreparationFragment extends Fragment {
 		realm = Realm.getDefaultInstance();
 
 		// load arguments
-		ArrayList<String> languageIds = getArguments().getStringArrayList(TAG_LANGUAGE_IDS);
+		String[] languageIds = getArguments().getStringArray(TAG_LANGUAGE_IDS);
 
 		// load languages passed in from create course fragment
 		languages = new RealmList<>();

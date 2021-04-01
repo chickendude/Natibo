@@ -44,7 +44,7 @@ class CoursePickLanguageViewModel @Inject constructor(
 	}
 
 	fun languagesConfirmed() {
-		val languageIds = selectedLanguages.map { it.languageId } as ArrayList<String>
+		val languageIds = selectedLanguages.map { it.languageId }
 		screenNavigator.toCoursePreparationFragment(languageIds)
 	}
 }

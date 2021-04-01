@@ -86,11 +86,11 @@ class ScreenNavigator @Inject constructor(
 		}
 	}
 
-	fun toCoursePreparationFragment(languageIds: ArrayList<String>) {
+	fun toCoursePreparationFragment(languageIds: List<String>) {
 		val fragment = CoursePreparationFragment()
 		// add language ids in a bundle
 		val bundle = Bundle()
-		bundle.putStringArrayList(CoursePreparationFragment.TAG_LANGUAGE_IDS, languageIds)
+		bundle.putStringArray(CoursePreparationFragment.TAG_LANGUAGE_IDS, languageIds.toTypedArray())
 		fragment.arguments = bundle
 		fragmentManager.beginTransaction()
 				.replace(R.id.fragmentPlaceHolder, fragment)
