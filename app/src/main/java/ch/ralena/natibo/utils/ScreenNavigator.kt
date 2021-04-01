@@ -10,6 +10,7 @@ import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.course.list.CourseListFragment
 import ch.ralena.natibo.ui.course.detail.CourseDetailFragment
 import ch.ralena.natibo.ui.course.create.CoursePickLanguageFragment
+import ch.ralena.natibo.ui.fragment.CoursePreparationFragment
 import ch.ralena.natibo.ui.language.list.LanguageListFragment
 import ch.ralena.natibo.ui.fragment.MainSettingsFragment
 import io.realm.Realm
@@ -83,5 +84,18 @@ class ScreenNavigator @Inject constructor(
 			val entryId = fragmentManager.getBackStackEntryAt(0).id
 			fragmentManager.popBackStackImmediate(entryId, FragmentManager.POP_BACK_STACK_INCLUSIVE)
 		}
+	}
+
+	fun toCoursePreparationFragment(languageIds: ArrayList<String>) {
+		val fragment = CoursePreparationFragment()
+		// add language ids in a bundle
+		val bundle = Bundle()
+		bundle.putStringArrayList(CoursePreparationFragment.TAG_LANGUAGE_IDS, languageIds)
+		fragment.arguments = bundle
+		fragmentManager.beginTransaction()
+				.replace(R.id.fragmentPlaceHolder, fragment)
+				.addToBackStack(null)
+				.commit()
+
 	}
 }

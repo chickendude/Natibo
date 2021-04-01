@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.di.component.PresentationComponent
+import ch.ralena.natibo.di.module.SelectedLanguagesItemTouchHelper
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.course.create.adapter.AvailableLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.adapter.SelectedLanguagesAdapter
@@ -40,11 +41,13 @@ class CoursePickLanguageFragment :
 	@Inject
 	lateinit var selectedAdapter: SelectedLanguagesAdapter
 
-	lateinit var selectedLanguages: ArrayList<Language>
-	private var realm: Realm? = null
+	@Inject
+	@SelectedLanguagesItemTouchHelper
+	lateinit var itemTouchHelper: ItemTouchHelper
+
+	// views
 	private lateinit var availableRecyclerView: RecyclerView
 	private lateinit var selectedRecyclerView: RecyclerView
-	private lateinit var itemTouchHelper: ItemTouchHelper
 	private lateinit var checkMenu: MenuItem
 
 
@@ -56,15 +59,26 @@ class CoursePickLanguageFragment :
 	override fun provideLayoutId() = R.layout.fragment_course_pick_language
 
 	override fun setupViews(view: View) {
-		// switch to back button
+		// enable back button and set title
 		mainActivity.title = getString(R.string.select_languages)
 		mainActivity.enableBackButton()
 		setHasOptionsMenu(true)
-		realm = Realm.getDefaultInstance()
-		selectedLanguages = arrayListOf()
 
 		// recycler views
-		loadRecyclerViews(view)
+		availableRecyclerView = view.findViewById(R.id.availableLanguagesRecyclerView)
+		availableRecyclerView.apply {
+			adapter = availableAdapter
+			layoutManager = GridLayoutManager(context, 3)
+		}
+
+		selectedRecyclerView = view.findViewById(R.id.selectedLanguagesRecyclerView)
+		selectedRecyclerView.apply {
+			adapter = selectedAdapter
+			layoutManager = LinearLayoutManager(context)
+		}
+
+		// attach ItemTouchHelper
+		itemTouchHelper.attachToRecyclerView(selectedRecyclerView)
 	}
 
 	override fun injectDependencies(injector: PresentationComponent) {
@@ -87,34 +101,17 @@ class CoursePickLanguageFragment :
 	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
 		inflater.inflate(R.menu.check_toolbar, menu)
 		checkMenu = menu.getItem(0)
-		checkMenu.setVisible(false)
+		checkMenu.isVisible = false
 		super.onCreateOptionsMenu(menu, inflater)
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
-		when (item.itemId) {
-			R.id.action_confirm -> loadCoursePreparationFragment()
-		}
+		if (item.itemId == R.id.action_confirm)
+			viewModel.languagesConfirmed()
 		return super.onOptionsItemSelected(item)
 	}
 
-	private fun loadRecyclerViews(view: View) {
-		availableRecyclerView = view.findViewById(R.id.availableLanguagesRecyclerView)
-		availableRecyclerView.apply {
-			adapter = availableAdapter
-			layoutManager = GridLayoutManager(context, 3)
-		}
-		selectedRecyclerView = view.findViewById(R.id.selectedLanguagesRecyclerView)
-		selectedRecyclerView.apply {
-			adapter = selectedAdapter
-			layoutManager = LinearLayoutManager(context)
-		}
-
-		val callback: ItemTouchHelper.Callback = ItemTouchHelperCallback(selectedAdapter, false)
-		itemTouchHelper = ItemTouchHelper(callback)
-		itemTouchHelper.attachToRecyclerView(selectedRecyclerView)
-	}
-
+	// ViewModel listeners
 	override fun onLanguageClicked(language: Language) {
 		viewModel.addRemoveLanguage(language)
 	}
@@ -131,28 +128,12 @@ class CoursePickLanguageFragment :
 		checkMenu.isVisible = isVisible
 	}
 
-	private fun loadCoursePreparationFragment() {
-		val fragment = CoursePreparationFragment()
-
-		// add language ids in a bundle
-		val bundle = Bundle()
-		val languageIds = ArrayList<String>()
-		for (language in selectedLanguages) {
-			languageIds.add(language.languageId)
-		}
-		bundle.putStringArrayList(CoursePreparationFragment.TAG_LANGUAGE_IDS, languageIds)
-		fragment.arguments = bundle
-		fragmentManager!!.beginTransaction()
-				.replace(R.id.fragmentPlaceHolder, fragment)
-				.addToBackStack(null)
-				.commit()
-	}
-
-	override fun onStartDrag(holder: RecyclerView.ViewHolder) {
-		itemTouchHelper.startDrag(holder)
-	}
-
 	override fun onLanguagesLoaded(languages: List<Language>) {
 		availableAdapter.loadLanguages(languages)
+	}
+
+	// SelectedLanguagesAdapter listener
+	override fun onStartDrag(holder: RecyclerView.ViewHolder) {
+		itemTouchHelper.startDrag(holder)
 	}
 }

@@ -1,13 +1,18 @@
 package ch.ralena.natibo.ui.course.create
 
+import android.os.Bundle
+import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.di.module.SelectedLanguages
 import ch.ralena.natibo.ui.base.BaseViewModel
+import ch.ralena.natibo.ui.fragment.CoursePreparationFragment
+import ch.ralena.natibo.utils.ScreenNavigator
 import javax.inject.Inject
 
 class CoursePickLanguageViewModel @Inject constructor(
 		private val languageRepository: LanguageRepository,
+		private val screenNavigator: ScreenNavigator,
 		@SelectedLanguages private val selectedLanguages: ArrayList<Language>
 ) : BaseViewModel<CoursePickLanguageViewModel.Listener>() {
 	interface Listener {
@@ -36,5 +41,10 @@ class CoursePickLanguageViewModel @Inject constructor(
 		if (selectedLanguages.size <= 1)
 			for (l in listeners)
 				l.onUpdateCheckMenuVisibility(selectedLanguages.size > 0)
+	}
+
+	fun languagesConfirmed() {
+		val languageIds = selectedLanguages.map { it.languageId } as ArrayList<String>
+		screenNavigator.toCoursePreparationFragment(languageIds)
 	}
 }
