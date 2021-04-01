@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity(), MainActivityViewModel.Listener {
 		}
 
 		// if the device wasn't rotated, load the starting page
-		if (savedInstanceState == null) loadCourseListFragment()
+		if (savedInstanceState == null) screenNavigator.toCourseListFragment()
 	}
 
 	override fun onDestroy() {
@@ -139,6 +139,7 @@ class MainActivity : AppCompatActivity(), MainActivityViewModel.Listener {
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 		super.onActivityResult(requestCode, resultCode, data)
+		// TODO: Move to ScreenNavigator
 		if (resultCode == RESULT_OK) {
 			if (requestCode == REQUEST_PICK_GLS) {
 				val fragment = LanguageImportFragment()
