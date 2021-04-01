@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.course.create.adapter
+package ch.ralena.natibo.ui.course.create.pick_language.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater

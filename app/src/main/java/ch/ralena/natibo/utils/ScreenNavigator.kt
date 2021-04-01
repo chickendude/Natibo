@@ -9,8 +9,8 @@ import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.course.list.CourseListFragment
 import ch.ralena.natibo.ui.course.detail.CourseDetailFragment
-import ch.ralena.natibo.ui.course.create.CoursePickLanguageFragment
-import ch.ralena.natibo.ui.fragment.CoursePreparationFragment
+import ch.ralena.natibo.ui.course.create.pick_language.PickLanguagesFragment
+import ch.ralena.natibo.ui.course.create.pick_schedule.PickScheduleFragment
 import ch.ralena.natibo.ui.language.list.LanguageListFragment
 import ch.ralena.natibo.ui.fragment.MainSettingsFragment
 import io.realm.Realm
@@ -36,7 +36,7 @@ class ScreenNavigator @Inject constructor(
 		if (realm.where(Language::class.java).count() == 0L) {
 			activity.snackBar(R.string.no_languages)
 		} else {
-			loadFragment(CoursePickLanguageFragment(), CoursePickLanguageFragment.TAG)
+			loadFragment(PickLanguagesFragment(), PickLanguagesFragment.TAG)
 		}
 	}
 
@@ -60,12 +60,12 @@ class ScreenNavigator @Inject constructor(
 	}
 
 	fun toCoursePreparationFragment(languageIds: List<String>) {
-		val fragment = CoursePreparationFragment()
+		val fragment = PickScheduleFragment()
 		// add language ids in a bundle
 		val bundle = Bundle()
-		bundle.putStringArray(CoursePreparationFragment.TAG_LANGUAGE_IDS, languageIds.toTypedArray())
+		bundle.putStringArray(PickScheduleFragment.TAG_LANGUAGE_IDS, languageIds.toTypedArray())
 		fragment.arguments = bundle
-		loadFragment(fragment, CoursePreparationFragment.TAG)
+		loadFragment(fragment, PickScheduleFragment.TAG)
 	}
 
 	// Private functions

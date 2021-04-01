@@ -1,20 +1,17 @@
-package ch.ralena.natibo.ui.course.create
+package ch.ralena.natibo.ui.course.create.pick_language
 
-import android.os.Bundle
-import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.di.module.SelectedLanguages
 import ch.ralena.natibo.ui.base.BaseViewModel
-import ch.ralena.natibo.ui.fragment.CoursePreparationFragment
 import ch.ralena.natibo.utils.ScreenNavigator
 import javax.inject.Inject
 
-class CoursePickLanguageViewModel @Inject constructor(
+class PickLanguagesViewModel @Inject constructor(
 		private val languageRepository: LanguageRepository,
 		private val screenNavigator: ScreenNavigator,
 		@SelectedLanguages private val selectedLanguages: ArrayList<Language>
-) : BaseViewModel<CoursePickLanguageViewModel.Listener>() {
+) : BaseViewModel<PickLanguagesViewModel.Listener>() {
 	interface Listener {
 		fun onLanguagesLoaded(languages: List<Language>)
 		fun onUpdateCheckMenuVisibility(isVisible: Boolean)

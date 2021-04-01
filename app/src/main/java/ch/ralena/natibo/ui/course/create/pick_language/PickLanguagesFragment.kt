@@ -1,6 +1,5 @@
-package ch.ralena.natibo.ui.course.create
+package ch.ralena.natibo.ui.course.create.pick_language
 
-import android.os.Bundle
 import android.view.*
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -11,13 +10,9 @@ import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.di.module.SelectedLanguagesItemTouchHelper
 import ch.ralena.natibo.ui.MainActivity
-import ch.ralena.natibo.ui.course.create.adapter.AvailableLanguagesAdapter
-import ch.ralena.natibo.ui.course.create.adapter.SelectedLanguagesAdapter
+import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailableLanguagesAdapter
+import ch.ralena.natibo.ui.course.create.pick_language.adapter.SelectedLanguagesAdapter
 import ch.ralena.natibo.ui.base.BaseFragment
-import ch.ralena.natibo.ui.callback.ItemTouchHelperCallback
-import ch.ralena.natibo.ui.fragment.CoursePreparationFragment
-import io.realm.Realm
-import java.util.*
 import javax.inject.Inject
 
 /**
@@ -26,10 +21,10 @@ import javax.inject.Inject
  * You will be given a list of available languages and must select a base language and optionally
  * one or more target languages.
  */
-class CoursePickLanguageFragment :
-		BaseFragment<CoursePickLanguageViewModel.Listener, CoursePickLanguageViewModel>(),
+class PickLanguagesFragment :
+		BaseFragment<PickLanguagesViewModel.Listener, PickLanguagesViewModel>(),
 		AvailableLanguagesAdapter.Listener,
-		CoursePickLanguageViewModel.Listener {
+		PickLanguagesViewModel.Listener {
 
 	@Inject
 	lateinit var mainActivity: MainActivity
@@ -51,11 +46,11 @@ class CoursePickLanguageFragment :
 
 
 	companion object {
-		val TAG: String = CoursePickLanguageFragment::class.java.simpleName
+		val TAG: String = PickLanguagesFragment::class.java.simpleName
 		const val TAG_COURSE_ID = "language_id"
 	}
 
-	override fun provideLayoutId() = R.layout.fragment_course_pick_language
+	override fun provideLayoutId() = R.layout.fragment_course_pick_languages
 
 	override fun setupViews(view: View) {
 		// enable back button and set title

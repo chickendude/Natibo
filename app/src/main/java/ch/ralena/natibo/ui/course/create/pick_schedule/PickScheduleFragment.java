@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.fragment;
+package ch.ralena.natibo.ui.course.create.pick_schedule;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -33,8 +33,8 @@ import io.realm.Realm;
 import io.realm.RealmList;
 
 // TODO: 13/04/18 move to course detail page
-public class CoursePreparationFragment extends Fragment {
-	public static final String TAG = CoursePreparationFragment.class.getSimpleName();
+public class PickScheduleFragment extends Fragment {
+	public static final String TAG = PickScheduleFragment.class.getSimpleName();
 	public static final String TAG_LANGUAGE_IDS = "tag_language_ids";
 
 	private Realm realm;
@@ -130,7 +130,7 @@ public class CoursePreparationFragment extends Fragment {
 	@Nullable
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_course_preparation, container, false);
+		View view = inflater.inflate(R.layout.fragment_course_pick_schedule, container, false);
 
 		// switch to back button
 		activity = (MainActivity) getActivity();

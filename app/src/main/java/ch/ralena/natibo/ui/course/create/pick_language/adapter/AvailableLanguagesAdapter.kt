@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.course.create.adapter
+package ch.ralena.natibo.ui.course.create.pick_language.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
-import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
