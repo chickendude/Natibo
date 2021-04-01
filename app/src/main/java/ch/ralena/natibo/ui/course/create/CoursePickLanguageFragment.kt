@@ -40,7 +40,6 @@ class CoursePickLanguageFragment :
 	@Inject
 	lateinit var selectedAdapter: SelectedLanguagesAdapter
 
-	lateinit var availableLanguages: List<Language>
 	lateinit var selectedLanguages: ArrayList<Language>
 	private var realm: Realm? = null
 	private lateinit var availableRecyclerView: RecyclerView
@@ -117,14 +116,19 @@ class CoursePickLanguageFragment :
 	}
 
 	override fun onLanguageClicked(language: Language) {
-		if (selectedLanguages.contains(language)) {
-			selectedLanguages.remove(language)
-		} else {
-			selectedLanguages.add(language)
-		}
-		// TODO: move to viewmodel, "onCheckMenuVisibilityChanged"
-		checkMenu.isVisible = selectedLanguages.size > 0
-		selectedAdapter.loadLanguages(selectedLanguages)
+		viewModel.addRemoveLanguage(language)
+	}
+
+	override fun onLanguageAdded(language: Language) {
+		selectedAdapter.addLanguage(language)
+	}
+
+	override fun onLanguageRemoved(language: Language) {
+		selectedAdapter.removeLanguage(language)
+	}
+
+	override fun onUpdateCheckMenuVisibility(isVisible: Boolean) {
+		checkMenu.isVisible = isVisible
 	}
 
 	private fun loadCoursePreparationFragment() {
@@ -148,8 +152,7 @@ class CoursePickLanguageFragment :
 		itemTouchHelper.startDrag(holder)
 	}
 
-	override fun languagesLoaded(languages: List<Language>) {
-		availableLanguages = languages
+	override fun onLanguagesLoaded(languages: List<Language>) {
 		availableAdapter.loadLanguages(languages)
 	}
 }

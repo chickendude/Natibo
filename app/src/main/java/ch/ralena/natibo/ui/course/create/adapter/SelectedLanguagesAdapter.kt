@@ -74,6 +74,17 @@ class SelectedLanguagesAdapter @Inject constructor(
 		notifyDataSetChanged()
 	}
 
+	fun addLanguage(language: Language) {
+		languages.add(language)
+		notifyItemInserted(languages.size)
+	}
+
+	fun removeLanguage(language: Language) {
+		val index = languages.indexOf(language)
+		languages.remove(language)
+		notifyItemRemoved(index)
+	}
+
 	inner class ViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 		private val languageName: TextView
 		private val flagImage: ImageView
@@ -89,14 +100,14 @@ class SelectedLanguagesAdapter @Inject constructor(
 			languageName = view.findViewById(R.id.languageLabel)
 			flagImage = view.findViewById(R.id.flagImageView)
 			handleImage = view.findViewById(R.id.handleImage)
-			handleImage.setOnTouchListener { v: View?, event: MotionEvent ->
+			handleImage.setOnTouchListener { _: View?, event: MotionEvent ->
 				if (event.action == MotionEvent.ACTION_DOWN) {
 					for (listener in listeners)
 						listener.onStartDrag(this@ViewHolder)
 				}
 				false
 			}
-			view.setOnClickListener { v: View? -> languageSubject.onNext(language!!) }
+			view.setOnClickListener { _: View? -> languageSubject.onNext(language!!) }
 		}
 	}
 }
