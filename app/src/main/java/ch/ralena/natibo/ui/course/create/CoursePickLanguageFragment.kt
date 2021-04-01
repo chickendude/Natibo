@@ -29,7 +29,6 @@ import javax.inject.Inject
 class CoursePickLanguageFragment :
 		BaseFragment<CoursePickLanguageViewModel.Listener, CoursePickLanguageViewModel>(),
 		AvailableLanguagesAdapter.Listener,
-		SelectedLanguagesAdapter.Listener,
 		CoursePickLanguageViewModel.Listener {
 
 	@Inject
@@ -130,10 +129,5 @@ class CoursePickLanguageFragment :
 
 	override fun onLanguagesLoaded(languages: List<Language>) {
 		availableAdapter.loadLanguages(languages)
-	}
-
-	// SelectedLanguagesAdapter listener
-	override fun onStartDrag(holder: RecyclerView.ViewHolder) {
-		itemTouchHelper.startDrag(holder)
 	}
 }
