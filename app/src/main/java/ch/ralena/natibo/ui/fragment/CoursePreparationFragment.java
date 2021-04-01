@@ -34,7 +34,7 @@ import io.realm.RealmList;
 
 // TODO: 13/04/18 move to course detail page
 public class CoursePreparationFragment extends Fragment {
-	private static final String TAG = CoursePreparationFragment.class.getSimpleName();
+	public static final String TAG = CoursePreparationFragment.class.getSimpleName();
 	public static final String TAG_LANGUAGE_IDS = "tag_language_ids";
 
 	private Realm realm;

@@ -100,7 +100,7 @@ class CoursePickLanguageFragment :
 	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
 		inflater.inflate(R.menu.check_toolbar, menu)
 		checkMenu = menu.getItem(0)
-		checkMenu.isVisible = false
+		viewModel.updateCheckMenuVisibility()
 		super.onCreateOptionsMenu(menu, inflater)
 	}
 

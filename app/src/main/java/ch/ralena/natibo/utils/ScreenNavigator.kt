@@ -65,11 +65,7 @@ class ScreenNavigator @Inject constructor(
 		val bundle = Bundle()
 		bundle.putStringArray(CoursePreparationFragment.TAG_LANGUAGE_IDS, languageIds.toTypedArray())
 		fragment.arguments = bundle
-		fragmentManager.beginTransaction()
-				.replace(R.id.fragmentPlaceHolder, fragment)
-				.addToBackStack(null)
-				.commit()
-
+		loadFragment(fragment, CoursePreparationFragment.TAG)
 	}
 
 	// Private functions
@@ -79,7 +75,7 @@ class ScreenNavigator @Inject constructor(
 				.beginTransaction()
 				.replace(R.id.fragmentPlaceHolder, fragment)
 
-		// make sure fragment isn't added twice
+		// make sure fragment isn't added to back stack twice
 		val backStackCount = fragmentManager.backStackEntryCount
 		if (backStackCount > 0) {
 			val entry = fragmentManager.getBackStackEntryAt(backStackCount - 1)

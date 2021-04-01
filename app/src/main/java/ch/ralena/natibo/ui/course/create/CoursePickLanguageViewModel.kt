@@ -38,6 +38,10 @@ class CoursePickLanguageViewModel @Inject constructor(
 			for (l in listeners)
 				l.onLanguageAdded(language)
 		}
+		updateCheckMenuVisibility()
+	}
+
+	fun updateCheckMenuVisibility() {
 		if (selectedLanguages.size <= 1)
 			for (l in listeners)
 				l.onUpdateCheckMenuVisibility(selectedLanguages.size > 0)
