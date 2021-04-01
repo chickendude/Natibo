@@ -1,254 +1,212 @@
-package ch.ralena.natibo.ui.course.create.pick_schedule;
+package ch.ralena.natibo.ui.course.create.pick_schedule
 
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.SeekBar;
-
-import java.util.ArrayList;
-import java.util.UUID;
-
-import ch.ralena.natibo.ui.MainActivity;
-import ch.ralena.natibo.R;
-import ch.ralena.natibo.data.room.object.Course;
-import ch.ralena.natibo.data.room.object.Language;
-import ch.ralena.natibo.data.room.object.Schedule;
-import ch.ralena.natibo.utils.Utils;
-import io.realm.Realm;
-import io.realm.RealmList;
+import android.text.Editable
+import android.text.InputType
+import android.text.TextUtils
+import android.text.TextWatcher
+import android.view.*
+import android.widget.*
+import android.widget.SeekBar.OnSeekBarChangeListener
+import ch.ralena.natibo.R
+import ch.ralena.natibo.data.room.`object`.Course
+import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.di.component.PresentationComponent
+import ch.ralena.natibo.ui.MainActivity
+import ch.ralena.natibo.ui.base.BaseFragment
+import ch.ralena.natibo.utils.Utils
+import io.realm.Realm
+import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 // TODO: 13/04/18 move to course detail page
-public class PickScheduleFragment extends Fragment {
-	public static final String TAG = PickScheduleFragment.class.getSimpleName();
-	public static final String TAG_LANGUAGE_IDS = "tag_language_ids";
+class PickScheduleFragment :
+		BaseFragment<PickScheduleViewModel.Listener, PickScheduleViewModel>(),
+		PickScheduleViewModel.Listener {
 
-	private Realm realm;
-	RealmList<Language> languages;
+	@Inject
+	lateinit var activity: MainActivity
+
+
+	private lateinit var realm: Realm
+	private var languages: List<Language>? = null
 
 	// Views
-	EditText languageNamesLabel;
-	EditText sentencesPerDayEdit;
-	SeekBar sentencesPerDaySeek;
-	EditText customScheduleEdit;
-	RadioGroup reviewScheduleRadioGroup;
-	RadioButton fourDayRadio;
-	RadioButton fiveDayRadio;
-	RadioButton customDayRadio;
-	CheckBox chorusCheckBox;
+	lateinit var languageNamesLabel: EditText
+	lateinit var sentencesPerDayEdit: EditText
+	lateinit var sentencesPerDaySeek: SeekBar
+	lateinit var customScheduleEdit: EditText
+	lateinit var reviewScheduleRadioGroup: RadioGroup
+	lateinit var fourDayRadio: RadioButton
+	lateinit var fiveDayRadio: RadioButton
+	lateinit var customDayRadio: RadioButton
+	lateinit var chorusCheckBox: CheckBox
 
-	MainActivity activity;
+	companion object {
+		val TAG: String = PickScheduleFragment::class.java.simpleName
+		const val TAG_LANGUAGE_IDS = "tag_language_ids"
+	}
 
-	// text watchers
-	TextWatcher sentencesPerDayTextWatcher = new TextWatcher() {
-		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+	override fun provideLayoutId() = R.layout.fragment_course_pick_schedule
 
-		}
-
-		@Override
-		public void onTextChanged(CharSequence s, int start, int before, int count) {
-			if (Utils.isNumeric(s.toString())) {
-				int number = Integer.parseInt(s.toString());
-				if (number <= 100) {
-					sentencesPerDaySeek.setProgress(number - 1);
-					sentencesPerDayEdit.setSelection(start + count);
-				} else {
-					sentencesPerDayEdit.setText("" + 100);
-				}
-			}
-		}
-
-		@Override
-		public void afterTextChanged(Editable s) {
-
-		}
-	};
-	TextWatcher customScheduleTextWatcher = new TextWatcher() {
-		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-		}
-
-		@Override
-		public void onTextChanged(CharSequence s, int start, int before, int count) {
-			if (s.length() > 0) {
-				String[] numbers = s.toString().split("[*.,/ ]");
-				boolean areAllNumbers = true;
-				for (String number : numbers) {
-					areAllNumbers = areAllNumbers && Utils.isNumeric(number);
-				}
-				if (areAllNumbers) {
-					String pattern = TextUtils.join(" / ", numbers);
-					customDayRadio.setText(pattern);
-				}
-			} else {
-				customDayRadio.setText("? / ? / ?");
-			}
-		}
-
-		@Override
-		public void afterTextChanged(Editable s) {
-
-		}
-	};
-
-	// seek bar change listener
-	SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
-		@Override
-		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			sentencesPerDayEdit.removeTextChangedListener(sentencesPerDayTextWatcher);
-			sentencesPerDayEdit.setText("" + (progress + 1));
-			sentencesPerDayEdit.setSelection(sentencesPerDayEdit.getText().length());
-			sentencesPerDayEdit.addTextChangedListener(sentencesPerDayTextWatcher);
-		}
-
-		@Override
-		public void onStartTrackingTouch(SeekBar seekBar) {
-		}
-
-		@Override
-		public void onStopTrackingTouch(SeekBar seekBar) {
-
-		}
-	};
-
-	@Nullable
-	@Override
-	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_course_pick_schedule, container, false);
-
+	override fun setupViews(view: View) {
 		// switch to back button
-		activity = (MainActivity) getActivity();
-		activity.enableBackButton();
-		activity.setTitle("Create an AI Course");
+		activity.enableBackButton()
+		activity.title = "Create an AI Course"
 
 		// we have a check button
-		setHasOptionsMenu(true);
+		setHasOptionsMenu(true)
+		realm = Realm.getDefaultInstance()
 
-		realm = Realm.getDefaultInstance();
-
-		// load arguments
-		String[] languageIds = getArguments().getStringArray(TAG_LANGUAGE_IDS);
-
-		// load languages passed in from create course fragment
-		languages = new RealmList<>();
-		for (String languageId : languageIds) {
-			languages.add(realm.where(Language.class).equalTo("languageId", languageId).findFirst());
+		// load language ids
+		arguments?.run {
+			getStringArray(TAG_LANGUAGE_IDS)?.let {
+				viewModel.saveLanguageIds(it)
+			}
 		}
 
-		// get views
-		languageNamesLabel = view.findViewById(R.id.languageNamesLabel);
-		sentencesPerDayEdit = view.findViewById(R.id.sentencesPerDayEdit);
-		sentencesPerDaySeek = view.findViewById(R.id.sentencesPerDaySeek);
-		customScheduleEdit = view.findViewById(R.id.customScheduleEdit);
-		reviewScheduleRadioGroup = view.findViewById(R.id.reviewScheduleRadioGroup);
-		fourDayRadio = view.findViewById(R.id.fourDayRadio);
-		fiveDayRadio = view.findViewById(R.id.fiveDayRadio);
-		customDayRadio = view.findViewById(R.id.customDayRadio);
-		chorusCheckBox = view.findViewById(R.id.chorusCheckBox);
+		// load views
+		languageNamesLabel = view.findViewById(R.id.languageNamesLabel)
+		sentencesPerDayEdit = view.findViewById(R.id.sentencesPerDayEdit)
+		sentencesPerDaySeek = view.findViewById(R.id.sentencesPerDaySeek)
+		customScheduleEdit = view.findViewById(R.id.customScheduleEdit)
+		reviewScheduleRadioGroup = view.findViewById(R.id.reviewScheduleRadioGroup)
+		fourDayRadio = view.findViewById(R.id.fourDayRadio)
+		fiveDayRadio = view.findViewById(R.id.fiveDayRadio)
+		customDayRadio = view.findViewById(R.id.customDayRadio)
+		chorusCheckBox = view.findViewById(R.id.chorusCheckBox)
 
-		// display languages in the course
-		ArrayList<String> languageNames = new ArrayList<>();
-		for (Language language : languages) {
-			languageNames.add(language.getLongName());
-		}
-		languageNamesLabel.setText(TextUtils.join(" → ", languageNames));
-		languageNamesLabel.setOnClickListener(v -> {
-			languageNamesLabel.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-		});
+		languageNamesLabel.setOnClickListener(View.OnClickListener { v: View? -> languageNamesLabel.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS) })
 
 		// custom schedule edit should start off gone
-		customScheduleEdit.setVisibility(View.GONE);
-		customScheduleEdit.addTextChangedListener(customScheduleTextWatcher);
+		customScheduleEdit.setVisibility(View.GONE)
+		customScheduleEdit.addTextChangedListener(customScheduleTextWatcher)
 
 		// set up sentencesPerDay EditText and SeekBar
-		sentencesPerDayEdit.addTextChangedListener(sentencesPerDayTextWatcher);
-		sentencesPerDaySeek.setOnSeekBarChangeListener(seekBarChangeListener);
-		sentencesPerDaySeek.setProgress(9);
+		sentencesPerDayEdit.addTextChangedListener(sentencesPerDayTextWatcher)
+		sentencesPerDaySeek.setOnSeekBarChangeListener(seekBarChangeListener)
+		sentencesPerDaySeek.setProgress(9)
 
 		// set up radio listeners
-		reviewScheduleRadioGroup.check(R.id.fourDayRadio);
-		reviewScheduleRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-			switch (checkedId) {
-				case R.id.customDayRadio:
-					customScheduleEdit.setVisibility(View.VISIBLE);
-					customScheduleEdit.requestFocus();
-					break;
-				default:
-					customScheduleEdit.setVisibility(View.GONE);
-					break;
+		reviewScheduleRadioGroup.check(R.id.fourDayRadio)
+		reviewScheduleRadioGroup.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
+			when (checkedId) {
+				R.id.customDayRadio -> {
+					customScheduleEdit.setVisibility(View.VISIBLE)
+					customScheduleEdit.requestFocus()
+				}
+				else -> customScheduleEdit.setVisibility(View.GONE)
 			}
-		});
-
-		return view;
+		})
 	}
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.check_toolbar, menu);
-		super.onCreateOptionsMenu(menu, inflater);
+	override fun injectDependencies(injector: PresentationComponent) {
+		injector.inject(this)
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.action_confirm:
-				String id = createCourse();
-				activity.loadCourseListFragment(id);
-				return true;
+	override fun onStart() {
+		super.onStart()
+		viewModel.registerListener(this)
+		viewModel.fetchLanguages()
+	}
+
+	override fun onStop() {
+		super.onStop()
+		viewModel.unregisterListener(this)
+	}
+
+	// text watchers
+	var sentencesPerDayTextWatcher: TextWatcher = object : TextWatcher {
+		override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+		override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+			if (Utils.isNumeric(s.toString())) {
+				val number = s.toString().toInt()
+				if (number <= 100) {
+					sentencesPerDaySeek.progress = number - 1
+					sentencesPerDayEdit.setSelection(start + count)
+				} else {
+					sentencesPerDayEdit.setText(100.toString())
+				}
+			}
 		}
-		return super.onOptionsItemSelected(item);
+
+		override fun afterTextChanged(s: Editable) {}
+	}
+	var customScheduleTextWatcher: TextWatcher = object : TextWatcher {
+		override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+		override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+			if (s.length > 0) {
+				val numbers = s.toString().split("[*.,/ ]").toTypedArray()
+				var areAllNumbers = true
+				for (number in numbers) {
+					areAllNumbers = areAllNumbers && Utils.isNumeric(number)
+				}
+				if (areAllNumbers) {
+					val pattern = TextUtils.join(" / ", numbers)
+					customDayRadio.text = pattern
+				}
+			} else {
+				customDayRadio.text = "? / ? / ?"
+			}
+		}
+
+		override fun afterTextChanged(s: Editable) {}
 	}
 
-	private String createCourse() {
-		int checkedRadioId = reviewScheduleRadioGroup.getCheckedRadioButtonId();
-		RadioButton checkedButton = getActivity().findViewById(checkedRadioId);
-		String[] dailyReviews = checkedButton.getText().toString().split(" / ");
-		int numSentencesPerDay = Integer.parseInt(sentencesPerDayEdit.getText().toString());
+	// seek bar change listener
+	var seekBarChangeListener: OnSeekBarChangeListener = object : OnSeekBarChangeListener {
+		override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+			sentencesPerDayEdit.removeTextChangedListener(sentencesPerDayTextWatcher)
+			sentencesPerDayEdit.setText((progress + 1).toString())
+			sentencesPerDayEdit.setSelection(sentencesPerDayEdit.text.length)
+			sentencesPerDayEdit.addTextChangedListener(sentencesPerDayTextWatcher)
+		}
+
+		override fun onStartTrackingTouch(seekBar: SeekBar) {}
+		override fun onStopTrackingTouch(seekBar: SeekBar) {}
+	}
+
+	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+		inflater.inflate(R.menu.check_toolbar, menu)
+		super.onCreateOptionsMenu(menu, inflater)
+	}
+
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		when (item.itemId) {
+			R.id.action_confirm -> {
+				createCourse()
+				return true
+			}
+		}
+		return super.onOptionsItemSelected(item)
+	}
+
+	private fun createCourse() {
+		val checkedRadioId = reviewScheduleRadioGroup.checkedRadioButtonId
+		val checkedButton = getActivity()!!.findViewById<RadioButton>(checkedRadioId)
+		val dailyReviews = checkedButton.text.toString().split(" / ").toTypedArray()
+		val numSentencesPerDay = sentencesPerDayEdit.text.toString().toInt()
 
 		// "base-target-target" if chorus enabled, otherwise "base-target"
-		StringBuilder order = new StringBuilder();
-
-		for (int i = 0; i < languages.size(); i++) {
-			if ((i > 0 || languages.size() == 1) && chorusCheckBox.isChecked())
-				order.append(i);
-			order.append(i);
+		val order = StringBuilder()
+		for (i in languages!!.indices) {
+			if ((i > 0 || languages!!.size == 1) && chorusCheckBox.isChecked) order.append(i)
+			order.append(i)
 		}
 
-		// --- begin transaction
-		realm.beginTransaction();
-		// create sentence schedule
-		Schedule schedule = realm.createObject(Schedule.class, UUID.randomUUID().toString());
-		schedule.setOrder(order.toString());
-		schedule.setNumSentences(numSentencesPerDay);
-		for (String review : dailyReviews) {
-			schedule.getReviewPattern().add(Integer.parseInt(review));
+		viewModel.createCourse(order.toString(), numSentencesPerDay, dailyReviews, languageNamesLabel.text.toString(), languages!!)
+	}
+
+	override fun onLanguagesLoaded(languages: List<Language>) {
+		this.languages = languages
+		// display languages in the course
+		val languageNames = ArrayList<String>()
+		for (language in languages) {
+			languageNames.add(language.longName)
 		}
+		languageNamesLabel.setText(TextUtils.join(" → ", languageNames))
+	}
 
-		// build course
-		Course course = realm.createObject(Course.class, UUID.randomUUID().toString());
-
-		course.setTitle(languageNamesLabel.getText().toString());
-		course.setLanguages(languages);
-		course.setPauseMillis(1000);
-		course.setSchedule(schedule);
-		realm.commitTransaction();
-		// --- end transaction
-		return course.getId();
+	override fun onCourseCreated(course: Course) {
+		activity.loadCourseListFragment(course.id)
 	}
 }
