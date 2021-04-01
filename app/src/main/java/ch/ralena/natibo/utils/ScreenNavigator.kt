@@ -59,6 +59,19 @@ class ScreenNavigator @Inject constructor(
 		loadFragment(MainSettingsFragment(), MainSettingsFragment.TAG)
 	}
 
+	fun toCoursePreparationFragment(languageIds: List<String>) {
+		val fragment = CoursePreparationFragment()
+		// add language ids in a bundle
+		val bundle = Bundle()
+		bundle.putStringArray(CoursePreparationFragment.TAG_LANGUAGE_IDS, languageIds.toTypedArray())
+		fragment.arguments = bundle
+		fragmentManager.beginTransaction()
+				.replace(R.id.fragmentPlaceHolder, fragment)
+				.addToBackStack(null)
+				.commit()
+
+	}
+
 	// Private functions
 
 	private fun loadFragment(fragment: Fragment, name: String) {
@@ -84,18 +97,5 @@ class ScreenNavigator @Inject constructor(
 			val entryId = fragmentManager.getBackStackEntryAt(0).id
 			fragmentManager.popBackStackImmediate(entryId, FragmentManager.POP_BACK_STACK_INCLUSIVE)
 		}
-	}
-
-	fun toCoursePreparationFragment(languageIds: List<String>) {
-		val fragment = CoursePreparationFragment()
-		// add language ids in a bundle
-		val bundle = Bundle()
-		bundle.putStringArray(CoursePreparationFragment.TAG_LANGUAGE_IDS, languageIds.toTypedArray())
-		fragment.arguments = bundle
-		fragmentManager.beginTransaction()
-				.replace(R.id.fragmentPlaceHolder, fragment)
-				.addToBackStack(null)
-				.commit()
-
 	}
 }
