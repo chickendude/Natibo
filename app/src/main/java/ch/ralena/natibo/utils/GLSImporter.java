@@ -180,7 +180,12 @@ public class GLSImporter {
 
 								// calculate mp3s length
 								String mp3Uri = audioFile.getAbsolutePath();
-								metadataRetriever.setDataSource(mp3Uri);
+								try {
+									metadataRetriever.setDataSource(mp3Uri);
+								} catch (RuntimeException re) {
+									// TODO: return message saying unable to read this mp3 file
+									Log.d(TAG, re.getLocalizedMessage());
+								}
 
 								int mp3Length = Integer.parseInt(metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
 								Pack pack = lang.getPack(book);
