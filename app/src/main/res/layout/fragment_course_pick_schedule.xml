@@ -70,7 +70,7 @@
 							<TextView
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:text="How many new sentenceGroups per day do you want to learn? Don't forget that you will also be reviewing previous days' sentenceGroups as well!"
+								android:text="@string/sentences_per_day_explanation"
 								android:textSize="14sp"/>
 
 							<LinearLayout

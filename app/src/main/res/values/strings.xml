@@ -59,4 +59,5 @@
     <string name="playback_speed_key" translatable="false">pref_playback_speed</string>
 	<string name="playback_speed_summary">The playback speed for the target language. Range from 0.5 to 2.5.</string>
 	<string name="playback_speed_default" translatable="false">1.0</string>
+	<string name="sentences_per_day_explanation">How many new sentences per day do you want to learn? Don\'t forget that you will also be reviewing previous days\' sentences as well!</string>
 </resources>
