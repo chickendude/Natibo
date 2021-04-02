@@ -75,10 +75,10 @@ class PickScheduleFragment :
 		customDayRadio = view.findViewById(R.id.customDayRadio)
 		chorusCheckBox = view.findViewById(R.id.chorusCheckBox)
 
-		languageNamesLabel.setOnClickListener(View.OnClickListener { v: View? -> languageNamesLabel.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS) })
+		languageNamesLabel.setOnClickListener { v: View? -> languageNamesLabel.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS }
 
 		// custom schedule edit should start off gone
-		customScheduleEdit.setVisibility(View.GONE)
+		customScheduleEdit.visibility = View.GONE
 		customScheduleEdit.addTextChangedListener(customScheduleTextWatcher)
 
 		// set up sentencesPerDay EditText and SeekBar
@@ -135,7 +135,12 @@ class PickScheduleFragment :
 		override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 		override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
 			if (s.length > 0) {
-				val numbers = s.toString().split("[*.,/ ]").toTypedArray()
+				val numbers = s.toString().split(
+						"*",
+						".",
+						",",
+						"/",
+						" ")
 				var areAllNumbers = true
 				for (number in numbers) {
 					areAllNumbers = areAllNumbers && Utils.isNumeric(number)
@@ -145,7 +150,7 @@ class PickScheduleFragment :
 					customDayRadio.text = pattern
 				}
 			} else {
-				customDayRadio.text = "? / ? / ?"
+				customDayRadio.text = "? / ? / ?2"
 			}
 		}
 
