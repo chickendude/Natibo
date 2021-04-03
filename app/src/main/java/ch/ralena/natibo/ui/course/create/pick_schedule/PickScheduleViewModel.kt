@@ -1,5 +1,6 @@
 package ch.ralena.natibo.ui.course.create.pick_schedule
 
+import android.text.TextUtils
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.`object`.Course
@@ -8,6 +9,7 @@ import ch.ralena.natibo.data.room.`object`.Schedule
 import ch.ralena.natibo.di.module.SelectedLanguages
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.ScreenNavigator
+import ch.ralena.natibo.utils.Utils
 import io.realm.RealmList
 import java.util.*
 import javax.inject.Inject
@@ -34,6 +36,25 @@ class PickScheduleViewModel @Inject constructor(
 		val course = courseRepository.createCourse(order, numSentencesPerDay, dailyReviews, title, languages)
 		for (l in listeners)
 			l.onCourseCreated(course)
+	}
+
+	fun getSchedulePatternFromString(string: String): String {
+		var pattern = "? / ? / ?"
+		if (string.isNotEmpty()) {
+			val numbers = string.split(
+					"*",
+					".",
+					",",
+					"/",
+					" ")
+			val areAllNumbers = numbers.all { numberString ->
+				numberString.toCharArray().all { it.isDigit() }
+			}
+			if (areAllNumbers) {
+				pattern = numbers.joinToString(" / ")
+			}
+		}
+		return pattern
 	}
 
 	fun saveLanguageIds(it: Array<String>) {

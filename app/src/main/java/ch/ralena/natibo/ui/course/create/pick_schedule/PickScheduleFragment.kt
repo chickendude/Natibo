@@ -13,6 +13,7 @@ import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
+import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.ScheduleTextWatcher
 import ch.ralena.natibo.utils.Utils
 import io.realm.Realm
 import javax.inject.Inject
@@ -21,10 +22,14 @@ import kotlin.collections.ArrayList
 // TODO: 13/04/18 move to course detail page
 class PickScheduleFragment :
 		BaseFragment<PickScheduleViewModel.Listener, PickScheduleViewModel>(),
-		PickScheduleViewModel.Listener {
+		PickScheduleViewModel.Listener,
+		ScheduleTextWatcher.Listener {
 
 	@Inject
 	lateinit var activity: MainActivity
+
+	@Inject
+	lateinit var scheduleTextWatcher: ScheduleTextWatcher
 
 
 	private lateinit var realm: Realm
@@ -75,28 +80,26 @@ class PickScheduleFragment :
 		customDayRadio = view.findViewById(R.id.customDayRadio)
 		chorusCheckBox = view.findViewById(R.id.chorusCheckBox)
 
-		languageNamesLabel.setOnClickListener { v: View? -> languageNamesLabel.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS }
+		languageNamesLabel.setOnClickListener { languageNamesLabel.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS }
 
 		// custom schedule edit should start off gone
 		customScheduleEdit.visibility = View.GONE
-		customScheduleEdit.addTextChangedListener(customScheduleTextWatcher)
+		customScheduleEdit.addTextChangedListener(scheduleTextWatcher)
 
 		// set up sentencesPerDay EditText and SeekBar
 		sentencesPerDayEdit.addTextChangedListener(sentencesPerDayTextWatcher)
 		sentencesPerDaySeek.setOnSeekBarChangeListener(seekBarChangeListener)
-		sentencesPerDaySeek.setProgress(9)
+		sentencesPerDaySeek.progress = 9
 
 		// set up radio listeners
 		reviewScheduleRadioGroup.check(R.id.fourDayRadio)
-		reviewScheduleRadioGroup.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
-			when (checkedId) {
-				R.id.customDayRadio -> {
-					customScheduleEdit.setVisibility(View.VISIBLE)
-					customScheduleEdit.requestFocus()
-				}
-				else -> customScheduleEdit.setVisibility(View.GONE)
+		reviewScheduleRadioGroup.setOnCheckedChangeListener { _: RadioGroup?, checkedId: Int ->
+			if (checkedId == R.id.customDayRadio) {
+				customScheduleEdit.visibility = View.VISIBLE
+				customScheduleEdit.requestFocus()
 			}
-		})
+			else customScheduleEdit.visibility = View.GONE
+		}
 	}
 
 	override fun injectDependencies(injector: PresentationComponent) {
@@ -107,11 +110,13 @@ class PickScheduleFragment :
 		super.onStart()
 		viewModel.registerListener(this)
 		viewModel.fetchLanguages()
+		scheduleTextWatcher.registerListener(this)
 	}
 
 	override fun onStop() {
 		super.onStop()
 		viewModel.unregisterListener(this)
+		scheduleTextWatcher.unregisterListener(this)
 	}
 
 	// text watchers
@@ -126,31 +131,6 @@ class PickScheduleFragment :
 				} else {
 					sentencesPerDayEdit.setText(100.toString())
 				}
-			}
-		}
-
-		override fun afterTextChanged(s: Editable) {}
-	}
-	var customScheduleTextWatcher: TextWatcher = object : TextWatcher {
-		override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-		override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-			if (s.length > 0) {
-				val numbers = s.toString().split(
-						"*",
-						".",
-						",",
-						"/",
-						" ")
-				var areAllNumbers = true
-				for (number in numbers) {
-					areAllNumbers = areAllNumbers && Utils.isNumeric(number)
-				}
-				if (areAllNumbers) {
-					val pattern = TextUtils.join(" / ", numbers)
-					customDayRadio.text = pattern
-				}
-			} else {
-				customDayRadio.text = "? / ? / ?2"
 			}
 		}
 
@@ -213,5 +193,9 @@ class PickScheduleFragment :
 
 	override fun onCourseCreated(course: Course) {
 		activity.loadCourseListFragment(course.id)
+	}
+
+	override fun onScheduleTextChanged(pattern: String) {
+		customDayRadio.text = viewModel.getSchedulePatternFromString(pattern)
 	}
 }
