@@ -1,18 +1,13 @@
 package ch.ralena.natibo.ui.course.create.pick_schedule
 
-import android.text.TextUtils
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
-import ch.ralena.natibo.data.room.`object`.Schedule
-import ch.ralena.natibo.di.module.SelectedLanguages
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.ScreenNavigator
-import ch.ralena.natibo.utils.Utils
-import io.realm.RealmList
-import java.util.*
 import javax.inject.Inject
+import kotlin.math.min
 
 class PickScheduleViewModel @Inject constructor(
 		private val screenNavigator: ScreenNavigator,
@@ -25,6 +20,10 @@ class PickScheduleViewModel @Inject constructor(
 	}
 
 	private lateinit var languageIds: Array<String>
+
+	companion object {
+		const val MAX_REPETITIONS = 99
+	}
 
 	fun fetchLanguages() {
 		val languages = languageRepository.fetchLanguagesFromIds(languageIds)
@@ -41,18 +40,23 @@ class PickScheduleViewModel @Inject constructor(
 	fun getSchedulePatternFromString(string: String): String {
 		var pattern = "? / ? / ?"
 		if (string.isNotEmpty()) {
-			val numbers = string.split(
+			// Split the string using the delimiters below
+			val numberStrings = string.trim(' ').split(
 					"*",
 					".",
 					",",
 					"/",
 					" ")
-			val areAllNumbers = numbers.all { numberString ->
-				numberString.toCharArray().all { it.isDigit() }
-			}
-			if (areAllNumbers) {
-				pattern = numbers.joinToString(" / ")
-			}
+
+			// Convert list of Strings to list of Integers and clean out bad input.
+			val numbers = numberStrings.map {
+				val number = it.toIntOrNull()
+				number?.let {
+					min(MAX_REPETITIONS, number)
+				}
+			}.filterNotNull()
+
+			pattern = numbers.joinToString(" / ")
 		}
 		return pattern
 	}
