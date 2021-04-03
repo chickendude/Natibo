@@ -14,6 +14,7 @@ import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.ScheduleTextWatcher
+import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.SentencesPerDayTextWatcher
 import ch.ralena.natibo.utils.Utils
 import io.realm.Realm
 import javax.inject.Inject
@@ -23,13 +24,17 @@ import kotlin.collections.ArrayList
 class PickScheduleFragment :
 		BaseFragment<PickScheduleViewModel.Listener, PickScheduleViewModel>(),
 		PickScheduleViewModel.Listener,
-		ScheduleTextWatcher.Listener {
+		ScheduleTextWatcher.Listener,
+		SentencesPerDayTextWatcher.Listener {
 
 	@Inject
 	lateinit var activity: MainActivity
 
 	@Inject
 	lateinit var scheduleTextWatcher: ScheduleTextWatcher
+
+	@Inject
+	lateinit var sentencesPerDayTextWatcher: SentencesPerDayTextWatcher
 
 
 	private lateinit var realm: Realm
@@ -54,15 +59,15 @@ class PickScheduleFragment :
 	override fun provideLayoutId() = R.layout.fragment_course_pick_schedule
 
 	override fun setupViews(view: View) {
-		// switch to back button
+		// Enable back button
 		activity.enableBackButton()
 		activity.title = "Create an AI Course"
 
-		// we have a check button
+		// We have a check button
 		setHasOptionsMenu(true)
 		realm = Realm.getDefaultInstance()
 
-		// load language ids
+		// Load language IDs
 		arguments?.run {
 			getStringArray(TAG_LANGUAGE_IDS)?.let {
 				viewModel.saveLanguageIds(it)
@@ -97,8 +102,7 @@ class PickScheduleFragment :
 			if (checkedId == R.id.customDayRadio) {
 				customScheduleEdit.visibility = View.VISIBLE
 				customScheduleEdit.requestFocus()
-			}
-			else customScheduleEdit.visibility = View.GONE
+			} else customScheduleEdit.visibility = View.GONE
 		}
 	}
 
@@ -111,33 +115,18 @@ class PickScheduleFragment :
 		viewModel.registerListener(this)
 		viewModel.fetchLanguages()
 		scheduleTextWatcher.registerListener(this)
+		sentencesPerDayTextWatcher.registerListener(this)
 	}
 
 	override fun onStop() {
 		super.onStop()
 		viewModel.unregisterListener(this)
 		scheduleTextWatcher.unregisterListener(this)
-	}
-
-	// text watchers
-	var sentencesPerDayTextWatcher: TextWatcher = object : TextWatcher {
-		override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-		override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-			if (Utils.isNumeric(s.toString())) {
-				val number = s.toString().toInt()
-				if (number <= 100) {
-					sentencesPerDaySeek.progress = number - 1
-					sentencesPerDayEdit.setSelection(start + count)
-				} else {
-					sentencesPerDayEdit.setText(100.toString())
-				}
-			}
-		}
-
-		override fun afterTextChanged(s: Editable) {}
+		sentencesPerDayTextWatcher.unregisterListener(this)
 	}
 
 	// seek bar change listener
+	// TODO: Move to ViewModel
 	var seekBarChangeListener: OnSeekBarChangeListener = object : OnSeekBarChangeListener {
 		override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
 			sentencesPerDayEdit.removeTextChangedListener(sentencesPerDayTextWatcher)
@@ -158,6 +147,7 @@ class PickScheduleFragment :
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
 			R.id.action_confirm -> {
+				// TODO: Move to ViewModel
 				createCourse()
 				return true
 			}
@@ -166,6 +156,7 @@ class PickScheduleFragment :
 	}
 
 	private fun createCourse() {
+		// TODO: Move to ViewModel
 		val checkedRadioId = reviewScheduleRadioGroup.checkedRadioButtonId
 		val checkedButton = getActivity()!!.findViewById<RadioButton>(checkedRadioId)
 		val dailyReviews = checkedButton.text.toString().split(" / ").toTypedArray()
@@ -188,7 +179,7 @@ class PickScheduleFragment :
 		for (language in languages) {
 			languageNames.add(language.longName)
 		}
-		languageNamesLabel.setText(TextUtils.join(" → ", languageNames))
+		languageNamesLabel.setText(languageNames.joinToString(" → "))
 	}
 
 	override fun onCourseCreated(course: Course) {
@@ -197,5 +188,13 @@ class PickScheduleFragment :
 
 	override fun onScheduleTextChanged(pattern: String) {
 		customDayRadio.text = viewModel.getSchedulePatternFromString(pattern)
+	}
+
+	override fun onSentencesPerDayTextChanged(pattern: String, cursorPosition: Int) {
+		sentencesPerDayTextWatcher.unregisterListener(this)
+		val sentencesPerDay = viewModel.getSentencesPerDayFromString(pattern)
+		sentencesPerDayEdit.setText(sentencesPerDay.toString())
+		sentencesPerDaySeek.progress = sentencesPerDay - 1
+		sentencesPerDayTextWatcher.registerListener(this)
 	}
 }

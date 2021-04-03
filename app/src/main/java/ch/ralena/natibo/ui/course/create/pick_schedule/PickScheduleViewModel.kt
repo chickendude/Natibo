@@ -6,6 +6,7 @@ import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.ScreenNavigator
+import ch.ralena.natibo.utils.Utils
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -60,6 +61,11 @@ class PickScheduleViewModel @Inject constructor(
 		}
 		return pattern
 	}
+
+	fun getSentencesPerDayFromString(string: String) =
+			string.toIntOrNull()?.let {
+				min(100, it)
+			} ?: 0
 
 	fun saveLanguageIds(it: Array<String>) {
 		languageIds = it
