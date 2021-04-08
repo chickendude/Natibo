@@ -1,9 +1,6 @@
 package ch.ralena.natibo.ui.course.create.pick_schedule
 
-import android.text.Editable
 import android.text.InputType
-import android.text.TextUtils
-import android.text.TextWatcher
 import android.view.*
 import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -15,7 +12,6 @@ import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.ScheduleTextWatcher
 import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.SentencesPerDayTextWatcher
-import ch.ralena.natibo.utils.Utils
 import io.realm.Realm
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -157,6 +153,7 @@ class PickScheduleFragment :
 
 	private fun createCourse() {
 		// TODO: Move to ViewModel
+		// TODO: Ensure sentences per day value isn't 0
 		val checkedRadioId = reviewScheduleRadioGroup.checkedRadioButtonId
 		val checkedButton = getActivity()!!.findViewById<RadioButton>(checkedRadioId)
 		val dailyReviews = checkedButton.text.toString().split(" / ").toTypedArray()
