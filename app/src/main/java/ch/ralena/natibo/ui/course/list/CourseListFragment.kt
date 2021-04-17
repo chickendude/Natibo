@@ -51,6 +51,7 @@ class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseList
 		}
 
 		view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
+			// todo: move to ViewModel
 			screenNavigator.toCourseCreateFragment()
 		}
 	}

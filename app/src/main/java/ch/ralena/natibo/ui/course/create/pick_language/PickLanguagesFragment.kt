@@ -105,7 +105,7 @@ class PickLanguagesFragment :
 		return super.onOptionsItemSelected(item)
 	}
 
-	// ViewModel listeners
+	// ViewModel/Adapter listeners
 	override fun onLanguageClicked(language: Language) {
 		viewModel.addRemoveLanguage(language)
 	}

@@ -13,6 +13,7 @@ import ch.ralena.natibo.ui.course.create.pick_language.PickLanguagesFragment
 import ch.ralena.natibo.ui.course.create.pick_schedule.PickScheduleFragment
 import ch.ralena.natibo.ui.language.list.LanguageListFragment
 import ch.ralena.natibo.ui.fragment.MainSettingsFragment
+import ch.ralena.natibo.ui.language.detail.LanguageDetailFragment
 import io.realm.Realm
 import javax.inject.Inject
 
@@ -53,6 +54,14 @@ class ScreenNavigator @Inject constructor(
 
 	fun toLanguageListFragment() {
 		loadFragment(LanguageListFragment(), LanguageListFragment.TAG)
+	}
+
+	fun toLanguageDetailsFragment(languageId: String) {
+		val fragment = LanguageDetailFragment()
+		fragment.arguments = Bundle().apply {
+			putString(LanguageDetailFragment.TAG_LANGUAGE_ID, languageId)
+		}
+		loadFragment(fragment, LanguageDetailFragment.TAG)
 	}
 
 	fun toMainSettingsFragment() {

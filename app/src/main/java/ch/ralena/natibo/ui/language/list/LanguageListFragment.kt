@@ -1,109 +1,83 @@
-package ch.ralena.natibo.ui.language.list;
+package ch.ralena.natibo.ui.language.list
 
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.os.Bundle
+import android.view.View
+import ch.ralena.natibo.R
+import androidx.recyclerview.widget.RecyclerView
+import android.widget.TextView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import ch.ralena.natibo.ui.language.list.adapter.LanguageListAdapter
+import androidx.recyclerview.widget.GridLayoutManager
+import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.di.component.PresentationComponent
+import ch.ralena.natibo.ui.MainActivity
+import ch.ralena.natibo.ui.base.BaseFragment
+import ch.ralena.natibo.ui.language.detail.LanguageDetailFragment
+import io.realm.Realm
+import java.util.ArrayList
+import javax.inject.Inject
 
-import java.util.ArrayList;
+class LanguageListFragment : BaseFragment<LanguageListViewModel.Listener, LanguageListViewModel>(),
+		LanguageListAdapter.Listener,
+		LanguageListViewModel.Listener {
 
-import ch.ralena.natibo.ui.MainActivity;
-import ch.ralena.natibo.R;
-import ch.ralena.natibo.ui.adapter.LanguageListAdapter;
-import ch.ralena.natibo.data.room.object.Language;
-import ch.ralena.natibo.ui.language.detail.LanguageDetailFragment;
-import io.realm.Realm;
-import io.realm.RealmList;
+	companion object {
+		val TAG: String = LanguageListFragment::class.java.simpleName
+	}
 
-public class LanguageListFragment extends Fragment {
-	public static final String TAG = LanguageListFragment.class.getSimpleName();
+	@Inject
+	lateinit var languageAdapter: LanguageListAdapter
 
-	ArrayList<Language> languages;
+	@Inject
+	lateinit var mainActivity: MainActivity
 
-	private Realm realm;
+	lateinit var languages: ArrayList<Language>
 
-	@Nullable
-	@Override
-	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_language_list, container, false);
+	override fun provideLayoutId(): Int = R.layout.fragment_language_list
 
-		// load schedules from database
-		realm = Realm.getDefaultInstance();
-		languages = Language.getLanguagesSorted(realm);
+	override fun setupViews(view: View) {
+		mainActivity.title = getString(R.string.languages)
 
-		// load views
-		RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-		TextView noLanguagesText = view.findViewById(R.id.noCoursesText);
-		FloatingActionButton fab = view.findViewById(R.id.fab);
+		viewModel.fetchLanguages()
 
-		if (languages.size() == 0) {
-			noLanguagesText.setVisibility(View.VISIBLE);
-			recyclerView.setVisibility(View.GONE);
-		} else {
-			// check if there are any empty languages
-			deleteEmptyLanguages();
+		view.findViewById<RecyclerView>(R.id.recyclerView).apply {
+			visibility = viewModel.getRecyclerViewVisibility()
+			adapter = languageAdapter
+			layoutManager = GridLayoutManager(context, 2)
+		}
 
-			// hide "No Courses" text
-			noLanguagesText.setVisibility(View.GONE);
-			recyclerView.setVisibility(View.VISIBLE);
-
-			// set up recyclerlist and adapter
-			LanguageListAdapter adapter = new LanguageListAdapter(languages);
-			recyclerView.setAdapter(adapter);
-			RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
-			recyclerView.setLayoutManager(layoutManager);
-
-			adapter.asObservable().subscribe(this::loadLanguageDetailFragment);
+		view.findViewById<TextView>(R.id.noCoursesText).apply {
+			visibility = viewModel.getNoCourseTextVisibility()
 		}
 
 		// set up FAB
-		fab.setOnClickListener(v -> ((MainActivity) getActivity()).importLanguagePack());
-
-		return view;
-	}
-
-	private void deleteEmptyLanguages() {
-		// find all empty languages
-		RealmList<Language> emptyLanguages = new RealmList<>();
-		for (Language language : languages) {
-			if (language.getLanguageType() == null || language.getLanguageId().equals(""))
-				emptyLanguages.add(language);
+		view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
+			(activity as MainActivity?)!!.importLanguagePack()
 		}
-		// delete the packs and languages themselves
-		realm.executeTransaction(r -> {
-			for (Language language : emptyLanguages) {
-				if (language.getPacks() != null)
-					language.getPacks().deleteAllFromRealm();
-				language.deleteFromRealm();
-			}
-		});
 	}
 
-	@Override
-	public void onStart() {
-		super.onStart();
-		((MainActivity) getActivity()).setMenuToLanguages();
-		getActivity().setTitle(getString(R.string.languages));
+	override fun injectDependencies(injector: PresentationComponent) {
+		injector.inject(this)
+		viewModel.registerListener(this)
 	}
 
-	private void loadLanguageDetailFragment(Language language) {
-		// load new fragment
-		LanguageDetailFragment fragment = new LanguageDetailFragment();
-		Bundle bundle = new Bundle();
-		bundle.putString(LanguageDetailFragment.TAG_LANGUAGE_ID, language.getLanguageId());
-		fragment.setArguments(bundle);
-		getFragmentManager()
-				.beginTransaction()
-				.replace(R.id.fragmentPlaceHolder, fragment)
-				.addToBackStack(null)
-				.commit();
+	override fun onStart() {
+		super.onStart()
+		viewModel.registerListener(this)
+		languageAdapter.registerListener(this)
 	}
 
+	override fun onStop() {
+		super.onStop()
+		viewModel.unregisterListener(this)
+		languageAdapter.unregisterListener(this)
+	}
+
+	override fun onLanguageClicked(language: Language) {
+		viewModel.languageSelected(language)
+	}
+
+	override fun onLanguagesLoaded(languages: List<Language>) {
+		languageAdapter.loadLanguages(languages)
+	}
 }

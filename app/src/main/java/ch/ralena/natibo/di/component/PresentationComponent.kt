@@ -5,6 +5,7 @@ import ch.ralena.natibo.di.module.PresentationModule
 import ch.ralena.natibo.ui.course.create.pick_language.PickLanguagesFragment
 import ch.ralena.natibo.ui.course.create.pick_schedule.PickScheduleFragment
 import ch.ralena.natibo.ui.course.list.CourseListFragment
+import ch.ralena.natibo.ui.language.list.LanguageListFragment
 import dagger.Subcomponent
 
 @PresentationScope
@@ -13,4 +14,5 @@ interface PresentationComponent {
 	fun inject(fragment: CourseListFragment)
 	fun inject(fragment: PickLanguagesFragment)
 	fun inject(fragment: PickScheduleFragment)
+	fun inject(fragment: LanguageListFragment)
 }

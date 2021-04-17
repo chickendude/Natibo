@@ -22,7 +22,7 @@ import io.realm.Realm;
 import io.realm.RealmList;
 
 public class LanguageDetailFragment extends Fragment {
-	private static final String TAG = LanguageDetailFragment.class.getSimpleName();
+	public static final String TAG = LanguageDetailFragment.class.getSimpleName();
 	public static final String TAG_LANGUAGE_ID = "language_id";
 
 	Language language;

@@ -6,6 +6,7 @@ import ch.ralena.natibo.di.PresentationScope
 import ch.ralena.natibo.ui.callback.ItemTouchHelperCallback
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailableLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.SelectedLanguagesAdapter
+import ch.ralena.natibo.ui.language.list.adapter.LanguageListAdapter
 import dagger.Module
 import dagger.Provides
 import javax.inject.Qualifier
@@ -20,9 +21,13 @@ class PresentationModule {
 	@Provides
 	fun selectedLanguagesAdapter() = SelectedLanguagesAdapter(arrayListOf())
 
+//	@PresentationScope
+//	@Provides
+//	fun languageListAdapter() = LanguageListAdapter(arrayListOf())
+
 	@PresentationScope
 	@Provides
-	@SelectedLanguages
+	@LanguageList
 	fun selectedLanguages() = arrayListOf<Language>()
 
 	@PresentationScope
@@ -36,7 +41,7 @@ class PresentationModule {
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
-annotation class SelectedLanguages
+annotation class LanguageList
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
