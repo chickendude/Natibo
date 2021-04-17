@@ -1,6 +1,5 @@
 package ch.ralena.natibo.ui.language.list
 
-import android.os.Bundle
 import android.view.View
 import ch.ralena.natibo.R
 import androidx.recyclerview.widget.RecyclerView
@@ -12,8 +11,6 @@ import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
-import ch.ralena.natibo.ui.language.detail.LanguageDetailFragment
-import io.realm.Realm
 import java.util.ArrayList
 import javax.inject.Inject
 

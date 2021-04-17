@@ -1,11 +1,8 @@
 package ch.ralena.natibo.ui.language.list
 
-import android.os.Bundle
 import android.view.View
-import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.ui.base.BaseViewModel
-import ch.ralena.natibo.ui.language.detail.LanguageDetailFragment
 import ch.ralena.natibo.utils.ScreenNavigator
 import io.realm.Realm
 import javax.inject.Inject
