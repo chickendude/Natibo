@@ -1,5 +1,6 @@
 package ch.ralena.natibo.ui.language.list
 
+import android.view.LayoutInflater
 import android.view.View
 import ch.ralena.natibo.R
 import androidx.recyclerview.widget.RecyclerView
@@ -8,13 +9,17 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import ch.ralena.natibo.ui.language.list.adapter.LanguageListAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.databinding.FragmentLanguageListBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import java.util.ArrayList
 import javax.inject.Inject
 
-class LanguageListFragment : BaseFragment<LanguageListViewModel.Listener, LanguageListViewModel>(),
+class LanguageListFragment :
+		BaseFragment<FragmentLanguageListBinding,
+				LanguageListViewModel.Listener,
+				LanguageListViewModel>(FragmentLanguageListBinding::inflate),
 		LanguageListAdapter.Listener,
 		LanguageListViewModel.Listener {
 
@@ -29,8 +34,6 @@ class LanguageListFragment : BaseFragment<LanguageListViewModel.Listener, Langua
 	lateinit var mainActivity: MainActivity
 
 	lateinit var languages: ArrayList<Language>
-
-	override fun provideLayoutId(): Int = R.layout.fragment_language_list
 
 	override fun setupViews(view: View) {
 		mainActivity.title = getString(R.string.languages)

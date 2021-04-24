@@ -1,11 +1,13 @@
 package ch.ralena.natibo.ui.course.list
 
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Course
+import ch.ralena.natibo.databinding.FragmentCourseListBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.adapter.CourseListAdapter
@@ -15,7 +17,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.realm.RealmResults
 import javax.inject.Inject
 
-class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseListViewModel>(), CourseListViewModel.Listener {
+class CourseListFragment :
+		BaseFragment<FragmentCourseListBinding,
+				CourseListViewModel.Listener,
+				CourseListViewModel>(FragmentCourseListBinding::inflate),
+		CourseListViewModel.Listener {
 	@Inject
 	lateinit var screenNavigator: ScreenNavigator
 
@@ -32,8 +38,6 @@ class CourseListFragment : BaseFragment<CourseListViewModel.Listener, CourseList
 		const val TAG_COURSE_ID = "tag_course_id"
 		const val TAG_START_SESSION = "tag_start_session"
 	}
-
-	override fun provideLayoutId() = R.layout.fragment_course_list
 
 	override fun setupViews(view: View) {
 		// load views

@@ -14,6 +14,7 @@ import ch.ralena.natibo.ui.course.create.pick_schedule.PickScheduleFragment
 import ch.ralena.natibo.ui.language.list.LanguageListFragment
 import ch.ralena.natibo.ui.fragment.MainSettingsFragment
 import ch.ralena.natibo.ui.language.detail.LanguageDetailFragment
+import ch.ralena.natibo.ui.sentences.SentenceListFragment
 import io.realm.Realm
 import javax.inject.Inject
 
@@ -26,9 +27,9 @@ class ScreenNavigator @Inject constructor(
 		val course = realm.where(Course::class.java).equalTo("id", courseId).findFirst()
 		course?.run {
 			val fragment = CourseDetailFragment()
-			val bundle = Bundle()
-			bundle.putString(CourseDetailFragment.TAG_COURSE_ID, course.getId())
-			fragment.setArguments(bundle)
+			fragment.arguments = Bundle().apply {
+				putString(CourseDetailFragment.TAG_COURSE_ID, course.getId())
+			}
 			loadFragment(fragment, CourseDetailFragment.TAG)
 		}
 	}
@@ -45,11 +46,20 @@ class ScreenNavigator @Inject constructor(
 		val fragment = CourseListFragment()
 		courseId?.let {
 			clearBackStack()
-			val bundle = Bundle()
-			bundle.putString(CourseListFragment.TAG_COURSE_ID, courseId)
-			fragment.arguments = bundle
+			fragment.arguments = Bundle().apply {
+				putString(CourseListFragment.TAG_COURSE_ID, courseId)
+			}
 		}
 		loadFragment(fragment, CourseListFragment.TAG)
+	}
+
+	fun toCoursePreparationFragment(languageIds: List<String>) {
+		val fragment = PickScheduleFragment()
+		// add language ids in a bundle
+		val bundle = Bundle()
+		bundle.putStringArray(PickScheduleFragment.TAG_LANGUAGE_IDS, languageIds.toTypedArray())
+		fragment.arguments = bundle
+		loadFragment(fragment, PickScheduleFragment.TAG)
 	}
 
 	fun toLanguageListFragment() {
@@ -68,13 +78,13 @@ class ScreenNavigator @Inject constructor(
 		loadFragment(MainSettingsFragment(), MainSettingsFragment.TAG)
 	}
 
-	fun toCoursePreparationFragment(languageIds: List<String>) {
-		val fragment = PickScheduleFragment()
-		// add language ids in a bundle
-		val bundle = Bundle()
-		bundle.putStringArray(PickScheduleFragment.TAG_LANGUAGE_IDS, languageIds.toTypedArray())
-		fragment.arguments = bundle
-		loadFragment(fragment, PickScheduleFragment.TAG)
+	fun toSentenceListFragment(packId: String, languageId: String) {
+		val fragment = SentenceListFragment()
+		fragment.arguments = Bundle().apply {
+			putString(SentenceListFragment.TAG_LANGUAGE_ID, languageId)
+			putString(SentenceListFragment.TAG_BASE_PACK_ID, packId)
+		}
+		loadFragment(fragment, SentenceListFragment.TAG)
 	}
 
 	// Private functions

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.databinding.FragmentCoursePickLanguagesBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.di.module.SelectedLanguagesItemTouchHelper
 import ch.ralena.natibo.ui.MainActivity
@@ -22,7 +23,9 @@ import javax.inject.Inject
  * one or more target languages.
  */
 class PickLanguagesFragment :
-		BaseFragment<PickLanguagesViewModel.Listener, PickLanguagesViewModel>(),
+		BaseFragment<FragmentCoursePickLanguagesBinding,
+				PickLanguagesViewModel.Listener,
+				PickLanguagesViewModel>(FragmentCoursePickLanguagesBinding::inflate),
 		AvailableLanguagesAdapter.Listener,
 		PickLanguagesViewModel.Listener {
 
@@ -49,8 +52,6 @@ class PickLanguagesFragment :
 		val TAG: String = PickLanguagesFragment::class.java.simpleName
 		const val TAG_COURSE_ID = "language_id"
 	}
-
-	override fun provideLayoutId() = R.layout.fragment_course_pick_languages
 
 	override fun setupViews(view: View) {
 		// enable back button and set title

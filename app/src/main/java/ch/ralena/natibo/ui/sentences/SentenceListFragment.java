@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.fragment;
+package ch.ralena.natibo.ui.sentences;
 
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -17,14 +17,13 @@ import java.io.IOException;
 
 import ch.ralena.natibo.ui.MainActivity;
 import ch.ralena.natibo.R;
-import ch.ralena.natibo.ui.adapter.SentenceListAdapter;
 import ch.ralena.natibo.data.room.object.Language;
 import ch.ralena.natibo.data.room.object.Pack;
 import ch.ralena.natibo.data.room.object.Sentence;
 import io.realm.Realm;
 
 public class SentenceListFragment extends Fragment {
-	private static final String TAG = SentenceListFragment.class.getSimpleName();
+	public static final String TAG = SentenceListFragment.class.getSimpleName();
 	public static final String TAG_LANGUAGE_ID = "language_id";
 	public static final String TAG_BASE_PACK_ID = "base_pack_id";
 	public static final String TAG_TARGET_PACK_ID = "target_pack_id";

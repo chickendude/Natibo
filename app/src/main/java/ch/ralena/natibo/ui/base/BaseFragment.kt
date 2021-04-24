@@ -6,13 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
+import androidx.viewbinding.ViewBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import javax.inject.Inject
 
-abstract class BaseFragment<LISTENER, VM: BaseViewModel<LISTENER>>: Fragment() {
+abstract class BaseFragment<VB : ViewBinding, LISTENER, VM : BaseViewModel<LISTENER>>(
+		private val inflate: (LayoutInflater, ViewGroup?, Boolean) -> VB
+) : Fragment() {
 	@Inject
 	lateinit var viewModel: VM
+
+	lateinit var binding: VB
 
 	val injector: PresentationComponent by lazy {
 		(requireActivity() as MainActivity).activityComponent.newPresentationComponent()
@@ -28,13 +33,12 @@ abstract class BaseFragment<LISTENER, VM: BaseViewModel<LISTENER>>: Fragment() {
 			container: ViewGroup?,
 			savedInstanceState: Bundle?
 	): View? {
-		val view = inflater.inflate(provideLayoutId(), container, false)
+		binding = inflate(inflater, container, false)
+		val view: View = binding.root
 		setupViews(view)
 		return view
 	}
 
-	@LayoutRes
-	abstract fun provideLayoutId(): Int
 	abstract fun setupViews(view: View)
 	abstract fun injectDependencies(injector: PresentationComponent)
 }

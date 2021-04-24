@@ -18,6 +18,7 @@ class LanguageListViewModel @Inject constructor(
 	lateinit var languages: List<Language>
 
 	fun fetchLanguages() {
+		// todo: move to a LanguageRepository
 		languages = Language.getLanguagesSorted(realm)
 		for (l in listeners)
 			l.onLanguagesLoaded(languages)

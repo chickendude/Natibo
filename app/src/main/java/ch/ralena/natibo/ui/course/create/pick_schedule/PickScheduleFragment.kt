@@ -7,6 +7,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.databinding.FragmentCoursePickScheduleBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
@@ -18,7 +19,9 @@ import kotlin.collections.ArrayList
 
 // TODO: 13/04/18 move to course detail page
 class PickScheduleFragment :
-		BaseFragment<PickScheduleViewModel.Listener, PickScheduleViewModel>(),
+		BaseFragment<FragmentCoursePickScheduleBinding,
+				PickScheduleViewModel.Listener,
+				PickScheduleViewModel>(FragmentCoursePickScheduleBinding::inflate),
 		PickScheduleViewModel.Listener,
 		ScheduleTextWatcher.Listener,
 		SentencesPerDayTextWatcher.Listener {
@@ -51,8 +54,6 @@ class PickScheduleFragment :
 		val TAG: String = PickScheduleFragment::class.java.simpleName
 		const val TAG_LANGUAGE_IDS = "tag_language_ids"
 	}
-
-	override fun provideLayoutId() = R.layout.fragment_course_pick_schedule
 
 	override fun setupViews(view: View) {
 		// Enable back button
