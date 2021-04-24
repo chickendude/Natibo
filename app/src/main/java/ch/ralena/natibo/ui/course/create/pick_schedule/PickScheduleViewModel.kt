@@ -44,7 +44,7 @@ class PickScheduleViewModel @Inject constructor(
 
 		// "base-target-target" if chorus enabled, otherwise "base-target"
 		val order = languages.mapIndexed { i, language ->
-			if (isChorus && (i > 0 || languages.size == 0))
+			if (isChorus && (i > 0 || languages.size == 1))
 				"$i$i"
 			else
 				"$i"
