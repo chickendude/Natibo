@@ -36,29 +36,27 @@ class LanguageListFragment :
 	lateinit var languages: ArrayList<Language>
 
 	override fun setupViews(view: View) {
+		viewModel.registerListener(this)
 		mainActivity.title = getString(R.string.languages)
 
 		viewModel.fetchLanguages()
 
-		view.findViewById<RecyclerView>(R.id.recyclerView).apply {
+		binding.recyclerView.apply {
 			visibility = viewModel.getRecyclerViewVisibility()
 			adapter = languageAdapter
 			layoutManager = GridLayoutManager(context, 2)
 		}
 
-		view.findViewById<TextView>(R.id.noCoursesText).apply {
-			visibility = viewModel.getNoCourseTextVisibility()
-		}
+		binding.noCoursesText.visibility = viewModel.getNoCourseTextVisibility()
 
 		// set up FAB
-		view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-			(activity as MainActivity?)!!.importLanguagePack()
+		binding.fab.setOnClickListener {
+			mainActivity.importLanguagePack()
 		}
 	}
 
 	override fun injectDependencies(injector: PresentationComponent) {
 		injector.inject(this)
-		viewModel.registerListener(this)
 	}
 
 	override fun onStart() {

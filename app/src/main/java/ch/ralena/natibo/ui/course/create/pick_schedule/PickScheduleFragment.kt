@@ -39,17 +39,6 @@ class PickScheduleFragment :
 	private lateinit var realm: Realm
 	private var languages: List<Language>? = null
 
-	// Views
-	lateinit var languageNamesLabel: EditText
-	lateinit var sentencesPerDayEdit: EditText
-	lateinit var sentencesPerDaySeek: SeekBar
-	lateinit var customScheduleEdit: EditText
-	lateinit var reviewScheduleRadioGroup: RadioGroup
-	lateinit var fourDayRadio: RadioButton
-	lateinit var fiveDayRadio: RadioButton
-	lateinit var customDayRadio: RadioButton
-	lateinit var chorusCheckBox: CheckBox
-
 	companion object {
 		val TAG: String = PickScheduleFragment::class.java.simpleName
 		const val TAG_LANGUAGE_IDS = "tag_language_ids"
@@ -71,35 +60,36 @@ class PickScheduleFragment :
 			}
 		}
 
-		// load views
-		languageNamesLabel = view.findViewById(R.id.languageNamesLabel)
-		sentencesPerDayEdit = view.findViewById(R.id.sentencesPerDayEdit)
-		sentencesPerDaySeek = view.findViewById(R.id.sentencesPerDaySeek)
-		customScheduleEdit = view.findViewById(R.id.customScheduleEdit)
-		reviewScheduleRadioGroup = view.findViewById(R.id.reviewScheduleRadioGroup)
-		fourDayRadio = view.findViewById(R.id.fourDayRadio)
-		fiveDayRadio = view.findViewById(R.id.fiveDayRadio)
-		customDayRadio = view.findViewById(R.id.customDayRadio)
-		chorusCheckBox = view.findViewById(R.id.chorusCheckBox)
+		binding.languageNamesLabel.setOnClickListener {
+			binding.languageNamesLabel.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+		}
 
-		languageNamesLabel.setOnClickListener { languageNamesLabel.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS }
+		// Custom schedule edit should start off gone
+		binding.customScheduleEdit.apply {
+			visibility = View.GONE
+			addTextChangedListener(scheduleTextWatcher)
+		}
 
-		// custom schedule edit should start off gone
-		customScheduleEdit.visibility = View.GONE
-		customScheduleEdit.addTextChangedListener(scheduleTextWatcher)
+		// Set up sentencesPerDay EditText and SeekBar
+		binding.sentencesPerDayEdit.addTextChangedListener(sentencesPerDayTextWatcher)
+		binding.sentencesPerDaySeek.apply {
+			setOnSeekBarChangeListener(seekBarChangeListener)
+			progress = 9
+		}
 
-		// set up sentencesPerDay EditText and SeekBar
-		sentencesPerDayEdit.addTextChangedListener(sentencesPerDayTextWatcher)
-		sentencesPerDaySeek.setOnSeekBarChangeListener(seekBarChangeListener)
-		sentencesPerDaySeek.progress = 9
 
 		// set up radio listeners
-		reviewScheduleRadioGroup.check(R.id.fourDayRadio)
-		reviewScheduleRadioGroup.setOnCheckedChangeListener { _: RadioGroup?, checkedId: Int ->
-			if (checkedId == R.id.customDayRadio) {
-				customScheduleEdit.visibility = View.VISIBLE
-				customScheduleEdit.requestFocus()
-			} else customScheduleEdit.visibility = View.GONE
+		binding.reviewScheduleRadioGroup.apply {
+			check(R.id.fourDayRadio)
+			setOnCheckedChangeListener { _: RadioGroup?, checkedId: Int ->
+				binding.customScheduleEdit.apply {
+					if (checkedId == R.id.customDayRadio) {
+						visibility = View.VISIBLE
+						requestFocus()
+					} else
+						visibility = View.GONE
+				}
+			}
 		}
 	}
 
@@ -126,10 +116,12 @@ class PickScheduleFragment :
 	// TODO: Move to ViewModel
 	var seekBarChangeListener: OnSeekBarChangeListener = object : OnSeekBarChangeListener {
 		override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-			sentencesPerDayEdit.removeTextChangedListener(sentencesPerDayTextWatcher)
-			sentencesPerDayEdit.setText((progress + 1).toString())
-			sentencesPerDayEdit.setSelection(sentencesPerDayEdit.text.length)
-			sentencesPerDayEdit.addTextChangedListener(sentencesPerDayTextWatcher)
+			binding.sentencesPerDayEdit.apply {
+				removeTextChangedListener(sentencesPerDayTextWatcher)
+				setText((progress + 1).toString())
+				setSelection(text.length)
+				addTextChangedListener(sentencesPerDayTextWatcher)
+			}
 		}
 
 		override fun onStartTrackingTouch(seekBar: SeekBar) {}
@@ -155,19 +147,19 @@ class PickScheduleFragment :
 	private fun createCourse() {
 		// TODO: Move to ViewModel
 		// TODO: Ensure sentences per day value isn't 0
-		val checkedRadioId = reviewScheduleRadioGroup.checkedRadioButtonId
+		val checkedRadioId = binding.reviewScheduleRadioGroup.checkedRadioButtonId
 		val checkedButton = getActivity()!!.findViewById<RadioButton>(checkedRadioId)
 		val dailyReviews = checkedButton.text.toString().split(" / ").toTypedArray()
-		val numSentencesPerDay = sentencesPerDayEdit.text.toString().toInt()
+		val numSentencesPerDay = binding.sentencesPerDayEdit.text.toString().toInt()
 
 		// "base-target-target" if chorus enabled, otherwise "base-target"
 		val order = StringBuilder()
 		for (i in languages!!.indices) {
-			if ((i > 0 || languages!!.size == 1) && chorusCheckBox.isChecked) order.append(i)
+			if ((i > 0 || languages!!.size == 1) && binding.chorusCheckBox.isChecked) order.append(i)
 			order.append(i)
 		}
 
-		viewModel.createCourse(order.toString(), numSentencesPerDay, dailyReviews, languageNamesLabel.text.toString(), languages!!)
+		viewModel.createCourse(order.toString(), numSentencesPerDay, dailyReviews, binding.languageNamesLabel.text.toString(), languages!!)
 	}
 
 	override fun onLanguagesLoaded(languages: List<Language>) {
@@ -177,22 +169,23 @@ class PickScheduleFragment :
 		for (language in languages) {
 			languageNames.add(language.longName)
 		}
-		languageNamesLabel.setText(languageNames.joinToString(" → "))
+		binding.languageNamesLabel.setText(languageNames.joinToString(" → "))
 	}
 
 	override fun onCourseCreated(course: Course) {
+		// todo: screennavigator
 		activity.loadCourseListFragment(course.id)
 	}
 
 	override fun onScheduleTextChanged(pattern: String) {
-		customDayRadio.text = viewModel.getSchedulePatternFromString(pattern)
+		binding.customDayRadio.text = viewModel.getSchedulePatternFromString(pattern)
 	}
 
 	override fun onSentencesPerDayTextChanged(pattern: String, cursorPosition: Int) {
 		sentencesPerDayTextWatcher.unregisterListener(this)
 		val sentencesPerDay = viewModel.getSentencesPerDayFromString(pattern)
-		sentencesPerDayEdit.setText(sentencesPerDay.toString())
-		sentencesPerDaySeek.progress = sentencesPerDay - 1
+		binding.sentencesPerDayEdit.setText(sentencesPerDay.toString())
+		binding.sentencesPerDaySeek.progress = sentencesPerDay - 1
 		sentencesPerDayTextWatcher.registerListener(this)
 	}
 }

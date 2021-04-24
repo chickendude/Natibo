@@ -28,8 +28,8 @@ class CourseListFragment :
 	@Inject
 	lateinit var mainActivity: MainActivity
 
-	private lateinit var recyclerView: RecyclerView
-	private lateinit var noCoursesText: TextView
+//	private lateinit var recyclerView: RecyclerView
+//	private lateinit var noCoursesText: TextView
 
 	private var courses: RealmResults<Course>? = null
 
@@ -41,8 +41,6 @@ class CourseListFragment :
 
 	override fun setupViews(view: View) {
 		// load views
-		noCoursesText = view.findViewById(R.id.noCoursesText)
-		recyclerView = view.findViewById(R.id.recyclerView)
 		mainActivity.title = getString(R.string.courses)
 		mainActivity.disableBackButton()
 		mainActivity.setMenuToCourses()
@@ -78,7 +76,7 @@ class CourseListFragment :
 
 	override fun showCourses(courses: RealmResults<Course>) {
 		this.courses = courses
-		recyclerView.apply {
+		binding.recyclerView.apply {
 			visibility = View.VISIBLE
 
 			// TODO: Switch to dependency injection and use method to update courses
@@ -90,6 +88,6 @@ class CourseListFragment :
 	}
 
 	override fun showNoCourses() {
-		noCoursesText.visibility = View.VISIBLE
+		binding.noCoursesText.visibility = View.VISIBLE
 	}
 }
