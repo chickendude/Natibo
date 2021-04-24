@@ -1,12 +1,16 @@
 package ch.ralena.natibo.ui.course.detail;
 
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.google.android.material.snackbar.Snackbar;
+
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -120,7 +124,8 @@ public class CourseDetailFragment extends Fragment {
 		ImageView deleteIcon = view.findViewById(R.id.deleteIcon);
 		View.OnClickListener deleteConfirmListener =
 				v -> {
-					realm.executeTransaction(realm -> realm.where(Course.class).equalTo("id", course.getId()).findFirst().deleteFromRealm());
+					String courseId = course.getId();
+					realm.executeTransactionAsync(r -> r.where(Course.class).equalTo("id", courseId).findFirst().deleteFromRealm());
 					activity.stopSession();
 					activity.loadCourseListFragment();
 				};
