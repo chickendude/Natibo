@@ -28,9 +28,6 @@ class CourseListFragment :
 	@Inject
 	lateinit var mainActivity: MainActivity
 
-//	private lateinit var recyclerView: RecyclerView
-//	private lateinit var noCoursesText: TextView
-
 	private var courses: RealmResults<Course>? = null
 
 	companion object {

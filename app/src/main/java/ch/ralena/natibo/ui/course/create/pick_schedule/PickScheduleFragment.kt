@@ -5,17 +5,13 @@ import android.view.*
 import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.Course
-import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.databinding.FragmentCoursePickScheduleBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.ScheduleTextWatcher
 import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.SentencesPerDayTextWatcher
-import io.realm.Realm
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 // TODO: 13/04/18 move to course detail page
 class PickScheduleFragment :
@@ -35,33 +31,24 @@ class PickScheduleFragment :
 	@Inject
 	lateinit var sentencesPerDayTextWatcher: SentencesPerDayTextWatcher
 
-
-	private lateinit var realm: Realm
-	private var languages: List<Language>? = null
-
 	companion object {
 		val TAG: String = PickScheduleFragment::class.java.simpleName
 		const val TAG_LANGUAGE_IDS = "tag_language_ids"
 	}
 
 	override fun setupViews(view: View) {
-		// Enable back button
+		viewModel.registerListener(this)
+
 		activity.enableBackButton()
 		activity.title = "Create an AI Course"
 
 		// We have a check button
 		setHasOptionsMenu(true)
-		realm = Realm.getDefaultInstance()
 
-		// Load language IDs
-		arguments?.run {
-			getStringArray(TAG_LANGUAGE_IDS)?.let {
-				viewModel.saveLanguageIds(it)
-			}
-		}
+		viewModel.fetchLanguages(arguments?.getStringArray(TAG_LANGUAGE_IDS))
 
-		binding.languageNamesLabel.setOnClickListener {
-			binding.languageNamesLabel.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+		binding.courseTitleEdit.setOnClickListener {
+			binding.courseTitleEdit.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
 		}
 
 		// Custom schedule edit should start off gone
@@ -80,10 +67,10 @@ class PickScheduleFragment :
 
 		// set up radio listeners
 		binding.reviewScheduleRadioGroup.apply {
-			check(R.id.fourDayRadio)
+			check(binding.fourDayRadio.id)
 			setOnCheckedChangeListener { _: RadioGroup?, checkedId: Int ->
 				binding.customScheduleEdit.apply {
-					if (checkedId == R.id.customDayRadio) {
+					if (checkedId == binding.customDayRadio.id) {
 						visibility = View.VISIBLE
 						requestFocus()
 					} else
@@ -100,7 +87,6 @@ class PickScheduleFragment :
 	override fun onStart() {
 		super.onStart()
 		viewModel.registerListener(this)
-		viewModel.fetchLanguages()
 		scheduleTextWatcher.registerListener(this)
 		sentencesPerDayTextWatcher.registerListener(this)
 	}
@@ -113,7 +99,6 @@ class PickScheduleFragment :
 	}
 
 	// seek bar change listener
-	// TODO: Move to ViewModel
 	var seekBarChangeListener: OnSeekBarChangeListener = object : OnSeekBarChangeListener {
 		override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
 			binding.sentencesPerDayEdit.apply {
@@ -136,45 +121,20 @@ class PickScheduleFragment :
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
 			R.id.action_confirm -> {
-				// TODO: Move to ViewModel
-				createCourse()
+				val checkedRadioId = binding.reviewScheduleRadioGroup.checkedRadioButtonId
+				val dailyReviews = binding.root.findViewById<RadioButton>(checkedRadioId).text.toString()
+				val numSentencesPerDay = binding.sentencesPerDayEdit.text.toString().toInt()
+				val isChorus = binding.chorusCheckBox.isChecked
+				val title = binding.courseTitleEdit.text.toString()
+				viewModel.createCourse(dailyReviews, numSentencesPerDay, title, isChorus)
 				return true
 			}
 		}
 		return super.onOptionsItemSelected(item)
 	}
 
-	private fun createCourse() {
-		// TODO: Move to ViewModel
-		// TODO: Ensure sentences per day value isn't 0
-		val checkedRadioId = binding.reviewScheduleRadioGroup.checkedRadioButtonId
-		val checkedButton = getActivity()!!.findViewById<RadioButton>(checkedRadioId)
-		val dailyReviews = checkedButton.text.toString().split(" / ").toTypedArray()
-		val numSentencesPerDay = binding.sentencesPerDayEdit.text.toString().toInt()
-
-		// "base-target-target" if chorus enabled, otherwise "base-target"
-		val order = StringBuilder()
-		for (i in languages!!.indices) {
-			if ((i > 0 || languages!!.size == 1) && binding.chorusCheckBox.isChecked) order.append(i)
-			order.append(i)
-		}
-
-		viewModel.createCourse(order.toString(), numSentencesPerDay, dailyReviews, binding.languageNamesLabel.text.toString(), languages!!)
-	}
-
-	override fun onLanguagesLoaded(languages: List<Language>) {
-		this.languages = languages
-		// display languages in the course
-		val languageNames = ArrayList<String>()
-		for (language in languages) {
-			languageNames.add(language.longName)
-		}
-		binding.languageNamesLabel.setText(languageNames.joinToString(" → "))
-	}
-
-	override fun onCourseCreated(course: Course) {
-		// todo: screennavigator
-		activity.loadCourseListFragment(course.id)
+	override fun setCourseTitle(title: String) {
+		binding.courseTitleEdit.setText(title)
 	}
 
 	override fun onScheduleTextChanged(pattern: String) {

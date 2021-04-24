@@ -8,7 +8,7 @@
 	android:orientation="vertical">
 
 	<EditText
-		android:id="@+id/languageNamesLabel"
+		android:id="@+id/course_title_edit"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:background="@color/colorPrimary"

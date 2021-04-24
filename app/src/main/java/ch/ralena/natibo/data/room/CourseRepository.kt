@@ -11,25 +11,26 @@ import javax.inject.Inject
 class CourseRepository @Inject constructor(private val realm: Realm) {
 	fun fetchCourses(): RealmResults<Course> = realm.where(Course::class.java).findAll()
 
-	fun createCourse(order: String, numSentencesPerDay: Int, dailyReviews: Array<String>, title: String, languages: List<Language>): Course {
+	fun createCourse(order: String, numSentencesPerDay: Int, dailyReviews: List<String>, title: String, languages: List<Language>): Course {
 		// --- begin transaction
 		realm.beginTransaction()
+
 		// create sentence schedule
-		val schedule: Schedule = realm.createObject<Schedule>(Schedule::class.java, UUID.randomUUID().toString())
-		schedule.setOrder(order.toString())
-		schedule.setNumSentences(numSentencesPerDay)
+		val schedule: Schedule = realm.createObject(Schedule::class.java, UUID.randomUUID().toString())
+		schedule.order = order
+		schedule.numSentences = numSentencesPerDay
 		for (review in dailyReviews) {
-			schedule.getReviewPattern().add(review.toInt())
+			schedule.reviewPattern.add(review.toInt())
 		}
 
 		// build course
-		val course: Course = realm.createObject<Course>(Course::class.java, UUID.randomUUID().toString())
+		val course: Course = realm.createObject(Course::class.java, UUID.randomUUID().toString())
 		course.setTitle(title)
 
 		course.languages.clear()
 		course.languages.addAll(languages)
-		course.setPauseMillis(1000)
-		course.setSchedule(schedule)
+		course.pauseMillis = 1000
+		course.schedule = schedule
 		realm.commitTransaction()
 		// --- end transaction
 		return course

@@ -2,11 +2,9 @@ package ch.ralena.natibo.ui.course.create.pick_schedule
 
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
-import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.ScreenNavigator
-import ch.ralena.natibo.utils.Utils
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -16,26 +14,45 @@ class PickScheduleViewModel @Inject constructor(
 		private val courseRepository: CourseRepository
 ) : BaseViewModel<PickScheduleViewModel.Listener>() {
 	interface Listener {
-		fun onLanguagesLoaded(languages: List<Language>)
-		fun onCourseCreated(course: Course)
+		fun setCourseTitle(title: String)
 	}
 
-	private lateinit var languageIds: Array<String>
+	private lateinit var languages: List<Language>
 
 	companion object {
 		const val MAX_REPETITIONS = 99
 	}
 
-	fun fetchLanguages() {
-		val languages = languageRepository.fetchLanguagesFromIds(languageIds)
+	fun fetchLanguages(languageIds: Array<String>?) {
+		// TODO: throw error if null or empty
+		if (languageIds.isNullOrEmpty())
+			return
+		languages = languageRepository.fetchLanguagesFromIds(languageIds)
+		val title = languages.map { it.longName }.joinToString(" → ")
 		for (l in listeners)
-			l.onLanguagesLoaded(languages)
+			l.setCourseTitle(title)
 	}
 
-	fun createCourse(order: String, numSentencesPerDay: Int, dailyReviews: Array<String>, title: String, languages: List<Language>) {
+	fun createCourse(dailyReviewsText: String, numSentencesPerDay: Int, title: String, isChorus: Boolean) {
+		if (numSentencesPerDay <= 0)
+			return
+
+		// Split up reviews and check if there are any invalid inputs
+		val dailyReviews = dailyReviewsText.split(" / ")
+		if (dailyReviews.any { it.toIntOrNull() == null })
+			return
+
+		// "base-target-target" if chorus enabled, otherwise "base-target"
+		val order = languages.mapIndexed { i, language ->
+			if (isChorus && (i > 0 || languages.size == 0))
+				"$i$i"
+			else
+				"$i"
+		}.joinToString("")
+
 		val course = courseRepository.createCourse(order, numSentencesPerDay, dailyReviews, title, languages)
-		for (l in listeners)
-			l.onCourseCreated(course)
+
+		screenNavigator.toCourseListFragment(course.id)
 	}
 
 	fun getSchedulePatternFromString(string: String): String {
@@ -66,8 +83,4 @@ class PickScheduleViewModel @Inject constructor(
 			string.toIntOrNull()?.let {
 				min(100, it)
 			} ?: 0
-
-	fun saveLanguageIds(it: Array<String>) {
-		languageIds = it
-	}
 }
