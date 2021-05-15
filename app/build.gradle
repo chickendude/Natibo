@@ -59,6 +59,7 @@ dependencies {
 	kapt "com.google.dagger:dagger-compiler:$dagger_version"
 	debugImplementation 'com.facebook.stetho:stetho:1.5.1'
 	debugImplementation 'com.uphyca:stetho_realm:2.2.2'
+	testImplementation 'io.kotest:kotest-assertions-core:4.5.0'
 	testImplementation "io.mockk:mockk:1.11.0"
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
 	androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {

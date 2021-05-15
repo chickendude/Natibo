@@ -1,5 +1,6 @@
 package ch.ralena.natibo.data.room
 
+import ch.ralena.natibo.data.MyResult
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.Schedule
@@ -11,12 +12,19 @@ import javax.inject.Inject
 class CourseRepository @Inject constructor(private val realm: Realm) {
 	fun fetchCourses(): RealmResults<Course> = realm.where(Course::class.java).findAll()
 
-	fun createCourse(order: String, numSentencesPerDay: Int, dailyReviews: List<String>, title: String, languages: List<Language>): Course {
+	fun createCourse(
+		order: String,
+		numSentencesPerDay: Int,
+		dailyReviews: List<String>,
+		title: String,
+		languages: List<Language>
+	): Course {
 		// --- begin transaction
 		realm.beginTransaction()
 
 		// create sentence schedule
-		val schedule: Schedule = realm.createObject(Schedule::class.java, UUID.randomUUID().toString())
+		val schedule: Schedule =
+			realm.createObject(Schedule::class.java, UUID.randomUUID().toString())
 		schedule.order = order
 		schedule.numSentences = numSentencesPerDay
 		for (review in dailyReviews) {
@@ -25,7 +33,7 @@ class CourseRepository @Inject constructor(private val realm: Realm) {
 
 		// build course
 		val course: Course = realm.createObject(Course::class.java, UUID.randomUUID().toString())
-		course.setTitle(title)
+		course.title = title
 
 		course.languages.clear()
 		course.languages.addAll(languages)
@@ -34,5 +42,11 @@ class CourseRepository @Inject constructor(private val realm: Realm) {
 		realm.commitTransaction()
 		// --- end transaction
 		return course
+	}
+
+	fun fetchCourse(courseId: String, callback: (result: MyResult) -> Unit) {
+		val course = realm.where(Course::class.java).equalTo("id", courseId).findFirst()
+		val result = if (course == null) MyResult.Failure else MyResult.Success(course)
+		callback(result)
 	}
 }
