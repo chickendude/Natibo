@@ -11,6 +11,19 @@ import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import javax.inject.Inject
 
+/**
+ * The base class all fragments extend.
+ *
+ * This provides some convenience methods to inject your ViewModel, simplify view binding and
+ * dependency injection, and handles [onCreate] and [onCreateView] for you.
+ *
+ * You should override [setupViews] and [injectDependencies] in your Fragment. [setupViews] is where
+ * you can do any work with your layout's views. In [injectDependencies] you should simply run the
+ * `injector`'s `inject` function.
+ *
+ * @param inflate this should be your viewbinding's inflate method, e.g.
+ * `MyFragmentBinding::inflate`
+ */
 abstract class BaseFragment<VB : ViewBinding, LISTENER, VM : BaseViewModel<LISTENER>>(
 		private val inflate: (LayoutInflater, ViewGroup?, Boolean) -> VB
 ) : Fragment() {
