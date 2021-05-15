@@ -21,7 +21,7 @@ internal class CourseRepositoryTest {
 	// region Helper fields-------------------------------------------------------------------------
 	private lateinit var sut: CourseRepository
 	private val listener = mockk<(Result<Course>) -> Unit>(relaxed = true)
-	private val realm = mockk<Realm>()
+	private val realm = mockk<Realm>(relaxed = true)
 	// endregion Helper fields----------------------------------------------------------------------
 
 	@BeforeEach
@@ -51,6 +51,17 @@ internal class CourseRepositoryTest {
 
 		// Then
 		verify { listener(Result.Failure(R.string.course_not_found)) }
+	}
+
+	@Test
+	fun `fetchCourses queries realm synchronously`() {
+		// Given
+
+		// When
+		sut.fetchCourses()
+
+		// Then
+		verify { realm.where(Course::class.java).findAll() }
 	}
 
 	// region Helper methods------------------------------------------------------------------------

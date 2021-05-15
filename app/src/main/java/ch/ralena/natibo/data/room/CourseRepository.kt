@@ -10,7 +10,15 @@ import io.realm.RealmResults
 import java.util.*
 import javax.inject.Inject
 
+/**
+ * Repository for obtaining [Course] data.
+ */
 class CourseRepository @Inject constructor(private val realm: Realm) {
+	/**
+	 * Fetches all courses in the database.
+	 *
+	 * @return `RealmResults` containing all courses in the database.
+	 */
 	fun fetchCourses(): RealmResults<Course> = realm.where(Course::class.java).findAll()
 
 	fun createCourse(
