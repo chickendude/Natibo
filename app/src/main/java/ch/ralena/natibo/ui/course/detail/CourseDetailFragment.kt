@@ -15,21 +15,51 @@ import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.Pack
+import ch.ralena.natibo.databinding.FragmentCourseDetailBinding
+import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.adapter.CourseDetailAdapter
+import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.fragment.CourseSettingsFragment
 import ch.ralena.natibo.ui.study_session.StudySessionFragment
 import com.google.android.material.snackbar.Snackbar
 import io.realm.Realm
 import io.realm.RealmList
 import java.util.*
+import javax.inject.Inject
 
 // TODO: 13/04/18 if no sentence sets have been chosen, prompt to select sentence packs.
-class CourseDetailFragment : Fragment() {
+class CourseDetailFragment : BaseFragment<
+		FragmentCourseDetailBinding,
+		CourseDetailViewModel.Listener,
+		CourseDetailViewModel>(FragmentCourseDetailBinding::inflate) {
+
+	@Inject
+	lateinit var activity: MainActivity
+
+	@Inject
+	lateinit var courseDetailAdapter: CourseDetailAdapter
 
 	private lateinit var course: Course
 	private lateinit var realm: Realm
 	private lateinit var adapter: CourseDetailAdapter
+
+
+	override fun setupViews(view: View) {
+		activity.title = "Course Title"
+		activity.enableBackButton()
+
+		binding.booksRecyclerView.apply {
+			adapter = courseDetailAdapter
+			layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+		}
+
+		// todo: subscribe to courseDetailAdapter
+	}
+
+	override fun injectDependencies(injector: PresentationComponent) {
+		TODO("Not yet implemented")
+	}
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -43,22 +73,13 @@ class CourseDetailFragment : Fragment() {
 		realm = Realm.getDefaultInstance()
 		course = realm.where(Course::class.java).equalTo("id", id).findFirst()!!
 		val targetLanguage: Language = course.getLanguages().first()!!
-		val activity = activity as MainActivity
+//		val activity = activity as MainActivity
 		activity.setTitle(course.getTitle())
-		activity.enableBackButton()
-		activity.setMenuToCourses()
+//		activity.enableBackButton()
+//		activity.setMenuToCourses()
 		loadCourseInfo(view, targetLanguage)
 		val matchingPacks: RealmList<Pack> =
 			targetLanguage.getMatchingPacks(course.getLanguages().last())
-
-		// set up recyclerlist and adapter
-		val recyclerView: RecyclerView = view.findViewById(R.id.booksRecyclerView)
-		adapter = CourseDetailAdapter(course.getPacks(), matchingPacks)
-		recyclerView.setAdapter(adapter)
-		val layoutManager: RecyclerView.LayoutManager =
-			LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-		recyclerView.setLayoutManager(layoutManager)
-		adapter.asObservable().subscribe { pack: Pack -> addRemovePack(pack) }
 
 		// set up icons and button
 		prepareDeleteCourseIcon(view, activity)
