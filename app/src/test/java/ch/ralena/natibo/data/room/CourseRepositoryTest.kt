@@ -1,14 +1,12 @@
 package ch.ralena.natibo.data.room
 
-import ch.ralena.natibo.data.MyResult
+import ch.ralena.natibo.R
+import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.`object`.Course
-import ch.ralena.natibo.ui.course.detail.CourseDetailViewModel
-import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.realm.Realm
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -22,7 +20,7 @@ internal class CourseRepositoryTest {
 
 	// region Helper fields-------------------------------------------------------------------------
 	private lateinit var sut: CourseRepository
-	private val listener = mockk<(MyResult) -> Unit>(relaxed = true)
+	private val listener = mockk<(Result<Course>) -> Unit>(relaxed = true)
 	private val realm = mockk<Realm>()
 	// endregion Helper fields----------------------------------------------------------------------
 
@@ -40,7 +38,7 @@ internal class CourseRepositoryTest {
 		sut.fetchCourse(COURSE_ID, listener)
 
 		// Then
-		verify { listener(MyResult.Success(COURSE)) }
+		verify { listener(Result.Success(COURSE)) }
 	}
 
 	@Test
@@ -52,7 +50,7 @@ internal class CourseRepositoryTest {
 		sut.fetchCourse(COURSE_ID, listener)
 
 		// Then
-		verify { listener(MyResult.Failure) }
+		verify { listener(Result.Failure(R.string.course_not_found)) }
 	}
 
 	// region Helper methods------------------------------------------------------------------------

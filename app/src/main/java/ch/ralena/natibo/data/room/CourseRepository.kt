@@ -1,6 +1,7 @@
 package ch.ralena.natibo.data.room
 
-import ch.ralena.natibo.data.MyResult
+import ch.ralena.natibo.R
+import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.Schedule
@@ -44,9 +45,20 @@ class CourseRepository @Inject constructor(private val realm: Realm) {
 		return course
 	}
 
-	fun fetchCourse(courseId: String, callback: (result: MyResult) -> Unit) {
+	/**
+	 * Fetches a single course.
+	 *
+	 * This fetches a single course and notifies [callback] whether it was successful or not.
+	 *
+	 * @param courseId The ID of the course to look for.
+	 * @param callback If found, the course will be passed to this wrapped in [Result.Success],
+	 * otherwise [Result.Failure] will be passed in.
+	 */
+	fun fetchCourse(courseId: String, callback: (result: Result<Course>) -> Unit) {
 		val course = realm.where(Course::class.java).equalTo("id", courseId).findFirst()
-		val result = if (course == null) MyResult.Failure else MyResult.Success(course)
-		callback(result)
+		if (course == null)
+			callback(Result.Failure(R.string.course_not_found))
+		else
+			callback(Result.Success(course))
 	}
 }
