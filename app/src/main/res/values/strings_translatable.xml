@@ -63,4 +63,13 @@
 	<string name="schedule_four_day_description">This is the standard schedule for studying 1–15 sentenceGroups per day. The first day you will see each new sentence 6 times, the next day 4, then 3, and the last day you will see each sentence twice. In total, you will practice each sentence 15 times.</string>
 	<string name="schedule_description">How many days will you study each sentence and how many times each day will you study them?</string>
 	<string name="review_schedule">Review Schedule</string>
+	<string name="chorus">Chorus</string>
+	<string name="sentences_per_day_icon">Sentences per day icon</string>
+	<string name="course_title">Course title</string>
+	<string name="review_schedule_icon">Review schedule icon</string>
+	<string name="chorus_icon">Chorus icon</string>
+	<string name="chorus_all">All</string>
+	<string name="chorus_new_sentences">New Sentences</string>
+	<string name="strings_none">None</string>
+	<string name="chorus_description">If enabled, you will hear the target language twice instead of once. \"All\" sets it for all sentences, \"New sentences\" only sets it the first session a sentence is shown. This can be changed later, however sentenceGroups that have already been studied one way will remain like that for all reviews.</string>
 </resources>

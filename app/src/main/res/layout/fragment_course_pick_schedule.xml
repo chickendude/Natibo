@@ -12,6 +12,8 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:background="@color/colorPrimary"
+		android:hint="@string/course_title"
+		android:importantForAutofill="no"
 		android:inputType="none"
 		android:padding="8dp"
 		android:singleLine="true"
@@ -44,6 +46,7 @@
 						android:id="@+id/sentences_per_day_icon"
 						android:layout_width="60dp"
 						android:layout_height="50dp"
+						android:contentDescription="@string/sentences_per_day_icon"
 						android:src="@drawable/ic_pound"
 						app:layout_constraintBottom_toBottomOf="parent"
 						app:layout_constraintStart_toStartOf="parent"
@@ -120,6 +123,7 @@
 						android:layout_width="0dp"
 						android:layout_height="wrap_content"
 						android:hint="@string/starting_sentence"
+						android:importantForAutofill="no"
 						android:inputType="number"
 						app:layout_constraintEnd_toEndOf="parent"
 						app:layout_constraintStart_toEndOf="@id/sentences_per_day_icon"
@@ -136,90 +140,86 @@
 				<LinearLayout
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:orientation="vertical">
+					android:gravity="center"
+					android:orientation="horizontal">
+
+					<ImageView
+						android:layout_width="60dp"
+						android:layout_height="match_parent"
+						android:contentDescription="@string/review_schedule_icon"
+						android:src="@drawable/ic_schedule"
+						app:tint="@color/colorPrimaryDark" />
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:gravity="center"
-						android:orientation="horizontal">
+						android:layout_margin="8dp"
+						android:orientation="vertical">
 
-						<ImageView
-							android:layout_width="60dp"
-							android:layout_height="match_parent"
-							android:src="@drawable/ic_schedule"
-							app:tint="@color/colorPrimaryDark" />
-
-						<LinearLayout
+						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_margin="8dp"
-							android:orientation="vertical">
+							android:text="@string/review_schedule"
+							android:textAlignment="center"
+							android:textSize="20sp"
+							android:textStyle="bold" />
+
+						<TextView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:text="@string/schedule_description"
+							android:textSize="14sp" />
+
+						<RadioGroup
+							android:id="@+id/reviewScheduleRadioGroup"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content">
+
+							<RadioButton
+								android:id="@+id/fourDayRadio"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:text="@string/schedule_four_day_radio" />
 
 							<TextView
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:text="@string/review_schedule"
-								android:textAlignment="center"
-								android:textSize="20sp"
-								android:textStyle="bold" />
+								android:text="@string/schedule_four_day_description"
+								android:textSize="12sp" />
+
+							<RadioButton
+								android:id="@+id/fiveDayRadio"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:text="@string/schedule_five_day_radio" />
 
 							<TextView
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:text="@string/schedule_description"
-								android:textSize="14sp" />
+								android:text="@string/schedule_five_day_description"
+								android:textSize="12sp" />
 
-							<RadioGroup
-								android:id="@+id/reviewScheduleRadioGroup"
+							<RadioButton
+								android:id="@+id/customDayRadio"
 								android:layout_width="match_parent"
-								android:layout_height="wrap_content">
+								android:layout_height="wrap_content"
+								android:text="@string/custom_day" />
 
-								<RadioButton
-									android:id="@+id/fourDayRadio"
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									android:text="@string/schedule_four_day_radio" />
+							<TextView
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:text="@string/custom_schedule_description"
+								android:textSize="12sp" />
 
-								<TextView
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									android:text="@string/schedule_four_day_description"
-									android:textSize="12sp" />
-
-								<RadioButton
-									android:id="@+id/fiveDayRadio"
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									android:text="@string/schedule_five_day_radio" />
-
-								<TextView
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									android:text="@string/schedule_five_day_description"
-									android:textSize="12sp" />
-
-								<RadioButton
-									android:id="@+id/customDayRadio"
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									android:text="@string/custom_day" />
-
-								<TextView
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									android:text="@string/custom_schedule_description"
-									android:textSize="12sp" />
-
-								<EditText
-									android:id="@+id/customScheduleEdit"
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:digits="0123456789,/. "
-									android:hint="@string/custom_schedule_hint"
-									android:inputType="numberDecimal" />
-							</RadioGroup>
-						</LinearLayout>
+							<EditText
+								android:id="@+id/customScheduleEdit"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:digits="0123456789,/. "
+								android:hint="@string/custom_schedule_hint"
+								android:importantForAutofill="no"
+								android:inputType="numberDecimal" />
+						</RadioGroup>
 					</LinearLayout>
 				</LinearLayout>
 			</androidx.cardview.widget.CardView>
@@ -229,52 +229,74 @@
 				android:layout_height="wrap_content"
 				android:layout_margin="4dp">
 
-				<LinearLayout
+				<androidx.constraintlayout.widget.ConstraintLayout
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:orientation="vertical">
 
-					<LinearLayout
-						android:layout_width="match_parent"
+					<ImageView
+						android:id="@+id/chorus_icon"
+						android:layout_width="60dp"
+						android:layout_height="50dp"
+						android:contentDescription="@string/chorus_icon"
+						android:src="@drawable/ic_chorus"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toTopOf="parent"
+						app:tint="@color/colorPrimaryDark" />
+
+					<TextView
+						android:id="@+id/chorus_label"
+						android:layout_width="0dp"
 						android:layout_height="wrap_content"
-						android:gravity="center"
-						android:orientation="horizontal">
+						android:layout_marginStart="@dimen/spacing_small"
+						android:text="@string/chorus"
+						android:textAlignment="center"
+						android:textSize="20sp"
+						android:textStyle="bold"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toEndOf="@id/chorus_icon"
+						app:layout_constraintTop_toTopOf="parent" />
 
-						<ImageView
-							android:layout_width="60dp"
-							android:layout_height="match_parent"
-							android:src="@drawable/ic_chorus"
-							app:tint="@color/colorPrimaryDark" />
+					<RadioGroup
+						android:id="@+id/chorus_radiogroup"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:checkedButton="@id/chorus_none_radio"
+						android:orientation="horizontal"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toStartOf="@id/chorus_label"
+						app:layout_constraintTop_toBottomOf="@id/chorus_label">
 
-						<LinearLayout
-							android:layout_width="match_parent"
+						<RadioButton
+							android:id="@+id/chorus_all_radio"
+							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
-							android:layout_margin="8dp"
-							android:orientation="vertical">
+							android:text="@string/chorus_all" />
 
-							<TextView
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:text="Chorus"
-								android:textAlignment="center"
-								android:textSize="20sp"
-								android:textStyle="bold" />
+						<RadioButton
+							android:id="@+id/chorus_new_radio"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_marginHorizontal="@dimen/spacing_medium"
+							android:text="@string/chorus_new_sentences" />
 
-							<CheckBox
-								android:id="@+id/chorusCheckBox"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:text="Enable Chorus?"
-								android:textSize="14sp" />
+						<RadioButton
+							android:id="@+id/chorus_none_radio"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:text="@string/strings_none" />
+					</RadioGroup>
 
-							<TextView
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:text="If enabled, you will hear the target language twice instead of once. This can be changed later, however sentenceGroups that have already been studied one way will remain like that for all reviews."
-								android:textSize="12sp" />
-						</LinearLayout>
-					</LinearLayout>
-				</LinearLayout>
+					<TextView
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:text="@string/chorus_description"
+						android:textSize="12sp"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toStartOf="@id/chorus_label"
+						app:layout_constraintTop_toBottomOf="@id/chorus_radiogroup" />
+				</androidx.constraintlayout.widget.ConstraintLayout>
 			</androidx.cardview.widget.CardView>
 
 		</LinearLayout>

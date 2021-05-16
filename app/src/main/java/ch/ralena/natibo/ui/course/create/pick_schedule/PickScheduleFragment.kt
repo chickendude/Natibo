@@ -124,7 +124,7 @@ class PickScheduleFragment :
 				val checkedRadioId = binding.reviewScheduleRadioGroup.checkedRadioButtonId
 				val dailyReviews = binding.root.findViewById<RadioButton>(checkedRadioId).text.toString()
 				val numSentencesPerDay = binding.sentencesPerDayEdit.text.toString().toInt()
-				val isChorus = binding.chorusCheckBox.isChecked
+				val isChorus = binding.chorusRadiogroup.checkedRadioButtonId == 0
 				val title = binding.courseTitleEdit.text.toString()
 				viewModel.createCourse(dailyReviews, numSentencesPerDay, title, isChorus)
 				return true
