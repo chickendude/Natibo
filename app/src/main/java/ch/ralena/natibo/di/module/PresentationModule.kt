@@ -2,10 +2,12 @@ package ch.ralena.natibo.di.module
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.data.room.`object`.Pack
 import ch.ralena.natibo.di.PresentationScope
 import ch.ralena.natibo.ui.callback.ItemTouchHelperCallback
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailableLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.SelectedLanguagesAdapter
+import ch.ralena.natibo.ui.course.detail.adapter.BookAdapter
 import ch.ralena.natibo.ui.language.detail.adapter.LanguageDetailAdapter
 import ch.ralena.natibo.ui.language.list.adapter.LanguageListAdapter
 import dagger.Module
@@ -26,9 +28,9 @@ class PresentationModule {
 	@Provides
 	fun languageDetailAdapter() = LanguageDetailAdapter(arrayListOf())
 
-//	@PresentationScope
-//	@Provides
-//	fun languageListAdapter() = LanguageListAdapter(arrayListOf())
+	@PresentationScope
+	@Provides
+	fun bookAdapter() = BookAdapter(arrayListOf(), arrayListOf())
 
 	@PresentationScope
 	@Provides

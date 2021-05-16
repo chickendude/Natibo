@@ -16,8 +16,8 @@ import ch.ralena.natibo.data.room.`object`.Pack
 import ch.ralena.natibo.databinding.FragmentCourseDetailBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
-import ch.ralena.natibo.ui.adapter.CourseDetailAdapter
 import ch.ralena.natibo.ui.base.BaseFragment
+import ch.ralena.natibo.ui.course.detail.adapter.BookAdapter
 import ch.ralena.natibo.ui.settings_course.CourseSettingsFragment
 import ch.ralena.natibo.ui.study_session.StudySessionFragment
 import com.google.android.material.snackbar.Snackbar
@@ -27,32 +27,35 @@ import java.util.*
 import javax.inject.Inject
 
 // TODO: 13/04/18 if no sentence sets have been chosen, prompt to select sentence packs.
-class CourseDetailFragment : BaseFragment<
+class CourseDetailFragment
+	: BaseFragment<
 		FragmentCourseDetailBinding,
 		CourseDetailViewModel.Listener,
-		CourseDetailViewModel>(FragmentCourseDetailBinding::inflate) {
+		CourseDetailViewModel>(FragmentCourseDetailBinding::inflate),
+	BookAdapter.Listener {
 
 	@Inject
 	lateinit var activity: MainActivity
 
 	@Inject
-	lateinit var courseDetailAdapter: CourseDetailAdapter
+	lateinit var bookAdapter: BookAdapter
 
 	private lateinit var course: Course
 	private lateinit var realm: Realm
-	private lateinit var adapter: CourseDetailAdapter
-
 
 	override fun setupViews(view: View) {
 		activity.title = "Course Title"
 		activity.enableBackButton()
 
+		bookAdapter.registerListener(this)
+
 		binding.booksRecyclerView.apply {
-			adapter = courseDetailAdapter
+			adapter = bookAdapter
 			layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 		}
 
-		// todo: subscribe to courseDetailAdapter
+		val id = arguments!!.getString(TAG_COURSE_ID)!!
+		viewModel.fetchCourse(id)
 	}
 
 	override fun injectDependencies(injector: PresentationComponent) {
@@ -71,10 +74,7 @@ class CourseDetailFragment : BaseFragment<
 		realm = Realm.getDefaultInstance()
 		course = realm.where(Course::class.java).equalTo("id", id).findFirst()!!
 		val targetLanguage: Language = course.getLanguages().first()!!
-//		val activity = activity as MainActivity
-		activity.setTitle(course.getTitle())
-//		activity.enableBackButton()
-//		activity.setMenuToCourses()
+		activity.title = course.title
 		loadCourseInfo(view, targetLanguage)
 		val matchingPacks: RealmList<Pack> =
 			targetLanguage.getMatchingPacks(course.getLanguages().last())
@@ -165,16 +165,20 @@ class CourseDetailFragment : BaseFragment<
 	}
 
 	private fun addRemovePack(pack: Pack) {
-		if (course.getPacks().contains(pack)) {
-			realm.executeTransaction { r: Realm? -> course.getPacks().remove(pack) }
+		if (course.packs.contains(pack)) {
+			realm.executeTransaction { r: Realm? -> course.packs.remove(pack) }
 		} else {
-			realm.executeTransaction { r: Realm? -> course.getPacks().add(pack) }
+			realm.executeTransaction { r: Realm? -> course.packs.add(pack) }
 		}
-		adapter.notifyDataSetChanged()
+		this.bookAdapter.notifyDataSetChanged()
 	}
 
 	companion object {
 		val TAG = CourseDetailFragment::class.java.simpleName
 		const val TAG_COURSE_ID = "language_id"
+	}
+
+	override fun onBookClicked(pack: Pack) {
+		addRemovePack(pack)
 	}
 }

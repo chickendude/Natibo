@@ -12,7 +12,7 @@ import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class AvailableLanguagesAdapter @Inject constructor(
+class AvailableLanguagesAdapter(
 		private val languages: ArrayList<Language>,
 		private val selectedLanguages: ArrayList<Language>
 ) : BaseRecyclerAdapter<AvailableLanguagesAdapter.ViewHolder, AvailableLanguagesAdapter.Listener>() {
@@ -37,7 +37,7 @@ class AvailableLanguagesAdapter @Inject constructor(
 		notifyDataSetChanged()
 	}
 
-	inner class ViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+	inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 		private val languageName: TextView = view.findViewById(R.id.languageLabel)
 		private val flagImage: ImageView = view.findViewById(R.id.flagImageView)
 		private val checkedImage: ImageView = view.findViewById(R.id.checkedImage)
