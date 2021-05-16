@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.fragment;
+package ch.ralena.natibo.ui.settings_course;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;

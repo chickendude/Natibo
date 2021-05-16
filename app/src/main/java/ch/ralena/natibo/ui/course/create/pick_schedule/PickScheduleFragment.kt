@@ -59,7 +59,7 @@ class PickScheduleFragment :
 
 		// Set up sentencesPerDay EditText and SeekBar
 		binding.sentencesPerDayEdit.addTextChangedListener(sentencesPerDayTextWatcher)
-		binding.sentencesPerDaySeek.apply {
+		binding.sentencesPerDaySeekbar.apply {
 			setOnSeekBarChangeListener(seekBarChangeListener)
 			progress = 9
 		}
@@ -145,7 +145,7 @@ class PickScheduleFragment :
 		sentencesPerDayTextWatcher.unregisterListener(this)
 		val sentencesPerDay = viewModel.getSentencesPerDayFromString(pattern)
 		binding.sentencesPerDayEdit.setText(sentencesPerDay.toString())
-		binding.sentencesPerDaySeek.progress = sentencesPerDay - 1
+		binding.sentencesPerDaySeekbar.progress = sentencesPerDay - 1
 		sentencesPerDayTextWatcher.registerListener(this)
 	}
 }

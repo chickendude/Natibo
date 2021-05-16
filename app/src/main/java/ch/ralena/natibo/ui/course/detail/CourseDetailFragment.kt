@@ -8,9 +8,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
@@ -20,7 +18,7 @@ import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.adapter.CourseDetailAdapter
 import ch.ralena.natibo.ui.base.BaseFragment
-import ch.ralena.natibo.ui.fragment.CourseSettingsFragment
+import ch.ralena.natibo.ui.settings_course.CourseSettingsFragment
 import ch.ralena.natibo.ui.study_session.StudySessionFragment
 import com.google.android.material.snackbar.Snackbar
 import io.realm.Realm
@@ -150,7 +148,8 @@ class CourseDetailFragment : BaseFragment<
 	private fun prepareSettingsIcon(view: View, activity: MainActivity?) {
 		val settingsIcon = view.findViewById<ImageView>(R.id.settingsIcon)
 		settingsIcon.setOnClickListener { v: View? ->
-			val fragment = CourseSettingsFragment()
+			val fragment =
+				CourseSettingsFragment()
 
 			// load fragment ID into fragment arguments
 			val bundle = Bundle()

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
@@ -19,7 +19,7 @@
 		android:textColor="@color/colorTextWhite"
 		android:textSize="20sp"
 		android:textStyle="bold"
-		tools:text="English → Spanish (Mexico) → German → Russian"/>
+		tools:text="English → Spanish (Mexico) → German → Russian" />
 
 	<ScrollView
 		android:layout_width="match_parent"
@@ -36,66 +36,96 @@
 				android:layout_height="wrap_content"
 				android:layout_margin="4dp">
 
-				<LinearLayout
+				<androidx.constraintlayout.widget.ConstraintLayout
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="vertical">
+					android:layout_height="wrap_content">
 
-					<LinearLayout
-						android:layout_width="match_parent"
+					<ImageView
+						android:id="@+id/sentences_per_day_icon"
+						android:layout_width="60dp"
+						android:layout_height="50dp"
+						android:src="@drawable/ic_pound"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toTopOf="parent"
+						app:tint="@color/colorPrimaryDark" />
+
+					<TextView
+						android:id="@+id/sentences_per_day_label"
+						android:layout_width="0dp"
 						android:layout_height="wrap_content"
-						android:gravity="center"
-						android:orientation="horizontal">
+						android:text="@string/sentences_per_day"
+						android:textAlignment="center"
+						android:textSize="20sp"
+						android:textStyle="bold"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toEndOf="@id/sentences_per_day_icon"
+						app:layout_constraintTop_toTopOf="parent" />
 
-						<ImageView
-							android:layout_width="60dp"
-							android:layout_height="match_parent"
-							android:src="@drawable/ic_pound"
-							android:tint="@color/colorPrimaryDark"/>
+					<TextView
+						android:id="@+id/sentences_per_day_description"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:text="@string/sentences_per_day_explanation"
+						android:textSize="14sp"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toEndOf="@id/sentences_per_day_icon"
+						app:layout_constraintTop_toBottomOf="@id/sentences_per_day_label" />
 
-						<LinearLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_margin="8dp"
-							android:orientation="vertical">
+					<SeekBar
+						android:id="@+id/sentences_per_day_seekbar"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center"
+						android:layout_weight="1"
+						android:max="99"
+						android:padding="3dp"
+						app:layout_constraintEnd_toStartOf="@id/sentences_per_day_edit"
+						app:layout_constraintStart_toEndOf="@id/sentences_per_day_icon"
+						app:layout_constraintTop_toBottomOf="@id/sentences_per_day_description" />
 
-							<TextView
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:text="Sentences per Day"
-								android:textAlignment="center"
-								android:textSize="20sp"
-								android:textStyle="bold"/>
+					<EditText
+						android:id="@+id/sentences_per_day_edit"
+						android:layout_width="50dp"
+						android:layout_height="wrap_content"
+						android:hint="@string/sentences_per_day"
+						android:importantForAutofill="no"
+						android:inputType="number"
+						app:layout_constraintBottom_toBottomOf="@id/sentences_per_day_seekbar"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintTop_toBottomOf="@id/sentences_per_day_description" />
 
-							<TextView
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:text="@string/sentences_per_day_explanation"
-								android:textSize="14sp"/>
+					<TextView
+						android:id="@+id/starting_sentence_label"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:text="@string/starting_sentence"
+						android:textAlignment="center"
+						android:textSize="20sp"
+						android:textStyle="bold"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toEndOf="@id/sentences_per_day_icon"
+						app:layout_constraintTop_toBottomOf="@id/sentences_per_day_seekbar" />
 
-							<LinearLayout
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:orientation="horizontal">
+					<TextView
+						android:id="@+id/starting_sentence_description"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:text="@string/starting_sentence_description"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toEndOf="@id/sentences_per_day_icon"
+						app:layout_constraintTop_toBottomOf="@id/starting_sentence_label" />
 
-								<SeekBar
-									android:id="@+id/sentencesPerDaySeek"
-									android:layout_width="0dp"
-									android:layout_height="wrap_content"
-									android:layout_gravity="center"
-									android:layout_weight="1"
-									android:max="99"
-									android:padding="3dp"/>
+					<EditText
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:hint="@string/starting_sentence"
+						android:inputType="number"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toEndOf="@id/sentences_per_day_icon"
+						app:layout_constraintTop_toBottomOf="@id/starting_sentence_description" />
 
-								<EditText
-									android:id="@+id/sentencesPerDayEdit"
-									android:layout_width="50dp"
-									android:layout_height="wrap_content"
-									android:inputType="number"/>
-							</LinearLayout>
-						</LinearLayout>
-					</LinearLayout>
-				</LinearLayout>
+				</androidx.constraintlayout.widget.ConstraintLayout>
 			</androidx.cardview.widget.CardView>
 
 			<androidx.cardview.widget.CardView
@@ -118,7 +148,7 @@
 							android:layout_width="60dp"
 							android:layout_height="match_parent"
 							android:src="@drawable/ic_schedule"
-							android:tint="@color/colorPrimaryDark"/>
+							app:tint="@color/colorPrimaryDark" />
 
 						<LinearLayout
 							android:layout_width="match_parent"
@@ -129,16 +159,16 @@
 							<TextView
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:text="Review Schedule"
+								android:text="@string/review_schedule"
 								android:textAlignment="center"
 								android:textSize="20sp"
-								android:textStyle="bold"/>
+								android:textStyle="bold" />
 
 							<TextView
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								android:text="How many days will you study each sentence and how many times each day will you study them?"
-								android:textSize="14sp"/>
+								android:text="@string/schedule_description"
+								android:textSize="14sp" />
 
 							<RadioGroup
 								android:id="@+id/reviewScheduleRadioGroup"
@@ -149,45 +179,45 @@
 									android:id="@+id/fourDayRadio"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:text="6 / 4 / 3 / 2"/>
+									android:text="@string/schedule_four_day_radio" />
 
 								<TextView
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:text="This is the standard schedule for studying 1-15 sentenceGroups per day. The first day you will see each new sentence 6 times, the next day 4, then 3, and the last day you will see each sentence twice. In total, you will practice each sentence 15 times."
-									android:textSize="12sp"/>
+									android:text="@string/schedule_four_day_description"
+									android:textSize="12sp" />
 
 								<RadioButton
 									android:id="@+id/fiveDayRadio"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:text="7 / 5 / 4 / 3 / 2"/>
+									android:text="@string/schedule_five_day_radio" />
 
 								<TextView
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:text="This is the standard schedule for studying 16+ sentenceGroups per day. Similar to above but starts at 7 reps per sentence on the first day. You will see each sentence 21 times."
-									android:textSize="12sp"/>
+									android:text="@string/schedule_five_day_description"
+									android:textSize="12sp" />
 
 								<RadioButton
 									android:id="@+id/customDayRadio"
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:text="? / ? / ?"/>
+									android:text="@string/custom_day" />
 
 								<TextView
 									android:layout_width="match_parent"
 									android:layout_height="wrap_content"
-									android:text="Create a custom pattern. Separate each day's reps by a space ( ), comma (,), or slash (/), e.g. '5 4 3 2 1', '5,4,3,2,1', or '5/4/3/2/1'."
-									android:textSize="12sp"/>
+									android:text="@string/custom_schedule_description"
+									android:textSize="12sp" />
 
 								<EditText
 									android:id="@+id/customScheduleEdit"
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
 									android:digits="0123456789,/. "
-									android:hint="5 4 3 2 1"
-									android:inputType="numberDecimal"/>
+									android:hint="@string/custom_schedule_hint"
+									android:inputType="numberDecimal" />
 							</RadioGroup>
 						</LinearLayout>
 					</LinearLayout>
@@ -214,7 +244,7 @@
 							android:layout_width="60dp"
 							android:layout_height="match_parent"
 							android:src="@drawable/ic_chorus"
-							android:tint="@color/colorPrimaryDark"/>
+							app:tint="@color/colorPrimaryDark" />
 
 						<LinearLayout
 							android:layout_width="match_parent"
@@ -228,20 +258,20 @@
 								android:text="Chorus"
 								android:textAlignment="center"
 								android:textSize="20sp"
-								android:textStyle="bold"/>
+								android:textStyle="bold" />
 
 							<CheckBox
 								android:id="@+id/chorusCheckBox"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:text="Enable Chorus?"
-								android:textSize="14sp"/>
+								android:textSize="14sp" />
 
 							<TextView
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:text="If enabled, you will hear the target language twice instead of once. This can be changed later, however sentenceGroups that have already been studied one way will remain like that for all reviews."
-								android:textSize="12sp"/>
+								android:textSize="12sp" />
 						</LinearLayout>
 					</LinearLayout>
 				</LinearLayout>
