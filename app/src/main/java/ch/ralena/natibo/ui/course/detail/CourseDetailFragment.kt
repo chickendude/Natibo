@@ -56,7 +56,7 @@ class CourseDetailFragment : BaseFragment<
 	}
 
 	override fun injectDependencies(injector: PresentationComponent) {
-		TODO("Not yet implemented")
+		injector.inject(this)
 	}
 
 	override fun onCreateView(

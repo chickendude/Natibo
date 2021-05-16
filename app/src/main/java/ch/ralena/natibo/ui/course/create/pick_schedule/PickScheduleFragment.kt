@@ -15,12 +15,12 @@ import javax.inject.Inject
 
 // TODO: 13/04/18 move to course detail page
 class PickScheduleFragment :
-		BaseFragment<FragmentCoursePickScheduleBinding,
-				PickScheduleViewModel.Listener,
-				PickScheduleViewModel>(FragmentCoursePickScheduleBinding::inflate),
-		PickScheduleViewModel.Listener,
-		ScheduleTextWatcher.Listener,
-		SentencesPerDayTextWatcher.Listener {
+	BaseFragment<FragmentCoursePickScheduleBinding,
+			PickScheduleViewModel.Listener,
+			PickScheduleViewModel>(FragmentCoursePickScheduleBinding::inflate),
+	PickScheduleViewModel.Listener,
+	ScheduleTextWatcher.Listener,
+	SentencesPerDayTextWatcher.Listener {
 
 	@Inject
 	lateinit var activity: MainActivity
@@ -63,7 +63,6 @@ class PickScheduleFragment :
 			setOnSeekBarChangeListener(seekBarChangeListener)
 			progress = 9
 		}
-
 
 		// set up radio listeners
 		binding.reviewScheduleRadioGroup.apply {
@@ -122,11 +121,20 @@ class PickScheduleFragment :
 		when (item.itemId) {
 			R.id.action_confirm -> {
 				val checkedRadioId = binding.reviewScheduleRadioGroup.checkedRadioButtonId
-				val dailyReviews = binding.root.findViewById<RadioButton>(checkedRadioId).text.toString()
+				val dailyReviews =
+					binding.root.findViewById<RadioButton>(checkedRadioId).text.toString()
 				val numSentencesPerDay = binding.sentencesPerDayEdit.text.toString().toInt()
-				val isChorus = binding.chorusRadiogroup.checkedRadioButtonId == 0
+				val startingSentence =
+					binding.startingSentenceEdit.text.toString().toIntOrNull() ?: 1
+				val chorus = binding.chorusRadiogroup.checkedRadioButtonId
 				val title = binding.courseTitleEdit.text.toString()
-				viewModel.createCourse(dailyReviews, numSentencesPerDay, title, isChorus)
+				viewModel.createCourse(
+					dailyReviews,
+					numSentencesPerDay,
+					startingSentence,
+					title,
+					chorus
+				)
 				return true
 			}
 		}

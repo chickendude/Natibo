@@ -120,6 +120,7 @@
 						app:layout_constraintTop_toBottomOf="@id/starting_sentence_label" />
 
 					<EditText
+						android:id="@+id/starting_sentence_edit"
 						android:layout_width="0dp"
 						android:layout_height="wrap_content"
 						android:hint="@string/starting_sentence"

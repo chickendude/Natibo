@@ -24,6 +24,7 @@ class CourseRepository @Inject constructor(private val realm: Realm) {
 	fun createCourse(
 		order: String,
 		numSentencesPerDay: Int,
+		startingSentence: Int,
 		dailyReviews: List<String>,
 		title: String,
 		languages: List<Language>
@@ -36,6 +37,7 @@ class CourseRepository @Inject constructor(private val realm: Realm) {
 			realm.createObject(Schedule::class.java, UUID.randomUUID().toString())
 		schedule.order = order
 		schedule.numSentences = numSentencesPerDay
+		schedule.sentenceIndex = startingSentence - 1
 		for (review in dailyReviews) {
 			schedule.reviewPattern.add(review.toInt())
 		}

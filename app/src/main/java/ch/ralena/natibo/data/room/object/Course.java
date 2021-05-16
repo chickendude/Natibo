@@ -51,6 +51,10 @@ public class Course extends RealmObject {
 	private Schedule schedule = new Schedule();    // the different pieces that make up the study routine for each day
 	private RealmList<Sentence> sentencesSeen = new RealmList<>();    // keep track of which sentences have been seen and which haven't
 
+	public enum Chorus {
+		ALL, NEW, NONE
+	}
+
 	// --- getters and setters ---
 
 	public String getId() {
