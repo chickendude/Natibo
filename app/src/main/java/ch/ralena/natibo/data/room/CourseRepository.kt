@@ -34,24 +34,24 @@ class CourseRepository @Inject constructor(private val realm: Realm) {
 		// --- begin transaction
 		realm.beginTransaction()
 
-		// create sentence schedule
-		val schedule: Schedule =
-			realm.createObject(Schedule::class.java, UUID.randomUUID().toString())
-		schedule.order = order
-		schedule.numSentences = numSentencesPerDay
-		schedule.sentenceIndex = startingSentence - 1
-		for (review in dailyReviews) {
-			schedule.reviewPattern.add(review.toInt())
+		// Create sentence schedule
+		val schedule =
+			realm.createObject(Schedule::class.java, UUID.randomUUID().toString()).apply {
+				this.order = order
+				numSentences = numSentencesPerDay
+				sentenceIndex = startingSentence - 1
+				for (review in dailyReviews)
+					reviewPattern.add(review.toInt())
+			}
+
+		// Build course
+		val course = realm.createObject(Course::class.java, UUID.randomUUID().toString()).apply {
+			this.title = title
+			this.languages.clear()
+			this.languages.addAll(languages)
+			pauseMillis = 1000
+			this.schedule = schedule
 		}
-
-		// build course
-		val course: Course = realm.createObject(Course::class.java, UUID.randomUUID().toString())
-		course.title = title
-
-		course.languages.clear()
-		course.languages.addAll(languages)
-		course.pauseMillis = 1000
-		course.schedule = schedule
 		realm.commitTransaction()
 		// --- end transaction
 		return course
