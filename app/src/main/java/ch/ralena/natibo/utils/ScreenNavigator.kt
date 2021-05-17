@@ -15,6 +15,7 @@ import ch.ralena.natibo.ui.language.list.LanguageListFragment
 import ch.ralena.natibo.ui.fragment.MainSettingsFragment
 import ch.ralena.natibo.ui.language.detail.LanguageDetailFragment
 import ch.ralena.natibo.ui.sentences.SentenceListFragment
+import ch.ralena.natibo.ui.study_session.StudySessionFragment
 import io.realm.Realm
 import javax.inject.Inject
 
@@ -85,6 +86,14 @@ class ScreenNavigator @Inject constructor(
 			putString(SentenceListFragment.TAG_BASE_PACK_ID, packId)
 		}
 		loadFragment(fragment, SentenceListFragment.TAG)
+	}
+
+	fun toStudySessionFragment(courseId: String) {
+		val fragment = StudySessionFragment()
+		fragment.arguments = Bundle().apply {
+			putString(StudySessionFragment.KEY_COURSE_ID, courseId)
+		}
+		loadFragment(fragment, StudySessionFragment.TAG)
 	}
 
 	// Private functions

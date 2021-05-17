@@ -9,8 +9,8 @@ import io.realm.RealmConfiguration
 open class MainApplication : Application() {
 	val appComponent by lazy {
 		DaggerAppComponent.builder()
-				.appModule(AppModule(this))
-				.build()
+			.appModule(AppModule(this))
+			.build()
 	}
 
 	override fun onCreate() {
@@ -18,10 +18,11 @@ open class MainApplication : Application() {
 		// initialize Realm
 		Realm.init(this)
 		val config = RealmConfiguration.Builder()
-				.name("natibo.realm")
-				.schemaVersion(1)
-				.deleteRealmIfMigrationNeeded()
-				.build()
+			.name("natibo.realm")
+			.allowWritesOnUiThread(true)
+			.schemaVersion(1)
+			.deleteRealmIfMigrationNeeded()
+			.build()
 		Realm.setDefaultConfiguration(config)
 	}
 }

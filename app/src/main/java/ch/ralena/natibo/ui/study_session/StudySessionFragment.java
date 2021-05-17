@@ -30,7 +30,7 @@ import io.reactivex.disposables.Disposable;
 import io.realm.Realm;
 
 public class StudySessionFragment extends Fragment {
-	private static final String TAG = StudySessionFragment.class.getSimpleName();
+	public static final String TAG = StudySessionFragment.class.getSimpleName();
 	public static final String KEY_COURSE_ID = "language_id";
 	private static final String KEY_IS_PAUSED = "key_is_paused";
 

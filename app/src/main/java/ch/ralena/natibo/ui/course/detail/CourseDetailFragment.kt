@@ -60,6 +60,10 @@ class CourseDetailFragment
 			layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 		}
 
+		binding.startSessionButton.setOnClickListener {
+			viewModel.startSession()
+		}
+
 		val id = arguments?.getString(TAG_COURSE_ID)
 		viewModel.fetchCourse(id)
 	}
@@ -75,23 +79,6 @@ class CourseDetailFragment
 //					.isCompleted()
 //			) R.string.start_session else R.string.continue_session
 //		)
-//		startSessionButton.setOnClickListener { v: View? ->
-//			// make sure we have books added before starting, otherwise it'll crash!
-//			if (course.getPacks().size == 0) {
-//				Toast.makeText(context, R.string.add_book_first, Toast.LENGTH_SHORT).show()
-//				return@setOnClickListener
-//			}
-//
-//			// now we can load the fragment
-//			val fragment = StudySessionFragment()
-//			val bundle = Bundle()
-//			bundle.putString(StudySessionFragment.KEY_COURSE_ID, course.getId())
-//			fragment.setArguments(bundle)
-//			fragmentManager!!.beginTransaction()
-//				.replace(R.id.fragmentPlaceHolder, fragment)
-//				.addToBackStack(null)
-//				.commit()
-//		}
 	}
 
 	private fun loadCourseInfo(course: Course) {
@@ -162,5 +149,9 @@ class CourseDetailFragment
 
 	override fun onCourseNotFound() {
 		Toast.makeText(context, R.string.course_not_found, Toast.LENGTH_SHORT).show()
+	}
+
+	override fun noPacksSelected() {
+		Toast.makeText(context, R.string.add_book_first, Toast.LENGTH_SHORT).show()
 	}
 }
