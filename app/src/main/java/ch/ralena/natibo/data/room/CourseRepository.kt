@@ -4,9 +4,11 @@ import ch.ralena.natibo.R
 import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.data.room.`object`.Pack
 import ch.ralena.natibo.data.room.`object`.Schedule
 import io.realm.Realm
 import io.realm.RealmResults
+import io.realm.kotlin.executeTransactionAwait
 import java.util.*
 import javax.inject.Inject
 
@@ -53,6 +55,26 @@ class CourseRepository @Inject constructor(private val realm: Realm) {
 		realm.commitTransaction()
 		// --- end transaction
 		return course
+	}
+
+	/**
+	 * Toggles a pack in a course.
+	 *
+	 * If the pack is in the course it will be removed, otherwise it will be added.
+	 *
+	 * @param packId The ID of the pack to toggle.
+	 * @param courseId The course ID of the pack which should be toggled.
+	 */
+	suspend fun togglePackInCourse(packId: String, courseId: String) {
+		val r = Realm.getDefaultInstance()
+		r.executeTransactionAwait {
+			val course = it.where(Course::class.java).equalTo("id", courseId).findFirst()!!
+			val pack = it.where(Pack::class.java).equalTo("id", packId).findFirst()!!
+			if (course.packs.contains(pack))
+				course.packs.remove(pack)
+			else
+				course.packs.add(pack)
+		}
 	}
 
 	/**

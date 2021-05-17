@@ -1,5 +1,6 @@
 package ch.ralena.natibo.ui.course.detail.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,10 +11,10 @@ import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Pack
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
 
-class BookAdapter(
+class PackAdapter(
 	private val targetPacks: ArrayList<Pack>,
 	private val packs: ArrayList<Pack>
-) : BaseRecyclerAdapter<BookAdapter.ViewHolder, BookAdapter.Listener>() {
+) : BaseRecyclerAdapter<PackAdapter.ViewHolder, PackAdapter.Listener>() {
 	interface Listener {
 		fun onBookClicked(pack: Pack)
 	}
@@ -30,13 +31,27 @@ class BookAdapter(
 
 	override fun getItemCount() = packs.size
 
+	fun loadPacks(packs: List<Pack>) {
+		this.packs.clear()
+		this.packs.addAll(packs)
+		notifyDataSetChanged()
+	}
+
+	fun toggleTargetPack(pack: Pack) {
+		if (targetPacks.contains(pack))
+			targetPacks.remove(pack)
+		else
+			targetPacks.add(pack)
+		notifyDataSetChanged()
+	}
+
 	inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 		private val book: CheckedTextView = view.findViewById(R.id.packTitleLabel)
 
 		private lateinit var pack: Pack
 
 		init {
-			view.setOnClickListener { v: View? -> for (l in listeners) l.onBookClicked(pack) }
+			view.setOnClickListener { for (l in listeners) l.onBookClicked(pack) }
 		}
 
 		fun bindView(pack: Pack) {

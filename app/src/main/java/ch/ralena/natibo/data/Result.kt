@@ -20,5 +20,5 @@ sealed class Result<T> {
 	 *
 	 * @param stringRes The resource string containing the error message.
 	 */
-	data class Failure<T>(@StringRes val stringRes: Int): Result<T>()
+	data class Failure<T>(@StringRes val stringRes: Int?): Result<T>()
 }
