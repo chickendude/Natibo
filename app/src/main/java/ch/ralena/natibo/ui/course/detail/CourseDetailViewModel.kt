@@ -15,21 +15,23 @@ class CourseDetailViewModel @Inject constructor(
 		fun onCourseFetched(course: Course)
 		fun onCourseNotFound()
 		fun noPacksSelected()
+		fun onSessionStarted()
+		fun onSessionNotStarted()
 	}
 
 	lateinit var courseId: String
 
 	fun fetchCourse(courseId: String?) {
-		if (courseId == null)
+		if (courseId == null) {
 			for (l in listeners) l.onCourseNotFound()
-		else
+		} else {
 			courseRepository.fetchCourse(courseId) {
-				if (it is Result.Success) {
-					this.courseId = it.data.id
-					for (l in listeners) l.onCourseFetched(it.data)
-				} else
+				if (it is Result.Success)
+					fetchCourseSuccess(it.data)
+				else
 					for (l in listeners) l.onCourseNotFound()
 			}
+		}
 	}
 
 	suspend fun addRemovePack(packId: String) {
@@ -53,4 +55,19 @@ class CourseDetailViewModel @Inject constructor(
 		courseRepository.deleteCourse(courseId)
 		screenNavigator.toCourseListFragment()
 	}
+
+	fun openSettings() {
+		screenNavigator.toCourseSettingsFragment(courseId)
+	}
+
+	// region Helper functions----------------------------------------------------------------------
+	private fun fetchCourseSuccess(course: Course) {
+		this.courseId = course.id
+		for (l in listeners) l.onCourseFetched(course)
+		if (course.currentDay == null)
+			for (l in listeners) l.onSessionNotStarted()
+		else
+			for (l in listeners) l.onSessionStarted()
+	}
+	// endregion Helper functions-------------------------------------------------------------------
 }

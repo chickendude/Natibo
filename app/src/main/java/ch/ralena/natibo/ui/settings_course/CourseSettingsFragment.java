@@ -20,6 +20,7 @@ Settings:
 1. Pause between sentences.
 */
 public class CourseSettingsFragment extends PreferenceFragmentCompat {
+	public static final String TAG = CourseSettingsFragment.class.getSimpleName();
 	public static final String PREF_PAUSE = "pref_pause";
 	public static final String PREF_START = "pref_start";
 	public static final String PREF_PLAYBACK_SPEED = "pref_playback_speed";

@@ -15,14 +15,15 @@ import ch.ralena.natibo.ui.language.list.LanguageListFragment
 import ch.ralena.natibo.ui.fragment.MainSettingsFragment
 import ch.ralena.natibo.ui.language.detail.LanguageDetailFragment
 import ch.ralena.natibo.ui.sentences.SentenceListFragment
+import ch.ralena.natibo.ui.settings_course.CourseSettingsFragment
 import ch.ralena.natibo.ui.study_session.StudySessionFragment
 import io.realm.Realm
 import javax.inject.Inject
 
 class ScreenNavigator @Inject constructor(
-		private val fragmentManager: FragmentManager,
-		private val realm: Realm,
-		private val activity: MainActivity
+	private val fragmentManager: FragmentManager,
+	private val realm: Realm,
+	private val activity: MainActivity
 ) {
 	fun toCourseDetailFragment(courseId: String?) {
 		val course = realm.where(Course::class.java).equalTo("id", courseId).findFirst()
@@ -56,11 +57,21 @@ class ScreenNavigator @Inject constructor(
 
 	fun toCoursePreparationFragment(languageIds: List<String>) {
 		val fragment = PickScheduleFragment()
-		// add language ids in a bundle
-		val bundle = Bundle()
-		bundle.putStringArray(PickScheduleFragment.TAG_LANGUAGE_IDS, languageIds.toTypedArray())
-		fragment.arguments = bundle
+		fragment.arguments = Bundle().apply {
+			// add language ids in a bundle
+			putStringArray(PickScheduleFragment.TAG_LANGUAGE_IDS, languageIds.toTypedArray())
+		}
 		loadFragment(fragment, PickScheduleFragment.TAG)
+	}
+
+	fun toCourseSettingsFragment(courseId: String) {
+		val fragment = CourseSettingsFragment()
+
+		// load fragment ID into fragment arguments
+		fragment.arguments = Bundle().apply {
+			putString(CourseSettingsFragment.KEY_ID, courseId)
+		}
+		loadFragment(fragment, CourseSettingsFragment.TAG)
 	}
 
 	fun toLanguageListFragment() {
@@ -100,8 +111,8 @@ class ScreenNavigator @Inject constructor(
 
 	private fun loadFragment(fragment: Fragment, name: String) {
 		val transaction = fragmentManager
-				.beginTransaction()
-				.replace(R.id.fragmentPlaceHolder, fragment)
+			.beginTransaction()
+			.replace(R.id.fragmentPlaceHolder, fragment)
 
 		// make sure fragment isn't added to back stack twice
 		val backStackCount = fragmentManager.backStackEntryCount

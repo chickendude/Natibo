@@ -75,6 +75,10 @@ class CourseDetailFragment
 				}.show()
 		}
 
+		binding.settingsIcon.setOnClickListener {
+			viewModel.openSettings()
+		}
+
 		val id = arguments?.getString(TAG_COURSE_ID)
 		viewModel.fetchCourse(id)
 	}
@@ -83,39 +87,11 @@ class CourseDetailFragment
 		injector.inject(this)
 	}
 
-	private fun prepareStartSessionButton(view: View) {
-//		val startSessionButton = view.findViewById<Button>(R.id.startSessionButton)
-//		startSessionButton.setText(
-//			if (course.getCurrentDay() == null || course.getCurrentDay()
-//					.isCompleted()
-//			) R.string.start_session else R.string.continue_session
-//		)
-	}
-
 	private fun loadCourseInfo(course: Course) {
 		binding.totalRepsText.text = String.format(Locale.US, "%d", course.totalReps)
 		binding.totalSentencesSeenText.text =
 			String.format(Locale.US, "%d", course.numSentencesSeen)
 		binding.flagImageView.setImageResource(course.languages.last()!!.languageType.drawable)
-	}
-
-	private fun prepareSettingsIcon(view: View, activity: MainActivity?) {
-//		val settingsIcon = view.findViewById<ImageView>(R.id.settingsIcon)
-//		settingsIcon.setOnClickListener { v: View? ->
-//			val fragment =
-//				CourseSettingsFragment()
-//
-//			// load fragment ID into fragment arguments
-//			val bundle = Bundle()
-//			bundle.putString(CourseSettingsFragment.KEY_ID, course.getId())
-//			fragment.arguments = bundle
-//
-//			// load the course settings fragment
-//			fragmentManager!!.beginTransaction()
-//				.replace(R.id.fragmentPlaceHolder, fragment)
-//				.addToBackStack(null)
-//				.commit()
-//		}
 	}
 
 	override fun onBookClicked(pack: Pack) {
@@ -145,5 +121,13 @@ class CourseDetailFragment
 
 	override fun noPacksSelected() {
 		Toast.makeText(context, R.string.add_book_first, Toast.LENGTH_SHORT).show()
+	}
+
+	override fun onSessionStarted() {
+		binding.startSessionButton.text = getString(R.string.continue_session)
+	}
+
+	override fun onSessionNotStarted() {
+		binding.startSessionButton.text = getString(R.string.start_session)
 	}
 }
