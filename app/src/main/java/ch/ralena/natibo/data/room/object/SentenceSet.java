@@ -88,10 +88,7 @@ public class SentenceSet extends RealmObject {
 			// shuffle sentences
 			ArrayList<SentenceGroup> sentenceGroups = new ArrayList<>();
 			for (int i = 0; i < numReviews; i++) {
-				for (int j = 0; j < sentenceSet.size(); j++) {
-					SentenceGroup sentenceGroup = sentenceSet.get(j);
-					sentenceGroups.add(sentenceGroup);
-				}
+				sentenceGroups.addAll(sentenceSet);
 			}
 			Collections.shuffle(sentenceGroups);
 
