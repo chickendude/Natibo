@@ -93,4 +93,13 @@ class CourseRepository @Inject constructor(private val realm: Realm) {
 		else
 			callback(Result.Success(course))
 	}
+
+	fun deleteCourse(courseId: String) {
+		realm.executeTransactionAsync {
+			it.where(Course::class.java)
+				.equalTo("id", courseId)
+				.findFirst()
+				?.deleteFromRealm()
+		}
+	}
 }

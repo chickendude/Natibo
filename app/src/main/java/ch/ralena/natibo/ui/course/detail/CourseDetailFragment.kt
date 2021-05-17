@@ -49,6 +49,9 @@ class CourseDetailFragment
 	@Inject
 	lateinit var packAdapter: PackAdapter
 
+	private val singleThreadContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+
+
 	override fun setupViews(view: View) {
 		activity.enableBackButton()
 
@@ -62,6 +65,14 @@ class CourseDetailFragment
 
 		binding.startSessionButton.setOnClickListener {
 			viewModel.startSession()
+		}
+
+		binding.deleteIcon.setOnClickListener {
+			Snackbar.make(view, R.string.confirm_delete, Snackbar.LENGTH_INDEFINITE)
+				.setAction(R.string.delete) {
+					viewModel.deleteCourse()
+					activity.stopSession()
+				}.show()
 		}
 
 		val id = arguments?.getString(TAG_COURSE_ID)
@@ -88,24 +99,6 @@ class CourseDetailFragment
 		binding.flagImageView.setImageResource(course.languages.last()!!.languageType.drawable)
 	}
 
-	private fun prepareDeleteCourseIcon(view: View, activity: MainActivity) {
-//		val deleteIcon = view.findViewById<ImageView>(R.id.deleteIcon)
-//		val deleteConfirmListener = View.OnClickListener { v: View? ->
-//			val courseId: String = course.getId()
-//			realm.executeTransactionAsync { r: Realm ->
-//				r.where(Course::class.java)
-//					.equalTo("id", courseId).findFirst()?.deleteFromRealm()
-//			}
-//			activity.stopSession()
-//			activity.loadCourseListFragment()
-//		}
-//		deleteIcon.setOnClickListener { v: View? ->
-//			Snackbar.make(view, R.string.confirm_delete, Snackbar.LENGTH_INDEFINITE)
-//				.setAction(R.string.delete, deleteConfirmListener)
-//				.show()
-//		}
-	}
-
 	private fun prepareSettingsIcon(view: View, activity: MainActivity?) {
 //		val settingsIcon = view.findViewById<ImageView>(R.id.settingsIcon)
 //		settingsIcon.setOnClickListener { v: View? ->
@@ -129,7 +122,6 @@ class CourseDetailFragment
 		val packId = pack.id
 		// We have to use our own single thread context, otherwise Realm complains about access on
 		// other threads. Can't wait to switch over to Room...
-		val singleThreadContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 		lifecycleScope.launch(Dispatchers.Main) {
 			withContext(singleThreadContext) {
 				viewModel.addRemovePack(packId)

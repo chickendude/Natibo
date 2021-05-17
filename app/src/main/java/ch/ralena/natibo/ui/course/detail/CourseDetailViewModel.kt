@@ -48,4 +48,9 @@ class CourseDetailViewModel @Inject constructor(
 			}
 		}
 	}
+
+	fun deleteCourse() {
+		courseRepository.deleteCourse(courseId)
+		screenNavigator.toCourseListFragment()
+	}
 }
