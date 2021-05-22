@@ -7,6 +7,7 @@ import ch.ralena.natibo.ui.callback.ItemTouchHelperCallback
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailableLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.SelectedLanguagesAdapter
 import ch.ralena.natibo.ui.course.detail.adapter.PackAdapter
+import ch.ralena.natibo.ui.course.list.adapter.CourseListAdapter
 import ch.ralena.natibo.ui.language.detail.adapter.LanguageDetailAdapter
 import dagger.Module
 import dagger.Provides
@@ -29,6 +30,10 @@ class PresentationModule {
 	@PresentationScope
 	@Provides
 	fun bookAdapter() = PackAdapter(arrayListOf(), arrayListOf())
+
+	@PresentationScope
+	@Provides
+	fun courseListAdapter() = CourseListAdapter(arrayListOf())
 
 	@PresentationScope
 	@Provides

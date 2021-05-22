@@ -1,46 +1,42 @@
 package ch.ralena.natibo.ui.course.list
 
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.databinding.FragmentCourseListBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
-import ch.ralena.natibo.ui.adapter.CourseListAdapter
 import ch.ralena.natibo.ui.base.BaseFragment
+import ch.ralena.natibo.ui.course.list.adapter.CourseListAdapter
 import ch.ralena.natibo.utils.ScreenNavigator
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import io.realm.RealmResults
 import javax.inject.Inject
 
 class CourseListFragment :
-		BaseFragment<FragmentCourseListBinding,
-				CourseListViewModel.Listener,
-				CourseListViewModel>(FragmentCourseListBinding::inflate),
-		CourseListViewModel.Listener {
-	@Inject
-	lateinit var screenNavigator: ScreenNavigator
-
-	@Inject
-	lateinit var mainActivity: MainActivity
-
-	private var courses: RealmResults<Course>? = null
-
+	BaseFragment<FragmentCourseListBinding,
+			CourseListViewModel.Listener,
+			CourseListViewModel>(FragmentCourseListBinding::inflate),
+	CourseListViewModel.Listener,
+	CourseListAdapter.Listener {
 	companion object {
 		val TAG: String = CourseListFragment::class.java.simpleName
 		const val TAG_COURSE_ID = "tag_course_id"
 		const val TAG_START_SESSION = "tag_start_session"
 	}
 
+	@Inject
+	lateinit var screenNavigator: ScreenNavigator
+
+	@Inject
+	lateinit var mainActivity: MainActivity
+
+	@Inject
+	lateinit var courseListAdapter: CourseListAdapter
+
 	override fun setupViews(view: View) {
 		// load views
 		mainActivity.title = getString(R.string.courses)
 		mainActivity.disableBackButton()
-		mainActivity.setMenuToCourses()
 
 		// check if a course id was passed in, if so move to CourseDetailFragment and add to back stack
 		arguments?.let {
@@ -49,9 +45,14 @@ class CourseListFragment :
 			screenNavigator.toCourseDetailFragment(courseId)
 		}
 
-		view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-			// todo: move to ViewModel
-			screenNavigator.toCourseCreateFragment()
+		binding.fab.setOnClickListener {
+			viewModel.fabClicked()
+		}
+
+		binding.recyclerView.apply {
+			visibility = View.VISIBLE
+			adapter = courseListAdapter
+			layoutManager = LinearLayoutManager(context)
 		}
 	}
 
@@ -62,29 +63,30 @@ class CourseListFragment :
 
 	override fun onStart() {
 		super.onStart()
+		courseListAdapter.registerListener(this)
 		viewModel.registerListener(this)
 		viewModel.fetchCourses()
 	}
 
 	override fun onStop() {
 		super.onStop()
+		courseListAdapter.unregisterListener(this)
 		viewModel.unregisterListener(this)
 	}
 
-	override fun showCourses(courses: RealmResults<Course>) {
-		this.courses = courses
-		binding.recyclerView.apply {
-			visibility = View.VISIBLE
-
-			// TODO: Switch to dependency injection and use method to update courses
-			val courseListAdapter = CourseListAdapter(courses)
-			adapter = courseListAdapter
-			layoutManager = LinearLayoutManager(context)
-			courseListAdapter.asObservable().subscribe { course: Course? -> screenNavigator.toCourseDetailFragment(course?.id) }
-		}
+	// region ViewModel listeners ------------------------------------------------------------------
+	override fun showCourses(courses: List<Course>) {
+		courseListAdapter.loadCourses(courses)
 	}
 
 	override fun showNoCourses() {
 		binding.noCoursesText.visibility = View.VISIBLE
 	}
+	// endregion ViewModel listeners ---------------------------------------------------------------
+
+	// region CourseListAdapter listeners ----------------------------------------------------------
+	override fun onCourseClicked(course: Course) {
+		screenNavigator.toCourseDetailFragment(course.id)
+	}
+	// endregion CourseListAdapter listeners -------------------------------------------------------
 }
