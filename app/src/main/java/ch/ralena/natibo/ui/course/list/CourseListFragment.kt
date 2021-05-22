@@ -84,7 +84,7 @@ class CourseListFragment :
 
 	// region CourseListAdapter listeners ----------------------------------------------------------
 	override fun onCourseClicked(course: Course) {
-		screenNavigator.toCourseDetailFragment(course.id)
+		viewModel.redirectToCourseDetail(course.id)
 	}
 	// endregion CourseListAdapter listeners -------------------------------------------------------
 }
