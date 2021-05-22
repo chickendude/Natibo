@@ -58,8 +58,8 @@ dependencies {
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 	kapt "androidx.room:room-compiler:$room_version"
 	kapt "com.google.dagger:dagger-compiler:$dagger_version"
-	debugImplementation 'com.facebook.stetho:stetho:1.5.1'
-	debugImplementation 'com.uphyca:stetho_realm:2.2.2'
+//	debugImplementation 'com.facebook.stetho:stetho:1.5.1'
+//	debugImplementation 'com.uphyca:stetho_realm:2.2.2'
 	testImplementation 'io.kotest:kotest-assertions-core:4.5.0'
 	testImplementation "io.mockk:mockk:1.11.0"
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
