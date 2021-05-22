@@ -29,4 +29,8 @@ class CourseListViewModel @Inject constructor(
 	fun fabClicked() {
 		screenNavigator.toCourseCreateFragment()
 	}
+
+	fun redirectToCourseDetail(courseId: String) {
+		screenNavigator.toCourseDetailFragment(courseId)
+	}
 }

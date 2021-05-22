@@ -25,9 +25,6 @@ class CourseListFragment :
 	}
 
 	@Inject
-	lateinit var screenNavigator: ScreenNavigator
-
-	@Inject
 	lateinit var mainActivity: MainActivity
 
 	@Inject
@@ -42,7 +39,8 @@ class CourseListFragment :
 		arguments?.let {
 			val courseId = it.getString(TAG_COURSE_ID)
 			arguments = null
-			screenNavigator.toCourseDetailFragment(courseId)
+			if (courseId != null)
+				viewModel.redirectToCourseDetail(courseId)
 		}
 
 		binding.fab.setOnClickListener {
