@@ -53,6 +53,7 @@ class CourseListAdapter(private val courses: ArrayList<Course>) :
 		fun bindView(course: Course) {
 			this.course = course
 			courseTitle.text = course.title
+			// TODO: Use String resource instead
 			numReps.text = String.format("%d reps", course.totalReps)
 			course.languages.last()?.let {
 				languageName.text = it.longName
