@@ -6,7 +6,10 @@ import ch.ralena.natibo.data.room.`object`.CourseRoom
 @Dao
 interface CourseDao {
 	@Query("SELECT * FROM courseroom")
-	fun getAll(): List<CourseRoom>
+	suspend fun getAll(): List<CourseRoom>
+
+	@Query("SELECT * FROM courseroom WHERE id = :id")
+	suspend fun getCourseById(id: Int): CourseRoom
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insert(course: CourseRoom)

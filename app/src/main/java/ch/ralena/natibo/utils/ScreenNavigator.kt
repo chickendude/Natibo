@@ -25,16 +25,12 @@ class ScreenNavigator @Inject constructor(
 	private val realm: Realm,
 	private val activity: MainActivity
 ) {
-	fun toCourseDetailFragment(courseId: Int?) {
-		throw NotImplementedError()
-//		val course = realm.where(Course::class.java).equalTo("id", courseId).findFirst()
-//		course?.run {
-//			val fragment = CourseDetailFragment()
-//			fragment.arguments = Bundle().apply {
-//				putString(CourseDetailFragment.TAG_COURSE_ID, course.getId())
-//			}
-//			loadFragment(fragment, CourseDetailFragment.TAG)
-//		}
+	fun toCourseDetailFragment(courseId: Int) {
+		val fragment = CourseDetailFragment()
+		fragment.arguments = Bundle().apply {
+			putInt(CourseDetailFragment.TAG_COURSE_ID, courseId)
+		}
+		loadFragment(fragment, CourseDetailFragment.TAG)
 	}
 
 	fun toCourseCreateFragment() {
