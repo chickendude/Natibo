@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.study_session;
+package ch.ralena.natibo.ui.study.overview;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -16,7 +16,7 @@ import java.util.List;
 
 import ch.ralena.natibo.ui.MainActivity;
 import ch.ralena.natibo.R;
-import ch.ralena.natibo.ui.adapter.StudySessionAdapter;
+import ch.ralena.natibo.ui.study.insession.adapter.StudySessionAdapter;
 import ch.ralena.natibo.data.room.object.Course;
 import ch.ralena.natibo.data.room.object.Day;
 import ch.ralena.natibo.data.room.object.SentenceGroup;

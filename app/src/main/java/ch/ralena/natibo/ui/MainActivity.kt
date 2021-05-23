@@ -16,7 +16,7 @@ import ch.ralena.natibo.di.module.ActivityModule
 import ch.ralena.natibo.service.StudySessionService
 import ch.ralena.natibo.service.StudySessionService.StudyBinder
 import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
-import ch.ralena.natibo.ui.study_session.StudySessionFragment
+import ch.ralena.natibo.ui.study.insession.StudySessionFragment
 import ch.ralena.natibo.utils.ScreenNavigator
 import ch.ralena.natibo.utils.Utils
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -150,7 +150,8 @@ class MainActivity : AppCompatActivity(), MainActivityViewModel.Listener {
 						.replace(R.id.fragmentPlaceHolder, fragment)
 						.commit()
 			} else if (requestCode == REQUEST_LOAD_SESSION) {
-				val fragment = StudySessionFragment()
+				val fragment =
+					StudySessionFragment()
 				supportFragmentManager
 						.beginTransaction()
 						.replace(R.id.fragmentPlaceHolder, fragment)

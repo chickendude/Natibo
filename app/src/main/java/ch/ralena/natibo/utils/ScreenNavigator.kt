@@ -16,7 +16,7 @@ import ch.ralena.natibo.ui.fragment.MainSettingsFragment
 import ch.ralena.natibo.ui.language.detail.LanguageDetailFragment
 import ch.ralena.natibo.ui.sentences.SentenceListFragment
 import ch.ralena.natibo.ui.settings_course.CourseSettingsFragment
-import ch.ralena.natibo.ui.study_session.StudySessionFragment
+import ch.ralena.natibo.ui.study.insession.StudySessionFragment
 import io.realm.Realm
 import javax.inject.Inject
 

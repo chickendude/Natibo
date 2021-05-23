@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.adapter;
+package ch.ralena.natibo.ui.study.overview.adapter;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;

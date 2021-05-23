@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.adapter;
+package ch.ralena.natibo.ui.study.insession.adapter;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,6 +14,7 @@ import ch.ralena.natibo.R;
 import ch.ralena.natibo.data.room.object.Language;
 import ch.ralena.natibo.data.room.object.Sentence;
 import ch.ralena.natibo.data.room.object.SentenceGroup;
+import ch.ralena.natibo.ui.study.overview.adapter.StudySessionSentenceAdapter;
 import io.reactivex.subjects.PublishSubject;
 import io.realm.RealmList;
 
