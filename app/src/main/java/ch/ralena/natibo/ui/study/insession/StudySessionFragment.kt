@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,7 +19,6 @@ import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Day
 import ch.ralena.natibo.data.room.`object`.SentenceGroup
-import ch.ralena.natibo.databinding.FragmentCoursePickLanguagesBinding
 import ch.ralena.natibo.databinding.FragmentStudySessionBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.service.StudySessionService
@@ -33,9 +33,12 @@ import java.util.*
 import javax.inject.Inject
 
 class StudySessionFragment :
-	BaseFragment<FragmentStudySessionBinding, StudySessionViewModel.Listener, StudySessionViewModel>(
+	BaseFragment<
+			FragmentStudySessionBinding,
+			StudySessionViewModel.Listener,
+			StudySessionViewModel>(
 		FragmentStudySessionBinding::inflate
-	) {
+	), StudySessionViewModel.Listener {
 	companion object {
 		val TAG = StudySessionFragment::class.java.simpleName
 		const val KEY_COURSE_ID = "language_id"
@@ -52,22 +55,37 @@ class StudySessionFragment :
 	private val prefs: SharedPreferences? = null
 	private lateinit var studySessionService: StudySessionService
 	private var millisLeft: Long = 0
-	private lateinit var countDownTimer: CountDownTimer
+	private var countDownTimer: CountDownTimer? = null
 	private var isPaused = false
 	var adapter: SentenceGroupAdapter? = null
 
-	// views
-	private lateinit var sentencesLayout: LinearLayout
 	var serviceDisposable: Disposable? = null
 	var sentenceDisposable: Disposable? = null
 	var finishDisposable: Disposable? = null
 
 	override fun setupViews(view: View) {
 		// load schedules from database
-		val id = arguments!!.getString(KEY_COURSE_ID)
+		val id = requireArguments().getString(KEY_COURSE_ID)
 		realm = Realm.getDefaultInstance()
 		course = realm.where(Course::class.java).equalTo("id", id).findFirst()!!
 		activity.startSession(course)
+
+		// connect to the studySessionService and start the session
+		connectToService()
+
+		// if the current day is done, start the next one
+		if (course.currentDay == null || course.currentDay.isCompleted)
+			course.prepareNextDay(realm)
+
+		// hide sentences layout until a sentence has been loaded
+		binding.sentencesLayout.visibility = View.VISIBLE
+
+		// load course title
+		binding.courseTitleText.text = course.title
+
+		binding.settingsIcon.setOnClickListener {
+			viewModel.settingsIconClicked()
+		}
 
 		// set up recycler view
 		binding.recyclerView.apply {
@@ -77,16 +95,6 @@ class StudySessionFragment :
 
 		// handle playing/pausing
 		binding.playPauseImage.setOnClickListener { v: View -> playPause(v) }
-
-		// connect to the studySessionService and start the session
-		connectToService()
-
-		// if the current day is done, start the next one
-		if (course.currentDay == null || course.currentDay.isCompleted)
-			course.prepareNextDay(realm)
-
-		// load all the views
-		loadGlobalViews(view)
 
 		activity.startSession(course)
 	}
@@ -102,22 +110,6 @@ class StudySessionFragment :
 	): View? {
 		isPaused = savedInstanceState?.getBoolean(KEY_IS_PAUSED, true) ?: true
 		return super.onCreateView(inflater, container, savedInstanceState)
-	}
-
-	private fun loadGlobalViews(view: View) {
-		// hide sentences layout until a sentence has been loaded
-		binding.sentencesLayout.visibility = View.VISIBLE
-
-		// load course title
-		binding.courseTitleText.text = course.title
-
-		binding.settingsIcon.setOnClickListener {
-			Toast.makeText(
-				activity,
-				R.string.course_settings_not_implemented,
-				Toast.LENGTH_SHORT
-			).show()
-		}
 	}
 
 	private fun connectToService() {
@@ -147,7 +139,7 @@ class StudySessionFragment :
 			if (studySessionService.getPlaybackStatus() == StudySessionService.PlaybackStatus.PLAYING) {
 				studySessionService.pause()
 				setPaused(true)
-				if (countDownTimer != null) countDownTimer.cancel()
+				countDownTimer?.cancel()
 			} else {
 				studySessionService.resume()
 				startTimer()
@@ -167,21 +159,21 @@ class StudySessionFragment :
 	private fun sessionFinished(day: Day) {
 		// mark day as completed
 		realm.executeTransaction { r: Realm? ->
-			course.addReps(course.getCurrentDay().getTotalReviews())
-			day.setCompleted(true)
+			course.addReps(course.currentDay.totalReviews)
+			day.isCompleted = true
 		}
 		val fragment = StudySessionOverviewFragment()
 		val bundle = Bundle()
 		bundle.putString(StudySessionOverviewFragment.KEY_COURSE_ID, course.getId())
-		fragment.setArguments(bundle)
-		fragmentManager!!.beginTransaction()
+		fragment.arguments = bundle
+		parentFragmentManager.beginTransaction()
 			.replace(R.id.fragmentPlaceHolder, fragment)
 			.commit()
 	}
 
 	private fun nextSentence(sentenceGroup: SentenceGroup) {
 		updatePlayPauseImage()
-		sentencesLayout.setVisibility(View.VISIBLE)
+		binding.sentencesLayout.visibility = View.VISIBLE
 		adapter?.updateSentenceGroup(sentenceGroup)
 
 		// update number of reps remaining
@@ -201,16 +193,14 @@ class StudySessionFragment :
 		)
 
 		// update time left
-		millisLeft = course.getCurrentDay().getTimeLeft().toLong()
+		millisLeft = course.currentDay.timeLeft.toLong()
 	}
 
 	private fun startTimer() {
 		millisLeft = millisLeft - millisLeft % 1000 - 1
 		updateTime()
 		// Make sure no two active timers are displayed at the same time
-		if (countDownTimer != null) {
-			countDownTimer.cancel()
-		}
+		countDownTimer?.cancel()
 		countDownTimer = object : CountDownTimer(millisLeft, 100) {
 			override fun onTick(millisUntilFinished: Long) {
 				if (!isPaused) {
@@ -224,9 +214,48 @@ class StudySessionFragment :
 			}
 		}
 		setPaused(false)
-		countDownTimer.start()
+		countDownTimer?.start()
 	}
 
+	override fun onSaveInstanceState(outState: Bundle) {
+		super.onSaveInstanceState(outState)
+		outState.putBoolean(KEY_IS_PAUSED, isPaused)
+	}
+
+	override fun onPause() {
+		super.onPause()
+		if (serviceDisposable != null) serviceDisposable!!.dispose()
+		if (sentenceDisposable != null) sentenceDisposable!!.dispose()
+		if (finishDisposable != null) finishDisposable!!.dispose()
+		countDownTimer?.cancel()
+	}
+
+	override fun onResume() {
+		super.onResume()
+		connectToService()
+	}
+
+	override fun onDestroy() {
+		super.onDestroy()
+		countDownTimer?.cancel()
+	}
+
+	// region ViewModel Listener--------------------------------------------------------------------
+	override fun makeToast(@StringRes stringRes: Int) {
+		Toast.makeText(activity, stringRes, Toast.LENGTH_SHORT).show()
+	}
+
+	override fun onCourseLoaded(course: Course) {
+
+	}
+
+	override fun onCourseNotFound(errorMsgRes: Int?) {
+		if (errorMsgRes != null)
+			makeToast(errorMsgRes)
+	}
+	// endregion ViewModel Listener-----------------------------------------------------------------
+
+	// region Helper functions----------------------------------------------------------------------
 	private fun setPaused(isPaused: Boolean) {
 		this.isPaused = isPaused
 	}
@@ -240,27 +269,5 @@ class StudySessionFragment :
 			secondsLeft % 60
 		)
 	}
-
-	override fun onSaveInstanceState(outState: Bundle) {
-		super.onSaveInstanceState(outState)
-		outState.putBoolean(KEY_IS_PAUSED, isPaused)
-	}
-
-	override fun onPause() {
-		super.onPause()
-		if (serviceDisposable != null) serviceDisposable!!.dispose()
-		if (sentenceDisposable != null) sentenceDisposable!!.dispose()
-		if (finishDisposable != null) finishDisposable!!.dispose()
-		if (countDownTimer != null) countDownTimer.cancel()
-	}
-
-	override fun onResume() {
-		super.onResume()
-		connectToService()
-	}
-
-	override fun onDestroy() {
-		super.onDestroy()
-		if (countDownTimer != null) countDownTimer.cancel()
-	}
+	// endregion Helper functions-------------------------------------------------------------------
 }

@@ -259,7 +259,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 
 	private void play() {
 		playbackStatus = PlaybackStatus.PLAYING;
-		if (!mediaPlayer.isPlaying()) {
+		if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
 			mediaPlayer.start();
 		}
 	}
