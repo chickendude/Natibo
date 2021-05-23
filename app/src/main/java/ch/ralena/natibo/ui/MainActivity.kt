@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity(), MainActivityViewModel.Listener {
 	 */
 	// TODO: Delete when everything is using ScreenNavigator
 	@JvmOverloads
-	fun loadCourseListFragment(courseId: String? = null) {
+	fun loadCourseListFragment(courseId: Int? = null) {
 		screenNavigator.toCourseListFragment(courseId)
 	}
 

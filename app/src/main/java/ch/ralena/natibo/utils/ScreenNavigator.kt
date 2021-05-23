@@ -25,15 +25,16 @@ class ScreenNavigator @Inject constructor(
 	private val realm: Realm,
 	private val activity: MainActivity
 ) {
-	fun toCourseDetailFragment(courseId: String?) {
-		val course = realm.where(Course::class.java).equalTo("id", courseId).findFirst()
-		course?.run {
-			val fragment = CourseDetailFragment()
-			fragment.arguments = Bundle().apply {
-				putString(CourseDetailFragment.TAG_COURSE_ID, course.getId())
-			}
-			loadFragment(fragment, CourseDetailFragment.TAG)
-		}
+	fun toCourseDetailFragment(courseId: Int?) {
+		throw NotImplementedError()
+//		val course = realm.where(Course::class.java).equalTo("id", courseId).findFirst()
+//		course?.run {
+//			val fragment = CourseDetailFragment()
+//			fragment.arguments = Bundle().apply {
+//				putString(CourseDetailFragment.TAG_COURSE_ID, course.getId())
+//			}
+//			loadFragment(fragment, CourseDetailFragment.TAG)
+//		}
 	}
 
 	fun toCourseCreateFragment() {
@@ -44,12 +45,12 @@ class ScreenNavigator @Inject constructor(
 		}
 	}
 
-	fun toCourseListFragment(courseId: String? = null) {
+	fun toCourseListFragment(courseId: Int? = null) {
 		val fragment = CourseListFragment()
 		courseId?.let {
 			clearBackStack()
 			fragment.arguments = Bundle().apply {
-				putString(CourseListFragment.TAG_COURSE_ID, courseId)
+				putInt(CourseListFragment.TAG_COURSE_ID, courseId)
 			}
 		}
 		loadFragment(fragment, CourseListFragment.TAG)

@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class LanguageType(
-		var id: String?,
-		var name: String?,
+		var id: String,
+		var name: String,
 		var drawable: Int
 ) : Parcelable

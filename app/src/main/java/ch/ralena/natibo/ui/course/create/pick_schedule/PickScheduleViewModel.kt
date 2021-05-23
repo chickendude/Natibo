@@ -8,6 +8,9 @@ import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.ScreenNavigator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -66,12 +69,25 @@ class PickScheduleViewModel @Inject constructor(
 				"$i"
 		}.joinToString("")
 
-		val course =
-			courseRepository.createCourse(order, numSentencesPerDay, startingSentence, dailyReviews, title, languages)
+		val baseLanguageCode = languages.first().languageId
+		val targetLanguageCode = languages.last().languageId
 
-		// TODO: perhaps wait for response from courseRepository and send signal back to fragment
-		//  sharing whether or not it was successful
-		screenNavigator.toCourseListFragment(course.id)
+		coroutineScope.launch(Dispatchers.Main) {
+			val course = withContext(Dispatchers.IO) {
+					courseRepository.createCourse(
+						order,
+						numSentencesPerDay,
+						startingSentence,
+						dailyReviews,
+						title,
+						baseLanguageCode,
+						targetLanguageCode
+					)
+			}
+			// TODO: perhaps wait for response from courseRepository and send signal back to fragment
+			//  sharing whether or not it was successful
+			screenNavigator.toCourseListFragment(course.id)
+		}
 	}
 
 	fun getSchedulePatternFromString(string: String): String {

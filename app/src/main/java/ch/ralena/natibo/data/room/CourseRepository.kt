@@ -3,62 +3,73 @@ package ch.ralena.natibo.data.room
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.`object`.*
+import ch.ralena.natibo.data.room.dao.CourseDao
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmResults
 import io.realm.kotlin.executeTransactionAwait
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
 /**
  * Repository for obtaining [Course] data.
  */
-class CourseRepository @Inject constructor(private val realm: Realm) {
+class CourseRepository @Inject constructor(
+	private val realm: Realm,
+	private val courseDao: CourseDao
+) {
 	/**
 	 * Fetches all courses in the database.
 	 *
-	 * @return `RealmResults` containing all courses in the database.
+	 * @return [List] containing all courses in the database.
 	 */
-	fun fetchCourses(): RealmResults<Course> = realm.where(Course::class.java).findAll()
+	suspend fun fetchCourses(): List<CourseRoom> = courseDao.getAll()
 
-	fun createCourse(
+	suspend fun createCourse(
 		order: String,
 		numSentencesPerDay: Int,
 		startingSentence: Int,
 		dailyReviews: List<String>,
 		title: String,
-		languages: List<Language>
-	): Course {
-		// --- begin transaction
-		realm.beginTransaction()
+		baseLanguageCode: String,
+		targetLanguageCode: String
+	): CourseRoom {
+		val scheduleRoom = ScheduleRoom(numSentencesPerDay, startingSentence, order, dailyReviews.joinToString(" "))
+		val courseRoom = CourseRoom(title, baseLanguageCode, targetLanguageCode, scheduleRoom)
+		courseDao.insert(courseRoom)
 
-		// Create sentence schedule
-		val schedule =
-			realm.createObject(Schedule::class.java, UUID.randomUUID().toString()).apply {
-				this.order = order
-				numSentences = numSentencesPerDay
-				sentenceIndex = startingSentence - 1
-				for (review in dailyReviews)
-					reviewPattern.add(review.toInt())
-			}
+//		// --- begin transaction
+//		realm.beginTransaction()
+//
+//		// Create sentence schedule
+//		val schedule =
+//			realm.createObject(Schedule::class.java, UUID.randomUUID().toString()).apply {
+//				this.order = order
+//				numSentences = numSentencesPerDay
+//				sentenceIndex = startingSentence - 1
+//				for (review in dailyReviews)
+//					reviewPattern.add(review.toInt())
+//			}
+//
+//		// Build course
+//		val course = realm.createObject(Course::class.java, UUID.randomUUID().toString()).apply {
+//			this.title = title
+//			this.languages.clear()
+//			this.languages.addAll(languages)
+//			pauseMillis = 1000
+//			this.schedule = schedule
+//			// TODO: make sure triangulation packs are handled
+//			packs = languages.first().getMatchingPacks(languages.last())
+//			buildFirstDay(this)
+//		}
+//		realm.commitTransaction()
+//		// --- end transaction
+//		for (set in course.currentDay.sentenceSets)
+//			set.buildSentences(realm)
 
-		// Build course
-		val course = realm.createObject(Course::class.java, UUID.randomUUID().toString()).apply {
-			this.title = title
-			this.languages.clear()
-			this.languages.addAll(languages)
-			pauseMillis = 1000
-			this.schedule = schedule
-			// TODO: make sure triangulation packs are handled
-			packs = languages.first().getMatchingPacks(languages.last())
-			buildFirstDay(this)
-		}
-		realm.commitTransaction()
-		// --- end transaction
-		for (set in course.currentDay.sentenceSets)
-			set.buildSentences(realm)
-
-		return course
+		return courseRoom
 	}
 
 	/**
@@ -130,7 +141,8 @@ class CourseRepository @Inject constructor(private val realm: Realm) {
 
 			// create new set of sentences based off the schedule
 			val sentenceSet = SentenceSet()
-			sentenceSet.sentenceSet = getSentenceGroups(sentenceIndex, numSentences, course.languages, course.packs)
+			sentenceSet.sentenceSet =
+				getSentenceGroups(sentenceIndex, numSentences, course.languages, course.packs)
 			sentenceSet.reviews = reviewPattern
 			sentenceSet.isFirstDay = true
 			sentenceSet.order = course.schedule.order

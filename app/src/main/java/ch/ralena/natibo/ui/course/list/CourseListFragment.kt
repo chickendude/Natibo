@@ -4,12 +4,12 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Course
+import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.databinding.FragmentCourseListBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.course.list.adapter.CourseListAdapter
-import ch.ralena.natibo.utils.ScreenNavigator
 import javax.inject.Inject
 
 class CourseListFragment :
@@ -37,9 +37,9 @@ class CourseListFragment :
 
 		// check if a course id was passed in, if so move to CourseDetailFragment and add to back stack
 		arguments?.let {
-			val courseId = it.getString(TAG_COURSE_ID)
+			val courseId = it.getInt(TAG_COURSE_ID, -1)
 			arguments = null
-			if (courseId != null)
+			if (courseId >= 0)
 				viewModel.redirectToCourseDetail(courseId)
 		}
 
@@ -73,7 +73,7 @@ class CourseListFragment :
 	}
 
 	// region ViewModel listeners ------------------------------------------------------------------
-	override fun showCourses(courses: List<Course>) {
+	override fun showCourses(courses: List<CourseRoom>) {
 		courseListAdapter.loadCourses(courses)
 	}
 
@@ -83,7 +83,7 @@ class CourseListFragment :
 	// endregion ViewModel listeners ---------------------------------------------------------------
 
 	// region CourseListAdapter listeners ----------------------------------------------------------
-	override fun onCourseClicked(course: Course) {
+	override fun onCourseClicked(course: CourseRoom) {
 		viewModel.redirectToCourseDetail(course.id)
 	}
 	// endregion CourseListAdapter listeners -------------------------------------------------------

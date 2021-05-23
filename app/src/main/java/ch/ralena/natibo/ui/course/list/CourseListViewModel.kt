@@ -1,10 +1,12 @@
 package ch.ralena.natibo.ui.course.list
 
 import ch.ralena.natibo.data.room.CourseRepository
-import ch.ralena.natibo.data.room.`object`.Course
+import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.ScreenNavigator
-import io.realm.RealmResults
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class CourseListViewModel @Inject constructor(
@@ -12,25 +14,29 @@ class CourseListViewModel @Inject constructor(
 		private val screenNavigator: ScreenNavigator
 ) : BaseViewModel<CourseListViewModel.Listener>() {
 	interface Listener {
-		fun showCourses(courses: List<Course>)
+		fun showCourses(courses: List<CourseRoom>)
 		fun showNoCourses()
 	}
 
 	fun fetchCourses() {
-		val courses = courseRepository.fetchCourses()
-		if (courses.size > 0)
-			for (listener in listeners)
-				listener.showCourses(courses)
-		else
-			for (listener in listeners)
-				listener.showNoCourses()
+		coroutineScope.launch(Dispatchers.Main) {
+			val courses = withContext(Dispatchers.IO) {
+				courseRepository.fetchCourses()
+			}
+			if (courses.isNotEmpty())
+				for (listener in listeners)
+					listener.showCourses(courses)
+			else
+				for (listener in listeners)
+					listener.showNoCourses()
+		}
 	}
 
 	fun fabClicked() {
 		screenNavigator.toCourseCreateFragment()
 	}
 
-	fun redirectToCourseDetail(courseId: String) {
+	fun redirectToCourseDetail(courseId: Int) {
 		screenNavigator.toCourseDetailFragment(courseId)
 	}
 }
