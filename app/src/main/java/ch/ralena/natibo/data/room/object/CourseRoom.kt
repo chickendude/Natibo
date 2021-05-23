@@ -19,6 +19,10 @@ data class CourseRoom(
 	@Embedded
 	val schedule: ScheduleRoom,
 
+	/** Contains information on the current study session in progress */
+	@Embedded
+	val session: SessionRoom?,
+
 	/** The amount of time to pause between sentences. Measured in milliseconds. */
 	val pause: Int = 1000,
 
@@ -56,4 +60,13 @@ data class ScheduleRoom(
 	 *  sentences 40 times, and 60 new sentences, etc.
 	 */
 	val reviewPattern: String
+)
+
+data class SessionRoom(
+	/**
+	 * User's progress in the current session.
+	 *
+	 * Holds the index of the current sentence being studied.
+	 */
+	val progress: Int,
 )

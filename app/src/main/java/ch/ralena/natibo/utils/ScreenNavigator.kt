@@ -61,12 +61,12 @@ class ScreenNavigator @Inject constructor(
 		loadFragment(fragment, PickScheduleFragment.TAG)
 	}
 
-	fun toCourseSettingsFragment(courseId: String) {
+	fun toCourseSettingsFragment(courseId: Int) {
 		val fragment = CourseSettingsFragment()
 
 		// load fragment ID into fragment arguments
 		fragment.arguments = Bundle().apply {
-			putString(CourseSettingsFragment.KEY_ID, courseId)
+			putInt(CourseSettingsFragment.KEY_ID, courseId)
 		}
 		loadFragment(fragment, CourseSettingsFragment.TAG)
 	}
@@ -96,10 +96,10 @@ class ScreenNavigator @Inject constructor(
 		loadFragment(fragment, SentenceListFragment.TAG)
 	}
 
-	fun toStudySessionFragment(courseId: String) {
+	fun toStudySessionFragment(courseId: Int) {
 		val fragment = StudySessionFragment()
 		fragment.arguments = Bundle().apply {
-			putString(StudySessionFragment.KEY_COURSE_ID, courseId)
+			putInt(StudySessionFragment.KEY_COURSE_ID, courseId)
 		}
 		loadFragment(fragment, StudySessionFragment.TAG)
 	}

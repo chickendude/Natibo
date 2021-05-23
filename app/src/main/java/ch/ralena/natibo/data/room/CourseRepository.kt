@@ -9,9 +9,11 @@ import io.realm.RealmList
 import io.realm.RealmResults
 import io.realm.kotlin.executeTransactionAwait
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 
 /**
  * Repository for obtaining [Course] data.
@@ -36,8 +38,13 @@ class CourseRepository @Inject constructor(
 		baseLanguageCode: String,
 		targetLanguageCode: String
 	): CourseRoom {
-		val scheduleRoom = ScheduleRoom(numSentencesPerDay, startingSentence, order, dailyReviews.joinToString(" "))
-		val courseRoom = CourseRoom(title, baseLanguageCode, targetLanguageCode, scheduleRoom)
+		val scheduleRoom = ScheduleRoom(
+			numSentencesPerDay,
+			startingSentence,
+			order,
+			dailyReviews.joinToString(" ")
+		)
+		val courseRoom = CourseRoom(title, baseLanguageCode, targetLanguageCode, scheduleRoom, null)
 		courseDao.insert(courseRoom)
 
 //		// --- begin transaction
@@ -80,7 +87,7 @@ class CourseRepository @Inject constructor(
 	 * @param packId The ID of the pack to toggle.
 	 * @param courseId The course ID of the pack which should be toggled.
 	 */
-	suspend fun togglePackInCourse(packId: String, courseId: String) {
+	suspend fun togglePackInCourse(packId: String, courseId: Int) {
 		val r = Realm.getDefaultInstance()
 		r.executeTransactionAwait {
 			val course = it.where(Course::class.java).equalTo("id", courseId).findFirst()!!
@@ -101,12 +108,12 @@ class CourseRepository @Inject constructor(
 	 * @param callback If found, the course will be passed to this wrapped in [Result.Success],
 	 * otherwise [Result.Failure] will be passed in.
 	 */
-	fun fetchCourse(courseId: String, callback: (result: Result<Course>) -> Unit) {
-		val course = realm.where(Course::class.java).equalTo("id", courseId).findFirst()
-		if (course == null)
-			callback(Result.Failure(R.string.course_not_found))
+	suspend fun fetchCourse(courseId: Int): Result<CourseRoom> {
+		val course = courseDao.getCourseById(courseId)
+		return if (course == null)
+			Result.Failure(R.string.course_not_found)
 		else
-			callback(Result.Success(course))
+			Result.Success(course)
 	}
 
 	/**
@@ -168,13 +175,8 @@ class CourseRepository @Inject constructor(
 		}
 	}
 
-	fun deleteCourse(courseId: String) {
-		realm.executeTransactionAsync {
-			it.where(Course::class.java)
-				.equalTo("id", courseId)
-				.findFirst()
-				?.deleteFromRealm()
-		}
+	suspend fun deleteCourse(course: CourseRoom) {
+		courseDao.delete(course)
 	}
 
 	// region Helper functions----------------------------------------------------------------------

@@ -5,7 +5,10 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
+import ch.ralena.natibo.data.LanguageData
+import ch.ralena.natibo.data.LanguageType
 import ch.ralena.natibo.data.room.`object`.Course
+import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.Pack
 import ch.ralena.natibo.databinding.FragmentCourseDetailBinding
 import ch.ralena.natibo.di.component.PresentationComponent
@@ -68,19 +71,13 @@ class CourseDetailFragment
 			viewModel.openSettings()
 		}
 
-		val id = arguments?.getString(TAG_COURSE_ID)
-		viewModel.fetchCourse(id)
+		arguments?.getInt(TAG_COURSE_ID)?.let {
+			viewModel.fetchCourse(it)
+		}
 	}
 
 	override fun injectDependencies(injector: PresentationComponent) {
 		injector.inject(this)
-	}
-
-	private fun loadCourseInfo(course: Course) {
-		binding.totalRepsText.text = String.format(Locale.US, "%d", course.totalReps)
-		binding.totalSentencesSeenText.text =
-			String.format(Locale.US, "%d", course.numSentencesSeen)
-		binding.flagImageView.setImageResource(course.languages.last()!!.languageType.drawable)
 	}
 
 	override fun onBookClicked(pack: Pack) {
@@ -95,13 +92,13 @@ class CourseDetailFragment
 		}
 	}
 
-	override fun onCourseFetched(course: Course) {
+	override fun onCourseFetched(course: CourseRoom) {
 		activity.title = course.title
-		val targetLanguage = course.languages.first()!!
+		val targetLanguage = getLanguage(course.targetLanguageCode)
 		loadCourseInfo(course)
-		val matchingPacks: List<Pack> =
-			targetLanguage.getMatchingPacks(course.languages.last())
-		packAdapter.loadPacks(matchingPacks)
+//		val matchingPacks: List<Pack> =
+//			targetLanguage.getMatchingPacks(course.languages.last())
+//		packAdapter.loadPacks(matchingPacks)
 	}
 
 	override fun onCourseNotFound() {
@@ -119,4 +116,17 @@ class CourseDetailFragment
 	override fun onSessionNotStarted() {
 		binding.startSessionButton.text = getString(R.string.start_session)
 	}
+
+	// region Helper functions----------------------------------------------------------------------
+	private fun getLanguage(code: String) = LanguageData.getLanguageById(code)
+
+	private fun loadCourseInfo(course: CourseRoom) {
+		binding.totalRepsText.text = String.format(Locale.US, "%d", course.repCount)
+//		binding.totalSentencesSeenText.text =
+//			String.format(Locale.US, "%d", course.numSentencesSeen)
+		getLanguage(course.targetLanguageCode)?.run {
+			binding.flagImageView.setImageResource(drawable)
+		}
+	}
+	// endregion Helper functions-------------------------------------------------------------------
 }

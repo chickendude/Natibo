@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Course
+import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.Day
 import ch.ralena.natibo.data.room.`object`.SentenceGroup
 import ch.ralena.natibo.databinding.FragmentStudySessionBinding
@@ -245,7 +246,7 @@ class StudySessionFragment :
 		Toast.makeText(activity, stringRes, Toast.LENGTH_SHORT).show()
 	}
 
-	override fun onCourseLoaded(course: Course) {
+	override fun onCourseLoaded(course: CourseRoom) {
 
 	}
 

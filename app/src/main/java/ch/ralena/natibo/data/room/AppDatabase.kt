@@ -7,7 +7,7 @@ import ch.ralena.natibo.data.room.dao.CourseDao
 
 @Database(
 	entities = [CourseRoom::class],
-	version = 2
+	version = 1
 )
 abstract class AppDatabase : RoomDatabase() {
 	abstract fun courseDao(): CourseDao
