@@ -1,173 +1,165 @@
-package ch.ralena.natibo.ui.language.importer;
+package ch.ralena.natibo.ui.language.importer
 
-import android.annotation.SuppressLint;
-import android.net.Uri;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.annotation.SuppressLint
+import android.net.Uri
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.work.*
+import ch.ralena.natibo.R
+import ch.ralena.natibo.ui.MainActivity
+import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker
+import ch.ralena.natibo.ui.language.list.LanguageListFragment
+import ch.ralena.natibo.utils.GLSImporter
 
-import ch.ralena.natibo.ui.MainActivity;
-import ch.ralena.natibo.R;
-import ch.ralena.natibo.ui.language.list.LanguageListFragment;
-import ch.ralena.natibo.utils.GLSImporter;
+class LanguageImportFragment : Fragment() {
 
-public class LanguageImportFragment extends Fragment {
-	public static final String EXTRA_URI = "extra_uri";
-	public static final int ACTION_OPENING_FILE = 0;
-	public static final int ACTION_COUNTING_SENTENCES = 1;
-	public static final int ACTION_READING_SENTENCES = 2;
-	public static final int ACTION_EXTRACTING_TEXT = 3;
-	public static final int ACTION_EXTRACTING_AUDIO = 4;
-	public static final int ACTION_EXIT = 5;
+	var progressBar: ProgressBar? = null
+	var fileNameText: TextView? = null
+	var actionText: TextView? = null
+	var counterText: TextView? = null
+	var totalText: TextView? = null
+	var dividerBarLabel: TextView? = null
+	var curAction = 0
 
-	ProgressBar progressBar;
-	TextView fileNameText;
-	TextView actionText;
-	TextView counterText;
-	TextView totalText;
-	TextView dividerBarLabel;
-
-	int curAction;
-
-	@Nullable
-	@Override
-	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_language_import, container, false);
-		progressBar = view.findViewById(R.id.progressBar);
-		fileNameText = view.findViewById(R.id.fileNameText);
-		actionText = view.findViewById(R.id.actionText);
-		counterText = view.findViewById(R.id.counterText);
-		totalText = view.findViewById(R.id.totalText);
-		dividerBarLabel = view.findViewById(R.id.dividerBarLabel);
-		return view;
+	override fun onCreateView(
+		inflater: LayoutInflater,
+		container: ViewGroup?,
+		savedInstanceState: Bundle?
+	): View? {
+		val view = inflater.inflate(R.layout.fragment_language_import, container, false)
+		progressBar = view.findViewById(R.id.progressBar)
+		fileNameText = view.findViewById(R.id.fileNameText)
+		actionText = view.findViewById(R.id.actionText)
+		counterText = view.findViewById(R.id.counterText)
+		totalText = view.findViewById(R.id.totalText)
+		dividerBarLabel = view.findViewById(R.id.dividerBarLabel)
+		return view
 	}
 
 	@SuppressLint("CheckResult")
-	@Override
-	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-		Uri uri = getArguments().getParcelable(EXTRA_URI);
-		GLSImporter importer = new GLSImporter();
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		val uri = requireArguments().getParcelable<Uri>(EXTRA_URI)
+
+		val data = Data.Builder().apply {
+			putString("uri", uri.toString())
+		}.build()
+
+		val workRequest = OneTimeWorkRequestBuilder<PackImporterWorker>()
+			.setInputData(data)
+			.build()
+		val workManager = WorkManager.getInstance(requireContext())
+		workManager
+			.getWorkInfoByIdLiveData(workRequest.id)
+			.observe(viewLifecycleOwner, {
+				if (it != null) {
+					val progress = it.progress
+					val value = progress.getInt("int", 0)
+				}
+			})
+		workManager
+			.enqueue(workRequest)
+		return
+		val importer = GLSImporter()
 
 		// the total counter
-		importer.totalObservable().subscribe(
-				total -> {
-					if (getActivity() != null)
-						getActivity().runOnUiThread(
-								() -> {
-									totalText.setText(String.valueOf(total));
-									progressBar.setMax(total);
-								}
-						);
-				}
-		);
+		importer.totalObservable().subscribe { total: Int ->
+			if (activity != null) requireActivity().runOnUiThread {
+				totalText!!.text = total.toString()
+				progressBar!!.max = total
+			}
+		}
 
 		// the progress counter
-		importer.progressObservable().subscribe(
-				progress -> {
-					if (getActivity() != null)
-						getActivity().runOnUiThread(
-								() -> {
-									counterText.setText(String.valueOf(progress));
-									progressBar.setProgress(progress);
-									// if pack has finished loading, go to the language list screen.
-									if (curAction == ACTION_EXTRACTING_AUDIO && progressBar.getMax() == progress) {
-										loadLanguageListFragment();
-									}
-								}
-						);
+		importer.progressObservable().subscribe { progress: Int ->
+			if (activity != null) requireActivity().runOnUiThread {
+				counterText!!.text = progress.toString()
+				progressBar!!.progress = progress
+				// if pack has finished loading, go to the language list screen.
+				if (curAction == ACTION_EXTRACTING_AUDIO && progressBar!!.max == progress) {
+					loadLanguageListFragment()
 				}
-		);
+			}
+		}
 
 		// load filename
-		importer.fileNameSubject().subscribe(
-				filename -> {
-					if (getActivity() != null)
-						getActivity().runOnUiThread(() -> {
-							fileNameText.setVisibility(View.VISIBLE);
-							fileNameText.setText(filename);
-						});
-				});
+		importer.fileNameSubject().subscribe { filename: String? ->
+			if (activity != null) requireActivity().runOnUiThread {
+				fileNameText!!.visibility = View.VISIBLE
+				fileNameText!!.text = filename
+			}
+		}
 
 		// the currently happening action
-		importer.actionSubject().subscribe(
-				actionId -> {
-					if (getActivity() != null)
-						getActivity().runOnUiThread(() -> {
-							curAction = actionId;
-							switch (actionId) {
-								case ACTION_OPENING_FILE:
-									openFile();
-									break;
-								case ACTION_COUNTING_SENTENCES:
-									countSentences();
-									break;
-								case ACTION_READING_SENTENCES:
-									readSentences();
-									break;
-								case ACTION_EXTRACTING_TEXT:
-									extractText();
-									break;
-								case ACTION_EXTRACTING_AUDIO:
-									extractAudio();
-									break;
-								case ACTION_EXIT:
-									loadLanguageListFragment();
-									break;
-							}
-						});
-				});
-
-		importer.importPack((MainActivity) getActivity(), uri);
+		importer.actionSubject().subscribe { actionId: Int ->
+			if (activity != null) requireActivity().runOnUiThread {
+				curAction = actionId
+				when (actionId) {
+					ACTION_OPENING_FILE -> openFile()
+					ACTION_COUNTING_SENTENCES -> countSentences()
+					ACTION_READING_SENTENCES -> readSentences()
+					ACTION_EXTRACTING_TEXT -> extractText()
+					ACTION_EXTRACTING_AUDIO -> extractAudio()
+					ACTION_EXIT -> loadLanguageListFragment()
+				}
+			}
+		}
+		importer.importPack(activity as MainActivity?, uri)
 	}
 
-	private void extractAudio() {
-		actionText.setText(getResources().getString(R.string.extracting_sentence_audio));
+	private fun extractAudio() {
+		actionText!!.text = resources.getString(R.string.extracting_sentence_audio)
 	}
 
-	private void readSentences() {
-		actionText.setText(getResources().getString(R.string.reading_sentences));
-
-		counterText.setVisibility(View.GONE);
-		dividerBarLabel.setVisibility(View.GONE);
-		totalText.setVisibility(View.GONE);
+	private fun readSentences() {
+		actionText!!.text = resources.getString(R.string.reading_sentences)
+		counterText!!.visibility = View.GONE
+		dividerBarLabel!!.visibility = View.GONE
+		totalText!!.visibility = View.GONE
 	}
 
-	private void extractText() {
-		actionText.setText(getResources().getString(R.string.extracting_sentence_text));
-
-		counterText.setVisibility(View.VISIBLE);
-		totalText.setVisibility(View.VISIBLE);
-		dividerBarLabel.setVisibility(View.VISIBLE);
+	private fun extractText() {
+		actionText!!.text = resources.getString(R.string.extracting_sentence_text)
+		counterText!!.visibility = View.VISIBLE
+		totalText!!.visibility = View.VISIBLE
+		dividerBarLabel!!.visibility = View.VISIBLE
 	}
 
-	private void countSentences() {
-		actionText.setText(getResources().getString(R.string.counting_sentences));
-
-		counterText.setVisibility(View.VISIBLE);
-		totalText.setVisibility(View.VISIBLE);
-		dividerBarLabel.setVisibility(View.VISIBLE);
+	private fun countSentences() {
+		actionText!!.text = resources.getString(R.string.counting_sentences)
+		counterText!!.visibility = View.VISIBLE
+		totalText!!.visibility = View.VISIBLE
+		dividerBarLabel!!.visibility = View.VISIBLE
 	}
 
-	private void openFile() {
-		actionText.setText(getResources().getString(R.string.opening_file));
-
-		fileNameText.setVisibility(View.VISIBLE);
-		actionText.setVisibility(View.VISIBLE);
-		counterText.setVisibility(View.GONE);
-		totalText.setVisibility(View.GONE);
-		dividerBarLabel.setVisibility(View.GONE);
+	private fun openFile() {
+		actionText!!.text = resources.getString(R.string.opening_file)
+		fileNameText!!.visibility = View.VISIBLE
+		actionText!!.visibility = View.VISIBLE
+		counterText!!.visibility = View.GONE
+		totalText!!.visibility = View.GONE
+		dividerBarLabel!!.visibility = View.GONE
 	}
 
-	private void loadLanguageListFragment() {
-		LanguageListFragment fragment = new LanguageListFragment();
-		getFragmentManager().beginTransaction()
-				.replace(R.id.fragmentPlaceHolder, fragment)
-				.commit();
+	private fun loadLanguageListFragment() {
+		val fragment = LanguageListFragment()
+		parentFragmentManager.beginTransaction()
+			.replace(R.id.fragmentPlaceHolder, fragment)
+			.commit()
+	}
+
+	companion object {
+		const val EXTRA_URI = "extra_uri"
+		const val ACTION_OPENING_FILE = 0
+		const val ACTION_COUNTING_SENTENCES = 1
+		const val ACTION_READING_SENTENCES = 2
+		const val ACTION_EXTRACTING_TEXT = 3
+		const val ACTION_EXTRACTING_AUDIO = 4
+		const val ACTION_EXIT = 5
 	}
 }
