@@ -6,14 +6,9 @@ import ch.ralena.natibo.data.room.`object`.*
 import ch.ralena.natibo.data.room.dao.CourseDao
 import io.realm.Realm
 import io.realm.RealmList
-import io.realm.RealmResults
 import io.realm.kotlin.executeTransactionAwait
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
-import kotlin.coroutines.coroutineContext
 
 /**
  * Repository for obtaining [Course] data.

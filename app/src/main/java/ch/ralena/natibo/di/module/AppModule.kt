@@ -25,4 +25,12 @@ class AppModule(private val application: Application) {
 	@Provides
 	@AppScope
 	fun courseDao(database: AppDatabase) = database.courseDao()
+
+	@Provides
+	@AppScope
+	fun packDao(database: AppDatabase) = database.packDao()
+
+	@Provides
+	@AppScope
+	fun sentenceDao(database: AppDatabase) = database.sentenceDao()
 }
