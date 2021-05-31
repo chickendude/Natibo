@@ -57,7 +57,7 @@ dependencies {
 	implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 	implementation 'io.reactivex.rxjava2:rxjava:2.2.6'
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-	kapt "androidx.room:room-compiler:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 	kapt "com.google.dagger:dagger-compiler:$dagger_version"
 //	debugImplementation 'com.facebook.stetho:stetho:1.5.1'
 //	debugImplementation 'com.uphyca:stetho_realm:2.2.2'

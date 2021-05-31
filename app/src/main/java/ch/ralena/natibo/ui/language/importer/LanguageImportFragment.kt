@@ -3,69 +3,54 @@ package ch.ralena.natibo.ui.language.importer
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ProgressBar
-import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.work.*
+import androidx.work.WorkManager
 import ch.ralena.natibo.R
-import ch.ralena.natibo.ui.MainActivity
+import ch.ralena.natibo.databinding.FragmentLanguageImportBinding
+import ch.ralena.natibo.di.component.PresentationComponent
+import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker
 import ch.ralena.natibo.ui.language.list.LanguageListFragment
-import ch.ralena.natibo.utils.GLSImporter
 
-class LanguageImportFragment : Fragment() {
+enum class ImportProgress {
+	COUNTING_SENTENCES,
+	SENTENCES_LOADED
+}
+class LanguageImportFragment :
+	BaseFragment<
+			FragmentLanguageImportBinding,
+			LanguageImportViewModel.Listener,
+			LanguageImportViewModel>(
+		FragmentLanguageImportBinding::inflate
+	) {
+	companion object {
+		const val EXTRA_URI = "extra_uri"
+		const val WORKER_PROGRESS = "worker_progress"
+		const val PROGRESS_VALUE = "progress_value"
+		const val ACTION_OPENING_FILE = 0
+		const val ACTION_COUNTING_SENTENCES = 1
+		const val ACTION_READING_SENTENCES = 2
+		const val ACTION_EXTRACTING_TEXT = 3
+		const val ACTION_EXTRACTING_AUDIO = 4
+		const val ACTION_EXIT = 5
+	}
 
-	var progressBar: ProgressBar? = null
-	var fileNameText: TextView? = null
-	var actionText: TextView? = null
-	var counterText: TextView? = null
-	var totalText: TextView? = null
-	var dividerBarLabel: TextView? = null
 	var curAction = 0
 
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedInstanceState: Bundle?
-	): View? {
-		val view = inflater.inflate(R.layout.fragment_language_import, container, false)
-		progressBar = view.findViewById(R.id.progressBar)
-		fileNameText = view.findViewById(R.id.fileNameText)
-		actionText = view.findViewById(R.id.actionText)
-		counterText = view.findViewById(R.id.counterText)
-		totalText = view.findViewById(R.id.totalText)
-		dividerBarLabel = view.findViewById(R.id.dividerBarLabel)
-		return view
+
+	override fun setupViews(view: View) {
+		launchWorker()
+	}
+
+	override fun injectDependencies(injector: PresentationComponent) {
+		injector.inject(this)
 	}
 
 	@SuppressLint("CheckResult")
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		val uri = requireArguments().getParcelable<Uri>(EXTRA_URI)
-
-		val data = Data.Builder().apply {
-			putString("uri", uri.toString())
-		}.build()
-
-		val workRequest = OneTimeWorkRequestBuilder<PackImporterWorker>()
-			.setInputData(data)
-			.build()
-		val workManager = WorkManager.getInstance(requireContext())
-		workManager
-			.getWorkInfoByIdLiveData(workRequest.id)
-			.observe(viewLifecycleOwner, {
-				if (it != null) {
-					val progress = it.progress
-					val value = progress.getInt("int", 0)
-				}
-			})
-		workManager
-			.enqueue(workRequest)
 		return
-		val importer = GLSImporter()
+/*		val importer = GLSImporter()
 
 		// the total counter
 		importer.totalObservable().subscribe { total: Int ->
@@ -109,42 +94,42 @@ class LanguageImportFragment : Fragment() {
 				}
 			}
 		}
-		importer.importPack(activity as MainActivity?, uri)
+		importer.importPack(activity as MainActivity?, uri)*/
 	}
 
-	private fun extractAudio() {
-		actionText!!.text = resources.getString(R.string.extracting_sentence_audio)
-	}
-
-	private fun readSentences() {
-		actionText!!.text = resources.getString(R.string.reading_sentences)
-		counterText!!.visibility = View.GONE
-		dividerBarLabel!!.visibility = View.GONE
-		totalText!!.visibility = View.GONE
-	}
-
-	private fun extractText() {
-		actionText!!.text = resources.getString(R.string.extracting_sentence_text)
-		counterText!!.visibility = View.VISIBLE
-		totalText!!.visibility = View.VISIBLE
-		dividerBarLabel!!.visibility = View.VISIBLE
-	}
-
-	private fun countSentences() {
-		actionText!!.text = resources.getString(R.string.counting_sentences)
-		counterText!!.visibility = View.VISIBLE
-		totalText!!.visibility = View.VISIBLE
-		dividerBarLabel!!.visibility = View.VISIBLE
-	}
-
-	private fun openFile() {
-		actionText!!.text = resources.getString(R.string.opening_file)
-		fileNameText!!.visibility = View.VISIBLE
-		actionText!!.visibility = View.VISIBLE
-		counterText!!.visibility = View.GONE
-		totalText!!.visibility = View.GONE
-		dividerBarLabel!!.visibility = View.GONE
-	}
+//	private fun extractAudio() {
+//		actionText!!.text = resources.getString(R.string.extracting_sentence_audio)
+//	}
+//
+//	private fun readSentences() {
+//		actionText!!.text = resources.getString(R.string.reading_sentences)
+//		counterText!!.visibility = View.GONE
+//		dividerBarLabel!!.visibility = View.GONE
+//		totalText!!.visibility = View.GONE
+//	}
+//
+//	private fun extractText() {
+//		actionText!!.text = resources.getString(R.string.extracting_sentence_text)
+//		counterText!!.visibility = View.VISIBLE
+//		totalText!!.visibility = View.VISIBLE
+//		dividerBarLabel!!.visibility = View.VISIBLE
+//	}
+//
+//	private fun countSentences() {
+//		actionText!!.text = resources.getString(R.string.counting_sentences)
+//		counterText!!.visibility = View.VISIBLE
+//		totalText!!.visibility = View.VISIBLE
+//		dividerBarLabel!!.visibility = View.VISIBLE
+//	}
+//
+//	private fun openFile() {
+//		actionText!!.text = resources.getString(R.string.opening_file)
+//		fileNameText!!.visibility = View.VISIBLE
+//		actionText!!.visibility = View.VISIBLE
+//		counterText!!.visibility = View.GONE
+//		totalText!!.visibility = View.GONE
+//		dividerBarLabel!!.visibility = View.GONE
+//	}
 
 	private fun loadLanguageListFragment() {
 		val fragment = LanguageListFragment()
@@ -153,13 +138,36 @@ class LanguageImportFragment : Fragment() {
 			.commit()
 	}
 
-	companion object {
-		const val EXTRA_URI = "extra_uri"
-		const val ACTION_OPENING_FILE = 0
-		const val ACTION_COUNTING_SENTENCES = 1
-		const val ACTION_READING_SENTENCES = 2
-		const val ACTION_EXTRACTING_TEXT = 3
-		const val ACTION_EXTRACTING_AUDIO = 4
-		const val ACTION_EXIT = 5
+	// region Helper functions----------------------------------------------------------------------
+	private fun launchWorker() {
+		val uri = requireArguments().getParcelable<Uri>(EXTRA_URI)
+
+		val data = Data.Builder().apply {
+			putString("uri", uri.toString())
+		}.build()
+
+		val workRequest = OneTimeWorkRequestBuilder<PackImporterWorker>()
+			.setInputData(data)
+			.build()
+		val workManager = WorkManager.getInstance(requireContext())
+		workManager
+			.getWorkInfoByIdLiveData(workRequest.id)
+			.observe(viewLifecycleOwner, { workInfo ->
+				if (workInfo != null) {
+					val progress = workInfo.progress
+					val updateType = progress.getInt(WORKER_PROGRESS, -1)
+					when(updateType) {
+						ImportProgress.COUNTING_SENTENCES.ordinal -> {
+							val count = progress.getInt(PROGRESS_VALUE, -1)
+							viewModel.updateSentenceCount(count)
+						}
+						ImportProgress.SENTENCES_LOADED.ordinal -> {
+							binding.actionText.text = "Sentences loaded"
+						}
+					}
+				}
+			})
+		workManager.enqueue(workRequest)
 	}
+	// endregion Helper functions-------------------------------------------------------------------
 }

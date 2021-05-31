@@ -7,6 +7,7 @@ import ch.ralena.natibo.ui.course.create.pick_schedule.PickScheduleFragment
 import ch.ralena.natibo.ui.course.detail.CourseDetailFragment
 import ch.ralena.natibo.ui.course.list.CourseListFragment
 import ch.ralena.natibo.ui.language.detail.LanguageDetailFragment
+import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
 import ch.ralena.natibo.ui.language.list.LanguageListFragment
 import ch.ralena.natibo.ui.study.insession.StudySessionFragment
 import dagger.Subcomponent
@@ -21,4 +22,5 @@ interface PresentationComponent {
 	fun inject(fragment: LanguageDetailFragment)
 	fun inject(fragment: CourseDetailFragment)
 	fun inject(fragment: StudySessionFragment)
+	fun inject(fragment: LanguageImportFragment)
 }

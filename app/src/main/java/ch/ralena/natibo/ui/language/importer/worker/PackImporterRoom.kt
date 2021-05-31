@@ -12,15 +12,14 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.work.CoroutineWorker
-import androidx.work.ForegroundInfo
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
+import androidx.work.*
+import ch.ralena.natibo.MainApplication
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.LanguageData
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.Pack
 import ch.ralena.natibo.ui.MainActivity
+import ch.ralena.natibo.ui.language.importer.ImportProgress
 import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
 import io.reactivex.subjects.PublishSubject
 import io.realm.Realm
@@ -35,18 +34,19 @@ import java.util.zip.ZipInputStream
 /**
  * Methods for importing a .gls file into the database.
  */
-class PackImporterWorker(context: Context, parameters: WorkerParameters) :
-	CoroutineWorker(context, parameters) {
+internal class PackImporterWorker(context: Context, parameters: WorkerParameters) :
+	CoroutineWorker(context, parameters),
+	CountFilesUseCase.Listener {
 
 	companion object {
-		val TAG = PackImporterWorker::class.java.simpleName
+		val TAG: String = PackImporterWorker::class.java.simpleName
 		const val NOTIFICATION_ID = 1
 		const val CHANNEL_ID = "pack_importer_id"
 
 		private const val STATUS_OK = 0
 		private const val STATUS_MISSING_GSP = 1
 		private const val STATUS_INVALID_LANGUAGE = 2
-		private const val BUFFER_SIZE = 1024
+		const val BUFFER_SIZE = 1024
 	}
 
 	private val contentResolver = applicationContext.contentResolver
@@ -56,10 +56,12 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 
 	private lateinit var notificationBuilder: NotificationCompat.Builder
 
+	private val countFilesUseCase = CountFilesUseCase()
+
 	override suspend fun doWork(): Result {
+		injectDependencies()
 		val uri = inputData.getString("uri")!!
-		val progress = uri
-		val foregroundInfo = createForegroundInfo(progress)
+		val foregroundInfo = createForegroundInfo(uri)
 		setForeground(foregroundInfo)
 		val success = loadPackFromUri(uri)
 		if (success.not())
@@ -71,8 +73,11 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		return Result.success()
 	}
 
+	private fun injectDependencies() {
+	}
+
 	// region Notification Setup--------------------------------------------------------------------
-	private fun createForegroundInfo(progress: String): ForegroundInfo {
+	private fun createForegroundInfo(contentText: String): ForegroundInfo {
 //		val id = applicationContext.getString(R.string.notification_channel_id)
 		val title = "Loading pack"
 		val cancel = "Cancel"
@@ -85,7 +90,7 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
 			.setContentTitle(title)
 			.setTicker(title)
-			.setContentText(progress)
+			.setContentText(contentText)
 			.setSmallIcon(R.drawable.ic_logo)
 			.setOngoing(true)
 			.addAction(android.R.drawable.ic_delete, cancel, intent)
@@ -131,20 +136,22 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		return uriString.substring(index + 1)
 	}
 
-	private fun readPack(uri: Uri): Boolean {
+	private suspend fun readPack(uri: Uri): Boolean {
 		// first pass
 		var bos: BufferedOutputStream
 		val inputStream = getInputStream(uri) ?: return false
 		val zis = ZipInputStream(BufferedInputStream(inputStream))
 
 		// check if there's anything missing in the file
-		val status = countFiles(zis)
-		if (status > STATUS_OK) {
-			val stringResId = when (status) {
-				STATUS_INVALID_LANGUAGE -> R.string.language_not_supported
-				STATUS_MISSING_GSP -> R.string.missing_gsp
-				else -> R.string.error_opening_file
-			}
+		countFilesUseCase.countFiles(zis, this)
+
+
+//		if (status > STATUS_OK) {
+//			val stringResId = when (status) {
+//				STATUS_INVALID_LANGUAGE -> R.string.language_not_supported
+//				STATUS_MISSING_GSP -> R.string.missing_gsp
+//				else -> R.string.error_opening_file
+//			}
 //			activity.runOnUiThread {
 //				Toast.makeText(
 //					activity.applicationContext,
@@ -153,7 +160,7 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 //				).show()
 //			}
 //			actionSubject.onNext(LanguageImportFragment.ACTION_EXIT)
-		}
+//		}
 		return true
 	}
 
@@ -161,46 +168,9 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 	 * Counts the number of files in a pack and does some basic verification to ensure files are
 	 * in order.
 	 */
-	@Throws(IOException::class)
-	private fun countFiles(zis: ZipInputStream): Int {
-		// update action in fragment
-//		actionSubject.onNext(LanguageImportFragment.ACTION_COUNTING_SENTENCES)
-		val buffer = ByteArray(BUFFER_SIZE)
-		var zipEntry: ZipEntry
-		var numFiles = 0
-		var bytesRead: Int
-		val baos = ByteArrayOutputStream()
-
-		// calculate number of files
-		var baseLanguage = ""
-		var targetLanguage = ""
-		var packName = ""
-		var hasGspFile = false
-		while (zis.nextEntry.also { zipEntry = it } != null) {
-			// only count the sentence mp3 files
-			if (zipEntry.name.endsWith("mp3")) {
-				packName = zipEntry.name.split(" - ").toTypedArray()[1]
-				numFiles++
-//				actionSubject.onNext(LanguageImportFragment.ACTION_COUNTING_SENTENCES)
-//				totalSubject.onNext(numFiles)
-				updateNotification("Scanning mp3 '$numFiles'")
-			} else if (zipEntry.name.endsWith(".gsp")) {
-				hasGspFile = true
-//				actionSubject.onNext(LanguageImportFragment.ACTION_READING_SENTENCES)
-				// extract base language and target language from file name
-				val nameParts = zipEntry.name.split("-").toTypedArray()
-				baseLanguage = nameParts[0].trim { it <= ' ' }
-				if (nameParts.size > 3) targetLanguage = nameParts[1].trim { it <= ' ' }
-				// extract contents of file into the StringBuilder
-				while (zis.read(buffer, 0, BUFFER_SIZE)
-						.also { bytesRead = it } >= 0
-				) {
-					baos.write(buffer, 0, bytesRead)
-				}
-			}
-		}
-		if (!hasGspFile) return STATUS_MISSING_GSP
-		if (LanguageData.getLanguageById(baseLanguage) == null) return STATUS_INVALID_LANGUAGE
+	private suspend fun countFiles(zis: ZipInputStream): Int {
+//		if (!hasGspFile) return STATUS_MISSING_GSP
+//		if (LanguageData.getLanguageById(baseLanguage) == null) return STATUS_INVALID_LANGUAGE
 
 //		// --- begin transaction
 //		realm.beginTransaction()
@@ -284,7 +254,7 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		return STATUS_OK
 	}
 
-	private fun loadPackFromUri(uriString: String): Boolean {
+	private suspend fun loadPackFromUri(uriString: String): Boolean {
 		// Convert Uri string back to Uri
 		val uri = Uri.parse(uriString)
 		val packFileName = extractFileName(uri) ?: return false
@@ -294,8 +264,7 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 			var bos: BufferedOutputStream
 			var inputStream: InputStream?
 			try {
-				val success = readPack(uri)
-				return success
+				return readPack(uri)
 
 //				// second pass
 //				var zipEntry: ZipEntry
@@ -401,6 +370,26 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		} else contentResolver.openInputStream(uri)
 	}
 	// endregion Helper functions-------------------------------------------------------------------
+
+	// region CountFilesUseCase Listener------------------------------------------------------------
+	private fun getData(type: ImportProgress) =
+		Data.Builder().putInt(LanguageImportFragment.WORKER_PROGRESS, type.ordinal)
+
+	override suspend fun onUpdateProgress(progress: Int) {
+		setProgressAsync(
+			getData(ImportProgress.COUNTING_SENTENCES)
+				.putInt("progress", progress)
+				.build()
+		)
+		if (progress % 100 == 0)
+			updateNotification("Scanning mp3 '$progress'")
+	}
+
+	override suspend fun onSentencesLoaded(sentences: List<String>) {
+		setProgress(getData(ImportProgress.SENTENCES_LOADED).build())
+		updateNotification(sentences.last())
+	}
+	// endregion CountFilesUseCase Listener---------------------------------------------------------
 
 }
 
