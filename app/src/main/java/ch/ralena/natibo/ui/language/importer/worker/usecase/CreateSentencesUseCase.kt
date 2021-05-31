@@ -1,77 +1,55 @@
 package ch.ralena.natibo.ui.language.importer.worker.usecase
 
+import ch.ralena.natibo.data.room.SentenceRepository
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.PackRoom
+import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker
 import ch.ralena.natibo.utils.Utils.readZip
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
-class CreateSentencesUseCase @Inject constructor() {
-	suspend fun createSentences(languageId: Long, packId: Long, sentences: List<String>) {
+class CreateSentencesUseCase @Inject constructor(
+	private val sentenceRepository: SentenceRepository
+) {
+	private var sentenceCount: Int = 0
+	fun sentenceCount(): Flow<Int> = flow {
+		emit(sentenceCount)
+		kotlinx.coroutines.delay(100)
+	}
 
-		// --- begin transaction
-//		realm.beginTransaction()
-//
-//		// create base language and pack if they don't exist
-//		var base = realm.where(
-//			Language::class.java
-//		).equalTo("languageId", baseLanguage).findFirst()
-//		if (base == null) {
-//			base = realm.createObject(Language::class.java, baseLanguage)
-//		}
-//		var basePack: Pack? = base!!.getPack(packName)
-//		if (basePack == null) {
-//			basePack = realm.createObject<Pack>(Pack::class.java, UUID.randomUUID().toString())
-//			basePack.setBook(packName)
-//			base.packs.add(basePack)
-//		}
-//
-//		// create target language and pack if they don't exist
-//		var target: Language?
-//		var targetPack: Pack? = null
-//		if (targetLanguage != "") {
-//			target =
-//				realm.where(Language::class.java).equalTo("languageId", targetLanguage).findFirst()
-//			if (target == null) {
-//				target = realm.createObject(Language::class.java, targetLanguage)
-//			}
-//			targetPack = target!!.getPack(packName)
-//			if (targetPack == null) {
-//				targetPack =
-//					realm.createObject<Pack>(Pack::class.java, UUID.randomUUID().toString())
-//				targetPack.setBook(packName)
-//				target.packs.add(targetPack)
-//			}
-//		}
-//		realm.commitTransaction()
-//		// --- end transaction
+	suspend fun createSentences(languageId: Long, packId: Long, sentences: List<String>) {
+		val sections = sentences[0].split("\t")
+
+		sentences.drop(1).forEach {
+			createSentence(it.split('\t'), sections)
+			sentenceCount++
+		}
 	}
 
 	// region Helper functions----------------------------------------------------------------------
-	/**
-	 * Reads the .gsp file and returns the list of sentences from it.
-	 *
-	 * @param zis ZipInputStream positioned at the .gsp file.
-	 * @return List of strings containing the lines from the .gsp file.
-	 */
-	private fun readGspFile(zis: ZipInputStream): List<String> {
-		val buffer = ByteArray(PackImporterWorker.BUFFER_SIZE)
-		var numBytesRead: Int
-		val baos = ByteArrayOutputStream()
-		while (
-			zis.read(
-				buffer,
-				0,
-				PackImporterWorker.BUFFER_SIZE
-			).also { numBytesRead = it } >= 0
-		) {
-			baos.write(buffer, 0, numBytesRead)
+	private suspend fun createSentence(parts: List<String>, sections: List<String>) {
+		val index = parts[0].toInt()
+		var original = ""
+		var alternate = ""
+		var ipa = ""
+		var romanization = ""
+		for (j in parts.indices) {
+			val value = parts[j]
+			when (sections[j].lowercase()) {
+				"sentence" -> original = value
+				"alternate" -> alternate = value
+				"ipa" -> ipa = value
+				"romanization" -> romanization = value
+				else -> Unit
+			}
 		}
-		val text = baos.toString("UTF-8").trim('\n')
-		return text.split("\n")
+		val sentence = SentenceRoom(index, original, alternate, romanization, ipa, "", 0)
+		sentenceRepository.createSentence(sentence)
 	}
 	// endregion Helper functions-------------------------------------------------------------------
 }

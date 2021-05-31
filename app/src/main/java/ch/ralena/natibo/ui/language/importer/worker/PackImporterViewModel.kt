@@ -11,6 +11,8 @@ import ch.ralena.natibo.ui.language.importer.worker.usecase.CountMp3sUseCase
 import ch.ralena.natibo.ui.language.importer.worker.usecase.CreateSentencesUseCase
 import ch.ralena.natibo.ui.language.importer.worker.usecase.FetchSentencesUseCase
 import ch.ralena.natibo.ui.language.importer.worker.usecase.ReadPackDataUseCase
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -48,48 +50,12 @@ class PackImporterViewModel @Inject constructor(
 			val sentences = fetchSentencesUseCase.fetchSentences(getInputStream(uri))
 			updateNotification(sentences.last())
 			createSentencesUseCase.createSentences(language, pack, sentences)
+			createSentencesUseCase.sentenceCount().onEach { updateNotification("Reading sentence: $it") }.collect()
 			// copy mp3 files over
 		} catch (e: ImportException) {
 			listeners.forEach { it.onError(e) }
 		}
 	}
-
-	// --- begin transaction
-//		realm.beginTransaction()
-//
-//		// create base language and pack if they don't exist
-//		var base = realm.where(
-//			Language::class.java
-//		).equalTo("languageId", baseLanguage).findFirst()
-//		if (base == null) {
-//			base = realm.createObject(Language::class.java, baseLanguage)
-//		}
-//		var basePack: Pack? = base!!.getPack(packName)
-//		if (basePack == null) {
-//			basePack = realm.createObject<Pack>(Pack::class.java, UUID.randomUUID().toString())
-//			basePack.setBook(packName)
-//			base.packs.add(basePack)
-//		}
-//
-//		// create target language and pack if they don't exist
-//		var target: Language?
-//		var targetPack: Pack? = null
-//		if (targetLanguage != "") {
-//			target =
-//				realm.where(Language::class.java).equalTo("languageId", targetLanguage).findFirst()
-//			if (target == null) {
-//				target = realm.createObject(Language::class.java, targetLanguage)
-//			}
-//			targetPack = target!!.getPack(packName)
-//			if (targetPack == null) {
-//				targetPack =
-//					realm.createObject<Pack>(Pack::class.java, UUID.randomUUID().toString())
-//				targetPack.setBook(packName)
-//				target.packs.add(targetPack)
-//			}
-//		}
-//		realm.commitTransaction()
-//		// --- end transaction
 
 	suspend fun createLanguage(languageCode: String): Long {
 		val languageId = languageRepository.createLanguage(languageCode)

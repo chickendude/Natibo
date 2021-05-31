@@ -243,47 +243,7 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 //
 //
 //
-//		// update action in fragment
-//		actionSubject.onNext(LanguageImportFragment.ACTION_EXTRACTING_TEXT)
-//		progressSubject.onNext(0)
-//		totalSubject.onNext(numFiles / if (targetLanguage == "") 1 else 2)
-//		val sentenceList = baos.toString("UTF-8").split("\n").toTypedArray()
-//		val sections = sentenceList[0].split("\t").toTypedArray()
-//		for (i in 1 until sentenceList.size) {
-//			progressSubject.onNext(i)
-//			val sentenceParts = sentenceList[i].split("\t").toTypedArray()
-//			val index = sentenceParts[0].toInt()
-//			var sentence: String? = null
-//			var translation: String? = null
-//			var ipa: String? = null
-//			var romanization: String? = null
-//			for (j in sentenceParts.indices) {
-//				val value = sentenceParts[j]
-//				when (sections[j]) {
-//					"index" -> {
-//					}
-//					"sentence" -> sentence = value
-//					"translation" -> translation = value
-//					"IPA" -> ipa = value
-//					"romanization" -> romanization = value
-//				}
-//			}
-//
-//			// create or update target and base sentences
-//			if (targetLanguage != "") targetPack?.createSentenceOrUpdate(
-//				realm,
-//				index,
-//				translation,
-//				ipa,
-//				romanization,
-//				null,
-//				0
-//			)
-//			basePack?.createSentenceOrUpdate(realm, index, sentence, ipa, romanization, null, 0)
-//		}
-//		actionSubject.onNext(LanguageImportFragment.ACTION_EXTRACTING_AUDIO)
-//		progressSubject.onNext(0)
-//		totalSubject.onNext(numFiles)
+
 		return STATUS_OK
 	}
 

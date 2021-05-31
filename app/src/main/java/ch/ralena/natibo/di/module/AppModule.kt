@@ -33,13 +33,13 @@ class AppModule(private val application: Application) {
 
 	@Provides
 	@AppScope
+	fun languageDao(database: AppDatabase) = database.languageDao()
+
+	@Provides
+	@AppScope
 	fun packDao(database: AppDatabase) = database.packDao()
 
 	@Provides
 	@AppScope
 	fun sentenceDao(database: AppDatabase) = database.sentenceDao()
-
-	@Provides
-	@AppScope
-	fun languageDao(database: AppDatabase) = database.languageDao()
 }
