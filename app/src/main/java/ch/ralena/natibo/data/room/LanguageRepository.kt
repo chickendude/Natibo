@@ -1,5 +1,6 @@
 package ch.ralena.natibo.data.room
 
+import ch.ralena.natibo.data.LanguageData
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
@@ -10,25 +11,40 @@ import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 class LanguageRepository @Inject constructor(
-		private val realm: Realm,
-		private val languageDao: LanguageDao
+	private val realm: Realm,
+	private val languageDao: LanguageDao
 ) {
 	suspend fun getById(id: String): LanguageRoom {
 		return languageDao.getById(id)
 	}
 
+	suspend fun createLanguage(id: String) {
+		LanguageData.getLanguageById(id)?.let {
+			val language = LanguageRoom(it.name, id)
+			languageDao.insert(language)
+		}
+	}
+
+	suspend fun fetchLanguages(): List<LanguageRoom> =
+		languageDao.getAll()
+
 	fun fetchLanguagesSorted(): List<Language> {
 		val languages = realm.where(Language::class.java).findAll()
 		val languagesSorted = ArrayList<Language>()
 		languagesSorted.addAll(languages)
-		languagesSorted.sortWith(Comparator { lang1: Language, lang2: Language -> lang1.longName.compareTo(lang2.longName) })
+		languagesSorted.sortWith(Comparator { lang1: Language, lang2: Language ->
+			lang1.longName.compareTo(
+				lang2.longName
+			)
+		})
 		return languagesSorted
 	}
 
 	fun fetchLanguagesFromIds(languageIds: Array<String>): List<Language> {
 		val languages = ArrayList<Language>()
 		for (languageId in languageIds) {
-			realm.where(Language::class.java).equalTo("languageId", languageId).findFirst()?.let { languages.add(it) }
+			realm.where(Language::class.java).equalTo("languageId", languageId).findFirst()
+				?.let { languages.add(it) }
 		}
 		return languages
 	}

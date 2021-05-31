@@ -165,6 +165,9 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 			val numMp3s = countMp3sUseCase.countMp3Files(getInputStream(uri))
 			val sentences = fetchSentencesUseCase.fetchSentences(getInputStream(uri))
 			onSentencesLoaded(sentences)
+			languageRepository.createLanguage(languageCode)
+			val languages = languageRepository.fetchLanguages()
+			Log.d(TAG, languages.toString())
 
 			var bos: BufferedOutputStream
 			var inputStream: InputStream?
