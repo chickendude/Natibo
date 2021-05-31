@@ -14,7 +14,7 @@ import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker
 import ch.ralena.natibo.ui.language.list.LanguageListFragment
 
 enum class ImportProgress {
-	COUNTING_SENTENCES,
+	MP3_COUNT,
 	SENTENCES_LOADED
 }
 class LanguageImportFragment :
@@ -26,8 +26,8 @@ class LanguageImportFragment :
 	) {
 	companion object {
 		const val EXTRA_URI = "extra_uri"
-		const val WORKER_PROGRESS = "worker_progress"
-		const val PROGRESS_VALUE = "progress_value"
+		const val WORKER_ACTION = "worker_action"
+		const val WORKER_VALUE = "worker_value"
 		const val ACTION_OPENING_FILE = 0
 		const val ACTION_COUNTING_SENTENCES = 1
 		const val ACTION_READING_SENTENCES = 2
@@ -155,11 +155,11 @@ class LanguageImportFragment :
 			.observe(viewLifecycleOwner, { workInfo ->
 				if (workInfo != null) {
 					val progress = workInfo.progress
-					val updateType = progress.getInt(WORKER_PROGRESS, -1)
+					val updateType = progress.getInt(WORKER_ACTION, -1)
 					when(updateType) {
-						ImportProgress.COUNTING_SENTENCES.ordinal -> {
-							val count = progress.getInt(PROGRESS_VALUE, -1)
-							viewModel.updateSentenceCount(count)
+						ImportProgress.MP3_COUNT.ordinal -> {
+							val count = progress.getInt(WORKER_VALUE, -1)
+							binding.actionText.text = "Num mp3 files: $count"
 						}
 						ImportProgress.SENTENCES_LOADED.ordinal -> {
 							binding.actionText.text = "Sentences loaded"

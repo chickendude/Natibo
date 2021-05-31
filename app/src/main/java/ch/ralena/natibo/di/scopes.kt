@@ -8,6 +8,10 @@ annotation class AppScope
 
 @Scope
 @Retention(AnnotationRetention.SOURCE)
+annotation class WorkerScope
+
+@Scope
+@Retention(AnnotationRetention.SOURCE)
 annotation class ActivityScope
 
 @Scope

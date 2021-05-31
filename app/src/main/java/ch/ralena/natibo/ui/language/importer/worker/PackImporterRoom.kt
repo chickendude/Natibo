@@ -16,8 +16,10 @@ import androidx.work.*
 import ch.ralena.natibo.MainApplication
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.LanguageData
+import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.Pack
+import ch.ralena.natibo.di.module.WorkerModule
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.language.importer.ImportProgress
 import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
@@ -30,14 +32,13 @@ import java.io.*
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import javax.inject.Inject
 
 /**
  * Methods for importing a .gls file into the database.
  */
-internal class PackImporterWorker(context: Context, parameters: WorkerParameters) :
-	CoroutineWorker(context, parameters),
-	CountFilesUseCase.Listener {
-
+class PackImporterWorker(context: Context, parameters: WorkerParameters) :
+	CoroutineWorker(context, parameters) {
 	companion object {
 		val TAG: String = PackImporterWorker::class.java.simpleName
 		const val NOTIFICATION_ID = 1
@@ -49,6 +50,20 @@ internal class PackImporterWorker(context: Context, parameters: WorkerParameters
 		const val BUFFER_SIZE = 1024
 	}
 
+	val workerComponent by lazy {
+		(applicationContext as MainApplication).appComponent.newWorkerComponent(WorkerModule(this))
+	}
+
+	@Inject
+	lateinit var languageRepository: LanguageRepository
+
+	@Inject
+	lateinit var countMp3sUseCase: CountMp3sUseCase
+
+	@Inject
+	lateinit var fetchSentencesUseCase: FetchSentencesUseCase
+
+
 	private val contentResolver = applicationContext.contentResolver
 
 	private val notificationManager =
@@ -56,10 +71,9 @@ internal class PackImporterWorker(context: Context, parameters: WorkerParameters
 
 	private lateinit var notificationBuilder: NotificationCompat.Builder
 
-	private val countFilesUseCase = CountFilesUseCase()
-
 	override suspend fun doWork(): Result {
 		injectDependencies()
+
 		val uri = inputData.getString("uri")!!
 		val foregroundInfo = createForegroundInfo(uri)
 		setForeground(foregroundInfo)
@@ -74,6 +88,7 @@ internal class PackImporterWorker(context: Context, parameters: WorkerParameters
 	}
 
 	private fun injectDependencies() {
+		workerComponent.inject(this)
 	}
 
 	// region Notification Setup--------------------------------------------------------------------
@@ -136,31 +151,118 @@ internal class PackImporterWorker(context: Context, parameters: WorkerParameters
 		return uriString.substring(index + 1)
 	}
 
-	private suspend fun readPack(uri: Uri): Boolean {
-		// first pass
-		var bos: BufferedOutputStream
-		val inputStream = getInputStream(uri) ?: return false
-		val zis = ZipInputStream(BufferedInputStream(inputStream))
+	private suspend fun loadPackFromUri(uriString: String): Boolean {
+		// Convert Uri string back to Uri
+		val uri = Uri.parse(uriString)
+		val packFileName = extractFileName(uri) ?: return false
+		updateNotification(packFileName)
 
-		// check if there's anything missing in the file
-		countFilesUseCase.countFiles(zis, this)
+		if (packFileName.lowercase(Locale.getDefault()).endsWith(".gls")) {
+			val nameParts = packFileName.removeSuffix(".gls").split("-")
+			val languageCode = nameParts.first()
+			val packName = nameParts.last()
 
+			val numMp3s = countMp3sUseCase.countMp3Files(getInputStream(uri))
+			val sentences = fetchSentencesUseCase.fetchSentences(getInputStream(uri))
+			onSentencesLoaded(sentences)
 
-//		if (status > STATUS_OK) {
-//			val stringResId = when (status) {
-//				STATUS_INVALID_LANGUAGE -> R.string.language_not_supported
-//				STATUS_MISSING_GSP -> R.string.missing_gsp
-//				else -> R.string.error_opening_file
-//			}
+			var bos: BufferedOutputStream
+			var inputStream: InputStream?
+			try {
+/*
+				// second pass
+				var zipEntry: ZipEntry
+				inputStream = getInputStream(uri)
+				zis = ZipInputStream(BufferedInputStream(inputStream))
+
+				// used to calculate length of mp3 file
+				val metadataRetriever = MediaMetadataRetriever()
+
+				// loop through files in the .gls zip
+				var fileNumber = 0
+				while (zis.nextEntry.also { zipEntry = it } != null) {
+					val entryName = zipEntry.name
+					if (entryName.contains(".mp3")) {
+						val parts = entryName.split(" - ").toTypedArray()
+						val language = parts[0]
+						val book = parts[1]
+						val number = parts[2]
+
+						// make sure it's one of the accepted languages
+						if (entryName.contains(".mp3")) {
+							val folder =
+								File(activity.filesDir.toString() + "/" + language + "/" + book)
+							if (!folder.isDirectory) {
+								folder.mkdirs()
+							}
+
+							// set up file path
+							val audioFile = File(folder.absolutePath + "/" + number)
+
+							// actually write the file
+							val buffer = ByteArray(PackImporterRoom.BUFFER_SIZE)
+							val fos = FileOutputStream(audioFile)
+							bos = BufferedOutputStream(fos, PackImporterRoom.BUFFER_SIZE)
+							var count: Int
+							while (zis.read(buffer, 0, PackImporterRoom.BUFFER_SIZE)
+									.also { count = it } != -1
+							) {
+								bos.write(buffer, 0, count)
+							}
+
+							// flush and close the stream before moving on to the next file
+							bos.flush()
+							bos.close()
+
+							// now set up database objects which we will fill in after extracting all mp3s
+							val index = number.replace(".mp3", "").toInt()
+							val lang = realm.where(
+								Language::class.java
+							).equalTo("languageId", language).findFirst()
+
+							// calculate mp3s length
+							val mp3Uri = audioFile.absolutePath
+							try {
+								metadataRetriever.setDataSource(mp3Uri)
+							} catch (re: RuntimeException) {
+								// TODO: return message saying unable to read this mp3 file
+								Log.d(PackImporterRoom.TAG, re.localizedMessage)
+							}
+							val mp3Length =
+								metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!
+									.toInt()
+							val pack: Pack = lang!!.getPack(book)
+							pack.createSentenceOrUpdate(
+								realm,
+								index,
+								null,
+								null,
+								null,
+								mp3Uri,
+								mp3Length
+							)
+						} else {
+							Log.d(PackImporterRoom.TAG, "Skipping: $entryName")
+						}
+						progressSubject.onNext(++fileNumber)
+					}
+				}
+				inputStream!!.close()
+				zis.close()*/
+			} catch (e: IOException) {
+				e.printStackTrace()
+			}
+		} else {
 //			activity.runOnUiThread {
 //				Toast.makeText(
 //					activity.applicationContext,
-//					activity.getString(stringResId),
+//					"Sorry, this filetype is not supported!",
 //					Toast.LENGTH_SHORT
 //				).show()
 //			}
 //			actionSubject.onNext(LanguageImportFragment.ACTION_EXIT)
-//		}
+		}
+
 		return true
 	}
 
@@ -254,138 +356,32 @@ internal class PackImporterWorker(context: Context, parameters: WorkerParameters
 		return STATUS_OK
 	}
 
-	private suspend fun loadPackFromUri(uriString: String): Boolean {
-		// Convert Uri string back to Uri
-		val uri = Uri.parse(uriString)
-		val packFileName = extractFileName(uri) ?: return false
-		updateNotification(packFileName)
-
-		if (packFileName.lowercase(Locale.getDefault()).endsWith(".gls")) {
-			var bos: BufferedOutputStream
-			var inputStream: InputStream?
-			try {
-				return readPack(uri)
-
-//				// second pass
-//				var zipEntry: ZipEntry
-//				inputStream = getInputStream(uri)
-//				zis = ZipInputStream(BufferedInputStream(inputStream))
-//
-//				// used to calculate length of mp3 file
-//				val metadataRetriever = MediaMetadataRetriever()
-//
-//				// loop through files in the .gls zip
-//				var fileNumber = 0
-//				while (zis.nextEntry.also { zipEntry = it } != null) {
-//					val entryName = zipEntry.name
-//					if (entryName.contains(".mp3")) {
-//						val parts = entryName.split(" - ").toTypedArray()
-//						val language = parts[0]
-//						val book = parts[1]
-//						val number = parts[2]
-//
-//						// make sure it's one of the accepted languages
-//						if (entryName.contains(".mp3")) {
-//							val folder =
-//								File(activity.filesDir.toString() + "/" + language + "/" + book)
-//							if (!folder.isDirectory) {
-//								folder.mkdirs()
-//							}
-//
-//							// set up file path
-//							val audioFile = File(folder.absolutePath + "/" + number)
-//
-//							// actually write the file
-//							val buffer = ByteArray(PackImporterRoom.BUFFER_SIZE)
-//							val fos = FileOutputStream(audioFile)
-//							bos = BufferedOutputStream(fos, PackImporterRoom.BUFFER_SIZE)
-//							var count: Int
-//							while (zis.read(buffer, 0, PackImporterRoom.BUFFER_SIZE)
-//									.also { count = it } != -1
-//							) {
-//								bos.write(buffer, 0, count)
-//							}
-//
-//							// flush and close the stream before moving on to the next file
-//							bos.flush()
-//							bos.close()
-//
-//							// now set up database objects which we will fill in after extracting all mp3s
-//							val index = number.replace(".mp3", "").toInt()
-//							val lang = realm.where(
-//								Language::class.java
-//							).equalTo("languageId", language).findFirst()
-//
-//							// calculate mp3s length
-//							val mp3Uri = audioFile.absolutePath
-//							try {
-//								metadataRetriever.setDataSource(mp3Uri)
-//							} catch (re: RuntimeException) {
-//								// TODO: return message saying unable to read this mp3 file
-//								Log.d(PackImporterRoom.TAG, re.localizedMessage)
-//							}
-//							val mp3Length =
-//								metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!
-//									.toInt()
-//							val pack: Pack = lang!!.getPack(book)
-//							pack.createSentenceOrUpdate(
-//								realm,
-//								index,
-//								null,
-//								null,
-//								null,
-//								mp3Uri,
-//								mp3Length
-//							)
-//						} else {
-//							Log.d(PackImporterRoom.TAG, "Skipping: $entryName")
-//						}
-//						progressSubject.onNext(++fileNumber)
-//					}
-//				}
-//				inputStream!!.close()
-//				zis.close()
-			} catch (e: IOException) {
-				e.printStackTrace()
-			}
-		} else {
-//			activity.runOnUiThread {
-//				Toast.makeText(
-//					activity.applicationContext,
-//					"Sorry, this filetype is not supported!",
-//					Toast.LENGTH_SHORT
-//				).show()
-//			}
-//			actionSubject.onNext(LanguageImportFragment.ACTION_EXIT)
+	private fun getInputStream(uri: Uri): InputStream {
+		return when (uri.scheme) {
+			"file" -> FileInputStream(File(uri.path!!))
+			else -> contentResolver.openInputStream(uri)!!
 		}
-
-		return true
-	}
-
-	@Throws(FileNotFoundException::class)
-	private fun getInputStream(uri: Uri): InputStream? {
-		return if (uri.scheme == "file") {
-			val file = File(uri.path)
-			FileInputStream(file)
-		} else contentResolver.openInputStream(uri)
 	}
 	// endregion Helper functions-------------------------------------------------------------------
 
 	// region CountFilesUseCase Listener------------------------------------------------------------
 	private fun getData(type: ImportProgress) =
-		Data.Builder().putInt(LanguageImportFragment.WORKER_PROGRESS, type.ordinal)
+		Data.Builder().putInt(LanguageImportFragment.WORKER_ACTION, type.ordinal)
 
-	override suspend fun onUpdateProgress(progress: Int) {
-		setProgressAsync(
-			getData(ImportProgress.COUNTING_SENTENCES)
-				.putInt("progress", progress)
-				.build()
-		)
-		if (progress % 100 == 0)
-			updateNotification("Scanning mp3 '$progress'")
-	}
-
-	override suspend fun onSentencesLoaded(sentences: List<String>) {
+	//	override suspend fun onMp3CountComplete(count: Int) {
+//		setProgressAsync(
+//			getData(ImportProgress.MP3_COUNT)
+//				.putInt(LanguageImportFragment.WORKER_VALUE, count)
+//				.build()
+//		)
+//	}
+//	override suspend fun onUpdateProgress(progress: Int) {
+//
+//		if (progress % 100 == 0)
+//			updateNotification("Scanning mp3 '$progress'")
+//	}
+//
+	private suspend fun onSentencesLoaded(sentences: List<String>) {
 		setProgress(getData(ImportProgress.SENTENCES_LOADED).build())
 		updateNotification(sentences.last())
 	}

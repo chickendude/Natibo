@@ -1,56 +1,64 @@
-package ch.ralena.natibo.utils;
+package ch.ralena.natibo.utils
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import androidx.appcompat.app.AlertDialog;
+import android.content.Context
+import androidx.appcompat.app.AlertDialog
+import java.io.BufferedInputStream
+import java.io.InputStream
+import java.util.zip.ZipInputStream
 
-public class Utils {
-	public static void alert(Context context, String title, String message) {
-		AlertDialog dialog = new AlertDialog.Builder(context).create();
-		dialog.setTitle(title);
-		dialog.setMessage(message);
-		dialog.show();
+object Utils {
+	fun alert(context: Context?, title: String?, message: String?) {
+		val dialog = AlertDialog.Builder(
+			context!!
+		).create()
+		dialog.setTitle(title)
+		dialog.setMessage(message)
+		dialog.show()
 	}
 
-	public static boolean isNumeric(String string) {
-		if (string == null || string.equals(""))
-			return false;
-		for (char c : string.toCharArray()) {
-			if (!Character.isDigit(c))
-				return false;
+	fun isNumeric(string: String?): Boolean {
+		if (string == null || string == "") return false
+		for (c in string.toCharArray()) {
+			if (!Character.isDigit(c)) return false
 		}
-		return true;
+		return true
 	}
 
-	public static class Storage {
-		private static final String PREFERENCES = "ch.ralena.natibo.PREFERENCES";
-		private static final String KEY_DAY_ID = "key_day_id";
-		private static final String KEY_COURSE_ID = "key_course_id";
-
-		private Context context;
-
-		public Storage(Context context) {
-			this.context = context;
+	class Storage(private val context: Context) {
+		fun putDayId(dayId: String?) {
+			val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+			preferences.edit().putString(KEY_DAY_ID, dayId).apply()
 		}
 
-		public void putDayId(String dayId) {
-			SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-			preferences.edit().putString(KEY_DAY_ID, dayId).apply();
+		val dayId: String?
+			get() {
+				val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+				return preferences.getString(KEY_DAY_ID, "")
+			}
+
+		fun putCourseId(dayId: String?) {
+			val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+			preferences.edit().putString(KEY_COURSE_ID, dayId).apply()
 		}
 
-		public String getDayId() {
-			SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-			return preferences.getString(KEY_DAY_ID, "");
-		}
+		val courseId: String?
+			get() {
+				val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+				return preferences.getString(KEY_COURSE_ID, "")
+			}
 
-		public void putCourseId(String dayId) {
-			SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-			preferences.edit().putString(KEY_COURSE_ID, dayId).apply();
+		companion object {
+			private const val PREFERENCES = "ch.ralena.natibo.PREFERENCES"
+			private const val KEY_DAY_ID = "key_day_id"
+			private const val KEY_COURSE_ID = "key_course_id"
 		}
+	}
 
-		public String getCourseId() {
-			SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-			return preferences.getString(KEY_COURSE_ID, "");
+	internal fun readZip(inputStream: InputStream, body: (zis: ZipInputStream) -> Unit) {
+		BufferedInputStream(inputStream).use { bis ->
+			ZipInputStream(bis).use { zis ->
+				body(zis)
+			}
 		}
 	}
 }
