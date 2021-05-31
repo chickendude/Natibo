@@ -43,9 +43,11 @@ class PackImporterViewModel @Inject constructor(
 	suspend fun importPack(uriString: String) {
 		val uri = Uri.parse(uriString)
 		try {
+			// Grab language and pack name
 			val (languageCode, packName) = readPackDataUseCase.extractLanguageAndPackName(uri)
 			val language = createLanguage(languageCode)
 			val pack = createPack(packName, languageCode)
+
 			val numMp3s = countMp3sUseCase.countMp3Files(getInputStream(uri))
 			val sentences = fetchSentencesUseCase.fetchSentences(getInputStream(uri))
 			updateNotification(sentences.last())
@@ -66,12 +68,16 @@ class PackImporterViewModel @Inject constructor(
 		return languageId
 	}
 
-	suspend fun createPack(packName: String, languageCode: String): Long {
-		val pack = PackRoom(
-			languageCode = languageCode,
-			name = packName
-		)
-		return packRepository.createPack(pack)
+	private suspend fun createPack(packName: String, languageCode: String): Long {
+		var pack = packRepository.fetchPackByNameAndLanguage(packName, languageCode)
+		if (pack == null) {
+			pack =  PackRoom(
+				languageCode = languageCode,
+				name = packName
+			)
+			packRepository.createPack(pack)
+		}
+		return pack.id
 	}
 
 	// region Helper functions----------------------------------------------------------------------

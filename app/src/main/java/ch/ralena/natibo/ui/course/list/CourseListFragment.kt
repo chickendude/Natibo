@@ -3,7 +3,6 @@ package ch.ralena.natibo.ui.course.list
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.databinding.FragmentCourseListBinding
 import ch.ralena.natibo.di.component.PresentationComponent
@@ -37,7 +36,7 @@ class CourseListFragment :
 
 		// check if a course id was passed in, if so move to CourseDetailFragment and add to back stack
 		arguments?.let {
-			val courseId = it.getInt(TAG_COURSE_ID, -1)
+			val courseId = it.getLong(TAG_COURSE_ID, -1)
 			arguments = null
 			if (courseId >= 0)
 				viewModel.redirectToCourseDetail(courseId)

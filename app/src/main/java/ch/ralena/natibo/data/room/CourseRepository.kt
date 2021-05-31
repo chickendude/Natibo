@@ -82,7 +82,7 @@ class CourseRepository @Inject constructor(
 	 * @param packId The ID of the pack to toggle.
 	 * @param courseId The course ID of the pack which should be toggled.
 	 */
-	suspend fun togglePackInCourse(packId: String, courseId: Int) {
+	suspend fun togglePackInCourse(packId: String, courseId: Long) {
 		val r = Realm.getDefaultInstance()
 		r.executeTransactionAwait {
 			val course = it.where(Course::class.java).equalTo("id", courseId).findFirst()!!

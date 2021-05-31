@@ -9,6 +9,9 @@ interface PackDao {
 	@Query("SELECT * FROM packroom")
 	suspend fun getAll(): List<PackRoom>
 
+	@Query("SELECT * FROM packroom WHERE name = :name AND languageCode = :languageCode LIMIT 1")
+	suspend fun getByNameAndLanguage(name: String, languageCode: String): PackRoom?
+
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insert(pack: PackRoom): Long
 

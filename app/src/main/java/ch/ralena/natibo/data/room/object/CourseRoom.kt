@@ -32,7 +32,7 @@ data class CourseRoom(
 	/** Total number of reps that have been done. */
 	val repCount: Int = 0,
 
-	@PrimaryKey(autoGenerate = true) val id: Int = 0
+	@PrimaryKey(autoGenerate = true) val id: Long = 0
 )
 
 data class ScheduleRoom(

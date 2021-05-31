@@ -36,7 +36,7 @@ class CourseListViewModel @Inject constructor(
 		screenNavigator.toCourseCreateFragment()
 	}
 
-	fun redirectToCourseDetail(courseId: Int) {
+	fun redirectToCourseDetail(courseId: Long) {
 		screenNavigator.toCourseDetailFragment(courseId)
 	}
 }

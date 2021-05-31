@@ -25,10 +25,10 @@ class ScreenNavigator @Inject constructor(
 	private val realm: Realm,
 	private val activity: MainActivity
 ) {
-	fun toCourseDetailFragment(courseId: Int) {
+	fun toCourseDetailFragment(courseId: Long) {
 		val fragment = CourseDetailFragment()
 		fragment.arguments = Bundle().apply {
-			putInt(CourseDetailFragment.TAG_COURSE_ID, courseId)
+			putLong(CourseDetailFragment.TAG_COURSE_ID, courseId)
 		}
 		loadFragment(fragment, CourseDetailFragment.TAG)
 	}
@@ -41,12 +41,12 @@ class ScreenNavigator @Inject constructor(
 		}
 	}
 
-	fun toCourseListFragment(courseId: Int? = null) {
+	fun toCourseListFragment(courseId: Long? = null) {
 		val fragment = CourseListFragment()
 		courseId?.let {
 			clearBackStack()
 			fragment.arguments = Bundle().apply {
-				putInt(CourseListFragment.TAG_COURSE_ID, courseId)
+				putLong(CourseListFragment.TAG_COURSE_ID, courseId)
 			}
 		}
 		loadFragment(fragment, CourseListFragment.TAG)
@@ -61,12 +61,12 @@ class ScreenNavigator @Inject constructor(
 		loadFragment(fragment, PickScheduleFragment.TAG)
 	}
 
-	fun toCourseSettingsFragment(courseId: Int) {
+	fun toCourseSettingsFragment(courseId: Long) {
 		val fragment = CourseSettingsFragment()
 
 		// load fragment ID into fragment arguments
 		fragment.arguments = Bundle().apply {
-			putInt(CourseSettingsFragment.KEY_ID, courseId)
+			putLong(CourseSettingsFragment.KEY_ID, courseId)
 		}
 		loadFragment(fragment, CourseSettingsFragment.TAG)
 	}
@@ -96,10 +96,10 @@ class ScreenNavigator @Inject constructor(
 		loadFragment(fragment, SentenceListFragment.TAG)
 	}
 
-	fun toStudySessionFragment(courseId: Int) {
+	fun toStudySessionFragment(courseId: Long) {
 		val fragment = StudySessionFragment()
 		fragment.arguments = Bundle().apply {
-			putInt(StudySessionFragment.KEY_COURSE_ID, courseId)
+			putLong(StudySessionFragment.KEY_COURSE_ID, courseId)
 		}
 		loadFragment(fragment, StudySessionFragment.TAG)
 	}

@@ -13,5 +13,5 @@ data class PackRoom(
 	/** ID of the matching [LanguageRoom] object */
 	val languageCode: String,
 
-	@PrimaryKey(autoGenerate = true) val id: Int = 0
+	@PrimaryKey(autoGenerate = true) val id: Long = 0
 )
