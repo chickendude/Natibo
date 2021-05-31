@@ -14,7 +14,7 @@ interface LanguageDao {
 	suspend fun getById (id: String) : LanguageRoom
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	suspend fun insert(language: LanguageRoom)
+	suspend fun insert(language: LanguageRoom): Long
 
 	@Update
 	suspend fun update(language: LanguageRoom)

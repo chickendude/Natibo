@@ -1,6 +1,7 @@
 package ch.ralena.natibo.di.module
 
 import android.app.Application
+import android.content.ContentResolver
 import androidx.room.Room
 import ch.ralena.natibo.data.room.AppDatabase
 import ch.ralena.natibo.di.AppScope
@@ -10,6 +11,10 @@ import io.realm.Realm
 
 @Module
 class AppModule(private val application: Application) {
+	@Provides
+	@AppScope
+	fun contentResolver(): ContentResolver = application.contentResolver
+
 	@Provides
 	fun realm(): Realm = Realm.getDefaultInstance()
 

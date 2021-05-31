@@ -16,7 +16,6 @@ import androidx.work.*
 import ch.ralena.natibo.MainApplication
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.LanguageData
-import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.Pack
 import ch.ralena.natibo.di.module.WorkerModule
@@ -25,20 +24,26 @@ import ch.ralena.natibo.ui.language.importer.ImportProgress
 import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
 import io.reactivex.subjects.PublishSubject
 import io.realm.Realm
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import java.io.*
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
+
+enum class Status {
+	IN_PROGRESS,
+	SUCCESS,
+	FAILURE
+}
+
 /**
  * Methods for importing a .gls file into the database.
  */
 class PackImporterWorker(context: Context, parameters: WorkerParameters) :
-	CoroutineWorker(context, parameters) {
+	CoroutineWorker(context, parameters),
+	PackImporterViewModel.Listener {
 	companion object {
 		val TAG: String = PackImporterWorker::class.java.simpleName
 		const val NOTIFICATION_ID = 1
@@ -50,20 +55,14 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		const val BUFFER_SIZE = 1024
 	}
 
-	val workerComponent by lazy {
+	private val workerComponent by lazy {
 		(applicationContext as MainApplication).appComponent.newWorkerComponent(WorkerModule(this))
 	}
 
 	@Inject
-	lateinit var languageRepository: LanguageRepository
+	lateinit var viewModel: PackImporterViewModel
 
-	@Inject
-	lateinit var countMp3sUseCase: CountMp3sUseCase
-
-	@Inject
-	lateinit var fetchSentencesUseCase: FetchSentencesUseCase
-
-
+	private var status = Status.IN_PROGRESS
 	private val contentResolver = applicationContext.contentResolver
 
 	private val notificationManager =
@@ -74,17 +73,18 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 	override suspend fun doWork(): Result {
 		injectDependencies()
 
-		val uri = inputData.getString("uri")!!
-		val foregroundInfo = createForegroundInfo(uri)
+		val uriString = inputData.getString("uri")!!
+		val foregroundInfo = createForegroundInfo(uriString)
 		setForeground(foregroundInfo)
-		val success = loadPackFromUri(uri)
-		if (success.not())
-			withContext(Dispatchers.Main) {
-				Toast.makeText(applicationContext, "Error opening file: $uri", Toast.LENGTH_SHORT)
-					.show()
-			}
-		delay(5000)
-		return Result.success()
+		viewModel.registerListener(this)
+		viewModel.importPack(uriString)
+		while (status == Status.IN_PROGRESS) {
+			delay(500)
+		}
+		return when (status) {
+			Status.SUCCESS -> Result.success()
+			else -> Result.failure()
+		}
 	}
 
 	private fun injectDependencies() {
@@ -131,48 +131,11 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		notificationManager.notify(1, notificationBuilder.build())
 	}
 
-	private fun extractFileName(uri: Uri): String? = when (uri.scheme) {
-		"file" -> extractFileNameFromFile(uri.toString())
-		"content" -> extractFileNameFromContent(uri)
-		else -> null
-	}
-
-	private fun extractFileNameFromContent(uri: Uri): String? =
-		contentResolver.query(uri, null, null, null, null)?.run {
-			val nameIndex = getColumnIndex(OpenableColumns.DISPLAY_NAME)
-			moveToFirst()
-			val fileName = getString(nameIndex)
-			close()
-			return fileName
-		}
-
-	private fun extractFileNameFromFile(uriString: String): String {
-		val index = uriString.lastIndexOf("/")
-		return uriString.substring(index + 1)
-	}
-
-	private suspend fun loadPackFromUri(uriString: String): Boolean {
-		// Convert Uri string back to Uri
-		val uri = Uri.parse(uriString)
-		val packFileName = extractFileName(uri) ?: return false
-		updateNotification(packFileName)
-
-		if (packFileName.lowercase(Locale.getDefault()).endsWith(".gls")) {
-			val nameParts = packFileName.removeSuffix(".gls").split("-")
-			val languageCode = nameParts.first()
-			val packName = nameParts.last()
-
-			val numMp3s = countMp3sUseCase.countMp3Files(getInputStream(uri))
-			val sentences = fetchSentencesUseCase.fetchSentences(getInputStream(uri))
-			onSentencesLoaded(sentences)
-			languageRepository.createLanguage(languageCode)
-			val languages = languageRepository.fetchLanguages()
-			Log.d(TAG, languages.toString())
-
+/*	private suspend fun loadPackFromUri(uriString: String): Boolean {
 			var bos: BufferedOutputStream
 			var inputStream: InputStream?
 			try {
-/*
+*//*
 				// second pass
 				var zipEntry: ZipEntry
 				inputStream = getInputStream(uri)
@@ -251,7 +214,7 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 					}
 				}
 				inputStream!!.close()
-				zis.close()*/
+				zis.close()*//*
 			} catch (e: IOException) {
 				e.printStackTrace()
 			}
@@ -267,7 +230,7 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		}
 
 		return true
-	}
+	}*/
 
 	/**
 	 * Counts the number of files in a pack and does some basic verification to ensure files are
@@ -277,42 +240,7 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 //		if (!hasGspFile) return STATUS_MISSING_GSP
 //		if (LanguageData.getLanguageById(baseLanguage) == null) return STATUS_INVALID_LANGUAGE
 
-//		// --- begin transaction
-//		realm.beginTransaction()
 //
-//		// create base language and pack if they don't exist
-//		var base = realm.where(
-//			Language::class.java
-//		).equalTo("languageId", baseLanguage).findFirst()
-//		if (base == null) {
-//			base = realm.createObject(Language::class.java, baseLanguage)
-//		}
-//		var basePack: Pack? = base!!.getPack(packName)
-//		if (basePack == null) {
-//			basePack = realm.createObject<Pack>(Pack::class.java, UUID.randomUUID().toString())
-//			basePack.setBook(packName)
-//			base.packs.add(basePack)
-//		}
-//
-//		// create target language and pack if they don't exist
-//		var target: Language?
-//		var targetPack: Pack? = null
-//		if (targetLanguage != "") {
-//			target =
-//				realm.where(Language::class.java).equalTo("languageId", targetLanguage).findFirst()
-//			if (target == null) {
-//				target = realm.createObject(Language::class.java, targetLanguage)
-//			}
-//			targetPack = target!!.getPack(packName)
-//			if (targetPack == null) {
-//				targetPack =
-//					realm.createObject<Pack>(Pack::class.java, UUID.randomUUID().toString())
-//				targetPack.setBook(packName)
-//				target.packs.add(targetPack)
-//			}
-//		}
-//		realm.commitTransaction()
-//		// --- end transaction
 //
 //
 //		// update action in fragment
@@ -359,34 +287,24 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		return STATUS_OK
 	}
 
-	private fun getInputStream(uri: Uri): InputStream {
-		return when (uri.scheme) {
-			"file" -> FileInputStream(File(uri.path!!))
-			else -> contentResolver.openInputStream(uri)!!
-		}
-	}
 	// endregion Helper functions-------------------------------------------------------------------
 
-	// region CountFilesUseCase Listener------------------------------------------------------------
+	// region ViewModel Listener------------------------------------------------------------
 	private fun getData(type: ImportProgress) =
 		Data.Builder().putInt(LanguageImportFragment.WORKER_ACTION, type.ordinal)
 
-	//	override suspend fun onMp3CountComplete(count: Int) {
-//		setProgressAsync(
-//			getData(ImportProgress.MP3_COUNT)
-//				.putInt(LanguageImportFragment.WORKER_VALUE, count)
-//				.build()
-//		)
-//	}
-//	override suspend fun onUpdateProgress(progress: Int) {
-//
-//		if (progress % 100 == 0)
-//			updateNotification("Scanning mp3 '$progress'")
-//	}
-//
-	private suspend fun onSentencesLoaded(sentences: List<String>) {
-		setProgress(getData(ImportProgress.SENTENCES_LOADED).build())
-		updateNotification(sentences.last())
+	override fun onNotificationUpdate(message: String) {
+		updateNotification(message)
+		setProgressAsync(
+			getData(ImportProgress.ACTION_TEXT)
+				.putString(LanguageImportFragment.WORKER_VALUE, message)
+				.build()
+		)
+	}
+
+	override fun onError(exception: ImportException) {
+		Toast.makeText(applicationContext, "${exception.message}", Toast.LENGTH_SHORT).show()
+		status = Status.FAILURE
 	}
 	// endregion CountFilesUseCase Listener---------------------------------------------------------
 

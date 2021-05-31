@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.language.importer.worker
+package ch.ralena.natibo.ui.language.importer.worker.usecase
 
 import ch.ralena.natibo.utils.Utils.readZip
 import java.io.InputStream

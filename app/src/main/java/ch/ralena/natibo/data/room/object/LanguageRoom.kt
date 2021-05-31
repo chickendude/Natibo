@@ -11,7 +11,6 @@ import androidx.room.PrimaryKey
  */
 data class LanguageRoom (
 	val name: String,
-
-	@PrimaryKey
-	val id: String
+	val code: String,
+	@PrimaryKey(autoGenerate = true) val id: Long = 0
 )

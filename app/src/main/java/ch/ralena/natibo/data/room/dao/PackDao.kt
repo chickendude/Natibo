@@ -10,7 +10,7 @@ interface PackDao {
 	suspend fun getAll(): List<PackRoom>
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	suspend fun insert(pack: PackRoom)
+	suspend fun insert(pack: PackRoom): Long
 
 	@Update
 	suspend fun update(pack: PackRoom)
