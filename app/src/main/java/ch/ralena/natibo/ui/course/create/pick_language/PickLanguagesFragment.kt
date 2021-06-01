@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.databinding.FragmentCoursePickLanguagesBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.di.module.SelectedLanguagesItemTouchHelper
@@ -107,15 +108,15 @@ class PickLanguagesFragment :
 	}
 
 	// ViewModel/Adapter listeners
-	override fun onLanguageClicked(language: Language) {
+	override fun onLanguageClicked(language: LanguageRoom) {
 		viewModel.addRemoveLanguage(language)
 	}
 
-	override fun onLanguageAdded(language: Language) {
+	override fun onLanguageAdded(language: LanguageRoom) {
 		selectedAdapter.addLanguage(language)
 	}
 
-	override fun onLanguageRemoved(language: Language) {
+	override fun onLanguageRemoved(language: LanguageRoom) {
 		selectedAdapter.removeLanguage(language)
 	}
 
@@ -123,7 +124,7 @@ class PickLanguagesFragment :
 		checkMenu.isVisible = isVisible
 	}
 
-	override fun onLanguagesLoaded(languages: List<Language>) {
+	override fun onLanguagesLoaded(languages: List<LanguageRoom>) {
 		availableAdapter.loadLanguages(languages)
 	}
 }

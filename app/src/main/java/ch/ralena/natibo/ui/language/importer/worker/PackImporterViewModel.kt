@@ -45,6 +45,7 @@ class PackImporterViewModel @Inject constructor(
 		try {
 			// Grab language and pack name
 			val (languageCode, packName) = readPackDataUseCase.extractLanguageAndPackName(uri)
+			// TODO: Make sure language isn't duplicated when creating it
 			val language = createLanguage(languageCode)
 			val pack = createPack(packName, languageCode)
 

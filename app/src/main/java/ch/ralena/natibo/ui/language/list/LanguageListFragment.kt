@@ -9,6 +9,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import ch.ralena.natibo.ui.language.list.adapter.LanguageListAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.databinding.FragmentLanguageListBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
@@ -41,14 +42,6 @@ class LanguageListFragment :
 
 		viewModel.fetchLanguages()
 
-		binding.recyclerView.apply {
-			visibility = viewModel.getRecyclerViewVisibility()
-			adapter = languageAdapter
-			layoutManager = GridLayoutManager(context, 2)
-		}
-
-		binding.noCoursesText.visibility = viewModel.getNoCourseTextVisibility()
-
 		// set up FAB
 		binding.fab.setOnClickListener {
 			mainActivity.importLanguagePack()
@@ -71,11 +64,27 @@ class LanguageListFragment :
 		languageAdapter.unregisterListener(this)
 	}
 
-	override fun onLanguageClicked(language: Language) {
+	// region Helper functions----------------------------------------------------------------------
+	private fun updateRecyclerView() {
+		binding.recyclerView.apply {
+			visibility = viewModel.getRecyclerViewVisibility()
+			adapter = languageAdapter
+			layoutManager = GridLayoutManager(context, 2)
+		}
+
+		binding.noCoursesText.visibility = viewModel.getNoCourseTextVisibility()
+	}
+	// endregion Helper functions-------------------------------------------------------------------
+
+	override fun onLanguageClicked(language: LanguageRoom) {
 		viewModel.languageSelected(language)
 	}
 
-	override fun onLanguagesLoaded(languages: List<Language>) {
+
+	// region ViewModel listeners-------------------------------------------------------------------
+	override fun onLanguagesLoaded(languages: List<LanguageRoom>) {
 		languageAdapter.loadLanguages(languages)
+		updateRecyclerView()
 	}
+	// endregion ViewModel listeners----------------------------------------------------------------
 }

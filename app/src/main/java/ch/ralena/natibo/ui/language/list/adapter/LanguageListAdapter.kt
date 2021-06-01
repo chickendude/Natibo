@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.di.module.LanguageList
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
 import io.reactivex.subjects.PublishSubject
@@ -15,10 +16,10 @@ import java.util.*
 import javax.inject.Inject
 
 class LanguageListAdapter @Inject constructor(
-		@LanguageList private val languages: ArrayList<Language>
+		private val languages: ArrayList<LanguageRoom>
 ) : BaseRecyclerAdapter<LanguageListAdapter.ViewHolder, LanguageListAdapter.Listener>() {
 	interface Listener {
-		fun onLanguageClicked(language: Language)
+		fun onLanguageClicked(language: LanguageRoom)
 	}
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,7 +35,7 @@ class LanguageListAdapter @Inject constructor(
 		return languages.size
 	}
 
-	fun loadLanguages(languages: List<Language>) {
+	fun loadLanguages(languages: List<LanguageRoom>) {
 		this.languages.clear()
 		this.languages.addAll(languages)
 		notifyDataSetChanged()
@@ -46,18 +47,18 @@ class LanguageListAdapter @Inject constructor(
 		private val numSentences: TextView = view.findViewById(R.id.numSentencesLabel)
 		private val flagImage: ImageView = view.findViewById(R.id.flagImageView)
 
-		private lateinit var language: Language
+		private lateinit var language: LanguageRoom
 
 		init {
 			view.setOnClickListener { for (l in listeners) l.onLanguageClicked(language) }
 		}
 
-		fun bindView(language: Language) {
+		fun bindView(language: LanguageRoom) {
 			this.language = language
-			languageName.text = language.longName
-			numPacks.text = "${language.packs.size}"
-			numSentences.text = "${language.sentenceCount}"
-			flagImage.setImageResource(language.languageType.drawable)
+			languageName.text = language.name
+//			numPacks.text = "${language.packs.size}"
+//			numSentences.text = "${language.sentenceCount}"
+//			flagImage.setImageResource(language.languageType.drawable)
 		}
 	}
 }

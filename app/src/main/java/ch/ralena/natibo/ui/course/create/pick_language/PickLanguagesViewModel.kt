@@ -2,30 +2,38 @@ package ch.ralena.natibo.ui.course.create.pick_language
 
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.di.module.LanguageList
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.ScreenNavigator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PickLanguagesViewModel @Inject constructor(
 		private val languageRepository: LanguageRepository,
 		private val screenNavigator: ScreenNavigator,
-		@LanguageList private val selectedLanguages: ArrayList<Language>
+		@LanguageList private val selectedLanguages: ArrayList<LanguageRoom>
 ) : BaseViewModel<PickLanguagesViewModel.Listener>() {
 	interface Listener {
-		fun onLanguagesLoaded(languages: List<Language>)
+		fun onLanguagesLoaded(languages: List<LanguageRoom>)
 		fun onUpdateCheckMenuVisibility(isVisible: Boolean)
-		fun onLanguageAdded(language: Language)
-		fun onLanguageRemoved(language: Language)
+		fun onLanguageAdded(language: LanguageRoom)
+		fun onLanguageRemoved(language: LanguageRoom)
 	}
 
 	fun fetchLanguages() {
-		val languages = languageRepository.fetchLanguagesSorted()
-		for (l in listeners)
-			l.onLanguagesLoaded(languages)
+		coroutineScope.launch(Dispatchers.Main) {
+			var languages: List<LanguageRoom>
+			withContext(Dispatchers.IO) {
+				languages = languageRepository.fetchLanguages()
+			}
+			listeners.forEach { it.onLanguagesLoaded(languages) }
+		}
 	}
 
-	fun addRemoveLanguage(language: Language) {
+	fun addRemoveLanguage(language: LanguageRoom) {
 		if (selectedLanguages.contains(language)) {
 			selectedLanguages.remove(language)
 			for (l in listeners)
@@ -45,7 +53,7 @@ class PickLanguagesViewModel @Inject constructor(
 	}
 
 	fun languagesConfirmed() {
-		val languageIds = selectedLanguages.map { it.languageId }
+		val languageIds = selectedLanguages.map { it.id }
 		screenNavigator.toCoursePreparationFragment(languageIds)
 	}
 }

@@ -9,13 +9,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
 import ch.ralena.natibo.ui.callback.ItemTouchHelperCallback.ItemTouchHelperAdapter
 import java.util.*
 import javax.inject.Inject
 
 class SelectedLanguagesAdapter @Inject constructor(
-		private val languages: ArrayList<Language>,
+		private val languages: ArrayList<LanguageRoom>,
 ) : BaseRecyclerAdapter<SelectedLanguagesAdapter.ViewHolder, SelectedLanguagesAdapter.Listener>(),
 		ItemTouchHelperAdapter {
 	interface Listener {}
@@ -60,12 +61,12 @@ class SelectedLanguagesAdapter @Inject constructor(
 		notifyItemRemoved(position)
 	}
 
-	fun addLanguage(language: Language) {
+	fun addLanguage(language: LanguageRoom) {
 		languages.add(language)
 		notifyItemInserted(languages.size)
 	}
 
-	fun removeLanguage(language: Language) {
+	fun removeLanguage(language: LanguageRoom) {
 		val index = languages.indexOf(language)
 		languages.remove(language)
 		notifyItemRemoved(index)
@@ -75,20 +76,20 @@ class SelectedLanguagesAdapter @Inject constructor(
 	inner class ViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 		private val languageName: TextView
 		private val flagImage: ImageView
-		private var language: Language? = null
+		private var language: LanguageRoom? = null
 
 		init {
 			languageName = view.findViewById(R.id.languageLabel)
 			flagImage = view.findViewById(R.id.flagImageView)
 		}
 
-		fun bindView(language: Language, position: Int) {
+		fun bindView(language: LanguageRoom, position: Int) {
 			this.language = language
 			if (position == 0)
-				languageName.text = String.format(Locale.getDefault(), view.resources.getString(R.string.base), language.longName)
+				languageName.text = String.format(Locale.getDefault(), view.resources.getString(R.string.base), language.name)
 			else
-				languageName.text = String.format(Locale.getDefault(), view.resources.getString(R.string.target), language.longName, position)
-			flagImage.setImageResource(language.languageType.drawable)
+				languageName.text = String.format(Locale.getDefault(), view.resources.getString(R.string.target), language.name, position)
+//			flagImage.setImageResource(language.languageType.drawable)
 		}
 	}
 }

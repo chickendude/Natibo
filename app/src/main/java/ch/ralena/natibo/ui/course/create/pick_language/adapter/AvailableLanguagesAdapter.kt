@@ -8,16 +8,17 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 class AvailableLanguagesAdapter(
-		private val languages: ArrayList<Language>,
-		private val selectedLanguages: ArrayList<Language>
+		private val languages: ArrayList<LanguageRoom>,
+		private val selectedLanguages: ArrayList<LanguageRoom>
 ) : BaseRecyclerAdapter<AvailableLanguagesAdapter.ViewHolder, AvailableLanguagesAdapter.Listener>() {
 	interface Listener {
-		fun onLanguageClicked(language: Language)
+		fun onLanguageClicked(language: LanguageRoom)
 	}
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -31,7 +32,7 @@ class AvailableLanguagesAdapter(
 
 	override fun getItemCount() = languages.size
 
-	fun loadLanguages(langs: List<Language>) {
+	fun loadLanguages(langs: List<LanguageRoom>) {
 		languages.clear()
 		languages.addAll(langs)
 		notifyDataSetChanged()
@@ -42,7 +43,7 @@ class AvailableLanguagesAdapter(
 		private val flagImage: ImageView = view.findViewById(R.id.flagImageView)
 		private val checkedImage: ImageView = view.findViewById(R.id.checkedImage)
 
-		private lateinit var language: Language
+		private lateinit var language: LanguageRoom
 
 		init {
 			view.setOnClickListener { v: View? ->
@@ -57,7 +58,7 @@ class AvailableLanguagesAdapter(
 			}
 		}
 
-		fun bindView(language: Language) {
+		fun bindView(language: LanguageRoom) {
 			this.language = language
 			if (selectedLanguages.contains(language)) {
 				checkedImage.visibility = View.VISIBLE
@@ -65,8 +66,8 @@ class AvailableLanguagesAdapter(
 			} else {
 				checkedImage.animate().scaleX(0f).setDuration(200).start()
 			}
-			languageName.text = language.longName
-			flagImage.setImageResource(language.languageType.drawable)
+			languageName.text = language.name
+//			flagImage.setImageResource(language.languageType.drawable)
 		}
 	}
 }

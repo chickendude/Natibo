@@ -2,6 +2,7 @@ package ch.ralena.natibo.di.module
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.di.PresentationScope
 import ch.ralena.natibo.ui.callback.ItemTouchHelperCallback
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailableLanguagesAdapter
@@ -9,6 +10,7 @@ import ch.ralena.natibo.ui.course.create.pick_language.adapter.SelectedLanguages
 import ch.ralena.natibo.ui.course.detail.adapter.PackAdapter
 import ch.ralena.natibo.ui.course.list.adapter.CourseListAdapter
 import ch.ralena.natibo.ui.language.detail.adapter.LanguageDetailAdapter
+import ch.ralena.natibo.ui.language.list.adapter.LanguageListAdapter
 import dagger.Module
 import dagger.Provides
 import javax.inject.Qualifier
@@ -29,6 +31,10 @@ class PresentationModule {
 
 	@PresentationScope
 	@Provides
+	fun languageListAdapter() = LanguageListAdapter(arrayListOf())
+
+	@PresentationScope
+	@Provides
 	fun bookAdapter() = PackAdapter(arrayListOf(), arrayListOf())
 
 	@PresentationScope
@@ -38,7 +44,7 @@ class PresentationModule {
 	@PresentationScope
 	@Provides
 	@LanguageList
-	fun selectedLanguages() = arrayListOf<Language>()
+	fun selectedLanguages() = arrayListOf<LanguageRoom>()
 
 	@PresentationScope
 	@Provides

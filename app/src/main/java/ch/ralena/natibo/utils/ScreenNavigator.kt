@@ -52,11 +52,11 @@ class ScreenNavigator @Inject constructor(
 		loadFragment(fragment, CourseListFragment.TAG)
 	}
 
-	fun toCoursePreparationFragment(languageIds: List<String>) {
+	fun toCoursePreparationFragment(languageIds: List<Long>) {
 		val fragment = PickScheduleFragment()
 		fragment.arguments = Bundle().apply {
 			// add language ids in a bundle
-			putStringArray(PickScheduleFragment.TAG_LANGUAGE_IDS, languageIds.toTypedArray())
+			putLongArray(PickScheduleFragment.TAG_LANGUAGE_IDS, languageIds.toLongArray())
 		}
 		loadFragment(fragment, PickScheduleFragment.TAG)
 	}
@@ -75,10 +75,10 @@ class ScreenNavigator @Inject constructor(
 		loadFragment(LanguageListFragment(), LanguageListFragment.TAG)
 	}
 
-	fun toLanguageDetailsFragment(languageId: String) {
+	fun toLanguageDetailsFragment(languageId: Long) {
 		val fragment = LanguageDetailFragment()
 		fragment.arguments = Bundle().apply {
-			putString(LanguageDetailFragment.TAG_LANGUAGE_ID, languageId)
+			putLong(LanguageDetailFragment.TAG_LANGUAGE_ID, languageId)
 		}
 		loadFragment(fragment, LanguageDetailFragment.TAG)
 	}
