@@ -52,7 +52,8 @@ class PackImporterViewModel @Inject constructor(
 			val sentences = fetchSentencesUseCase.fetchSentences(getInputStream(uri))
 			updateNotification(sentences.last())
 			createSentencesUseCase.createSentences(language, pack, sentences)
-			createSentencesUseCase.sentenceCount().onEach { updateNotification("Reading sentence: $it") }.collect()
+			createSentencesUseCase.sentenceCount()
+				.onEach { updateNotification("Reading sentence: $it") }.collect()
 			// copy mp3 files over
 		} catch (e: ImportException) {
 			listeners.forEach { it.onError(e) }
@@ -70,12 +71,10 @@ class PackImporterViewModel @Inject constructor(
 
 	private suspend fun createPack(packName: String, languageCode: String): Long {
 		var pack = packRepository.fetchPackByNameAndLanguage(packName, languageCode)
+		// Create the pack if it doesn't exist already
 		if (pack == null) {
-			pack =  PackRoom(
-				languageCode = languageCode,
-				name = packName
-			)
-			packRepository.createPack(pack)
+			pack = PackRoom(packName, languageCode)
+			return packRepository.createPack(pack)
 		}
 		return pack.id
 	}
