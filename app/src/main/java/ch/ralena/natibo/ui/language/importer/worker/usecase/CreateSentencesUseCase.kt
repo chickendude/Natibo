@@ -63,7 +63,7 @@ class CreateSentencesUseCase @Inject constructor(
 			sentenceRepository.updateSentence(
 				sentence.copy(
 					index = index,
-					original = original + " - updated",
+					original = original,
 					alternate = alternate,
 					romanization = romanization,
 					ipa = ipa
