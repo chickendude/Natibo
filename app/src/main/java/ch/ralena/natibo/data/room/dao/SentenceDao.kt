@@ -10,10 +10,13 @@ interface SentenceDao {
 	@Query("SELECT * FROM sentenceroom")
 	suspend fun getAll(): List<SentenceRoom>
 
+	@Query("SELECT * FROM sentenceroom WHERE packId = :packId")
+	suspend fun getAllInPack(packId: Long): List<SentenceRoom>
+
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insert(sentence: SentenceRoom)
 
-	@Update
+	@Update(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun update(sentence: SentenceRoom)
 
 	@Delete

@@ -34,5 +34,8 @@ data class SentenceRoom(
 	/** The length in milliseconds of the mp3. */
 	val mp3Length: Int,
 
+	/** The pack the sentence belongs to. */
+	val packId: Long,
+
 	@PrimaryKey(autoGenerate = true) val id: Int = 0
 )

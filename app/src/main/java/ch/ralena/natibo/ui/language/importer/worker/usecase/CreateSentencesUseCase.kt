@@ -17,22 +17,31 @@ class CreateSentencesUseCase @Inject constructor(
 	private val sentenceRepository: SentenceRepository
 ) {
 	private var sentenceCount: Int = 0
+
 	fun sentenceCount(): Flow<Int> = flow {
 		emit(sentenceCount)
 		kotlinx.coroutines.delay(100)
 	}
 
 	suspend fun createSentences(languageId: Long, packId: Long, sentences: List<String>) {
+		val packSentences = sentenceRepository.fetchSentencesInPack(packId)
+
 		val sections = sentences[0].split("\t")
 
 		sentences.drop(1).forEach {
-			createSentence(it.split('\t'), sections)
+			createSentence(packId, it.split('\t'), sections, packSentences)
 			sentenceCount++
 		}
 	}
 
 	// region Helper functions----------------------------------------------------------------------
-	private suspend fun createSentence(parts: List<String>, sections: List<String>) {
+	private suspend fun createSentence(
+		packId: Long,
+		parts: List<String>,
+		sections: List<String>,
+		packSentences: List<SentenceRoom>
+	) {
+		// Extract parts
 		val index = parts[0].toInt()
 		var original = ""
 		var alternate = ""
@@ -48,8 +57,23 @@ class CreateSentencesUseCase @Inject constructor(
 				else -> Unit
 			}
 		}
-		val sentence = SentenceRoom(index, original, alternate, romanization, ipa, "", 0)
-		sentenceRepository.createSentence(sentence)
+		// Create/update sentence
+		val sentence = packSentences.firstOrNull { it.index == index }
+		if (sentence != null) {
+			sentenceRepository.updateSentence(
+				sentence.copy(
+					index = index,
+					original = original + " - updated",
+					alternate = alternate,
+					romanization = romanization,
+					ipa = ipa
+				)
+			)
+		} else {
+			sentenceRepository.createSentence(
+				SentenceRoom(index, original, alternate, romanization, ipa, "", 0, packId)
+			)
+		}
 	}
 	// endregion Helper functions-------------------------------------------------------------------
 }

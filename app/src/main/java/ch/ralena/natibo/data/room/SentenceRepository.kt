@@ -11,4 +11,10 @@ class SentenceRepository @Inject constructor(
 
 	suspend fun fetchSentences(): List<SentenceRoom> =
 		sentenceDao.getAll()
+
+	suspend fun fetchSentencesInPack(packId: Long): List<SentenceRoom> =
+		sentenceDao.getAllInPack(packId)
+
+	suspend fun updateSentence(sentence: SentenceRoom) =
+		sentenceDao.update(sentence)
 }
