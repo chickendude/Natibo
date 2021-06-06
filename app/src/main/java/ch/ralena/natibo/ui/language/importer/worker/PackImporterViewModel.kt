@@ -51,11 +51,14 @@ class PackImporterViewModel @Inject constructor(
 
 			val numMp3s = countMp3sUseCase.countMp3Files(getInputStream(uri))
 			val sentences = fetchSentencesUseCase.fetchSentences(getInputStream(uri))
+			// TODO: check if numMp3s == sentences.size
 			updateNotification(sentences.last())
 			createSentencesUseCase.createSentences(language, pack, sentences)
 			createSentencesUseCase.sentenceCount()
 				.onEach { updateNotification("Reading sentence: $it") }.collect()
 			// copy mp3 files over
+			countMp3sUseCase.copyMp3s(getInputStream(uri))
+			updateNotification("Mp3s copied over")
 		} catch (e: ImportException) {
 			listeners.forEach { it.onError(e) }
 		}
