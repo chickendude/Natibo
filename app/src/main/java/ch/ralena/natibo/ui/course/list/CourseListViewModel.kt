@@ -20,6 +20,7 @@ class CourseListViewModel @Inject constructor(
 
 	fun fetchCourses() {
 		coroutineScope.launch(Dispatchers.Main) {
+			val response = courseRepository.fetchCourse(888)
 			val courses = withContext(Dispatchers.IO) {
 				courseRepository.fetchCourses()
 			}

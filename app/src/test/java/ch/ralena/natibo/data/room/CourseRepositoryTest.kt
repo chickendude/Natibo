@@ -3,79 +3,88 @@ package ch.ralena.natibo.data.room
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.`object`.Course
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import ch.ralena.natibo.data.room.`object`.CourseRoom
+import ch.ralena.natibo.data.room.`object`.ScheduleRoom
+import ch.ralena.natibo.data.room.dao.CourseDao
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import io.mockk.*
 import io.realm.Realm
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-internal class CourseRepositoryTest {
-	// region Constants-----------------------------------------------------------------------------
-	companion object {
-		private val COURSE = Course()
-		private val COURSE_ID = COURSE.id
-	}
-	// endregion Constants--------------------------------------------------------------------------
+// region Constants---------------------------------------------------------------------------------
+private val SCHEDULE = ScheduleRoom(10, 0, "01", "6432")
+private val COURSE = CourseRoom(
+	title = "title",
+	baseLanguageCode = "en",
+	targetLanguageCode = "es",
+	schedule = SCHEDULE,
+	session = null
+)
+private val COURSE_ID = COURSE.id
+// endregion Constants------------------------------------------------------------------------------
 
+@ExperimentalCoroutinesApi
+internal class CourseRepositoryTest {
 	// region Helper fields-------------------------------------------------------------------------
-	private lateinit var sut: CourseRepository
-	private val listener = mockk<(Result<Course>) -> Unit>(relaxed = true)
 	private val realm = mockk<Realm>(relaxed = true)
+	private val courseDao = mockk<CourseDao>(relaxed = true)
 	// endregion Helper fields----------------------------------------------------------------------
+
+	private lateinit var sut: CourseRepository
 
 	@BeforeEach
 	fun setUp() {
-		sut = CourseRepository(realm)
+		sut = CourseRepository(realm, courseDao)
 	}
 
 	@Test
-	fun `fetchCourse success notifies of success with correct data`() {
+	fun `fetchCourse success notifies of success with correct data`() = runBlockingTest {
 		// Given
 		success()
 
 		// When
-		sut.fetchCourse(COURSE_ID, listener)
+		val result = sut.fetchCourse(COURSE_ID)
 
 		// Then
-		verify { listener(Result.Success(COURSE)) }
+		result.shouldBeInstanceOf<Result.Success<CourseRoom>>()
+		result.data.id.shouldBe(COURSE_ID)
 	}
 
 	@Test
-	fun `fetchCourse not found notifies of failure`() {
+	fun `fetchCourse not found notifies of failure`() = runBlockingTest {
 		// Given
-		nullResult()
+		failure()
 
 		// When
-		sut.fetchCourse(COURSE_ID, listener)
+		val result = sut.fetchCourse(COURSE_ID)
 
 		// Then
-		verify { listener(Result.Failure(R.string.course_not_found)) }
+		result.shouldBeInstanceOf<Result.Failure<Any>>()
+		result.stringRes.shouldBe(R.string.course_not_found)
 	}
 
 	@Test
-	fun `fetchCourses queries realm synchronously`() {
+	fun `fetchCourses queries courseDao`() = runBlockingTest {
 		// Given
 
 		// When
 		sut.fetchCourses()
 
 		// Then
-		verify { realm.where(Course::class.java).findAll() }
+		coVerify { courseDao.getAll() }
 	}
 
 	// region Helper methods------------------------------------------------------------------------
 	private fun success() {
-		every {
-			realm.where(Course::class.java).equalTo("id", COURSE_ID).findFirst()
-		} returns COURSE
+		coEvery { courseDao.getCourseById(COURSE_ID) } returns COURSE
 	}
 
-	private fun nullResult() {
-		every { realm.where(Course::class.java).equalTo("id", COURSE_ID).findFirst() } returns null
+	private fun failure() {
+		coEvery { courseDao.getCourseById(COURSE_ID) } returns null
 	}
 	// endregion Helper methods---------------------------------------------------------------------
-
-	// region Helper classes------------------------------------------------------------------------
-	// endregion Helper classes---------------------------------------------------------------------
 }

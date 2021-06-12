@@ -9,7 +9,7 @@ interface CourseDao {
 	suspend fun getAll(): List<CourseRoom>
 
 	@Query("SELECT * FROM courseroom WHERE id = :id")
-	suspend fun getCourseById(id: Int): CourseRoom
+	suspend fun getCourseById(id: Long): CourseRoom?
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insert(course: CourseRoom)

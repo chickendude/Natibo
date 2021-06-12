@@ -27,7 +27,7 @@ class StudySessionViewModel @Inject constructor(
 		listeners.forEach { it.makeToast(R.string.course_settings_not_implemented) }
 	}
 
-	fun fetchCourse(id: Int) {
+	fun fetchCourse(id: Long) {
 		coroutineScope.launch(Dispatchers.Main) {
 			val result = withContext(Dispatchers.IO) { courseRepository.fetchCourse(id) }
 			when (result) {

@@ -71,7 +71,7 @@ class CourseDetailFragment
 			viewModel.openSettings()
 		}
 
-		arguments?.getInt(TAG_COURSE_ID)?.let {
+		arguments?.getLong(TAG_COURSE_ID)?.let {
 			viewModel.fetchCourse(it)
 		}
 	}

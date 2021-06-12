@@ -1,5 +1,6 @@
 package ch.ralena.natibo.data.room
 
+import android.util.Log
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.`object`.*
@@ -75,6 +76,23 @@ class CourseRepository @Inject constructor(
 	}
 
 	/**
+	 * Fetches a single course.
+	 *
+	 * This fetches a single course and returns [Result.Success] if it was successful, otherwise
+	 * it returns [Result.Failure].
+	 *
+	 * @param courseId The ID of the course to look for.
+	 * @return [Result.Success] if it was successful, otherwise [Result.Failure].
+	 */
+	suspend fun fetchCourse(courseId: Long): Result<CourseRoom> {
+		val course = courseDao.getCourseById(courseId)
+		return if (course == null)
+			Result.Failure(R.string.course_not_found)
+		else
+			Result.Success(course)
+	}
+
+	/**
 	 * Toggles a pack in a course.
 	 *
 	 * If the pack is in the course it will be removed, otherwise it will be added.
@@ -92,23 +110,6 @@ class CourseRepository @Inject constructor(
 			else
 				course.packs.add(pack)
 		}
-	}
-
-	/**
-	 * Fetches a single course.
-	 *
-	 * This fetches a single course and notifies [callback] whether it was successful or not.
-	 *
-	 * @param courseId The ID of the course to look for.
-	 * @param callback If found, the course will be passed to this wrapped in [Result.Success],
-	 * otherwise [Result.Failure] will be passed in.
-	 */
-	suspend fun fetchCourse(courseId: Int): Result<CourseRoom> {
-		val course = courseDao.getCourseById(courseId)
-		return if (course == null)
-			Result.Failure(R.string.course_not_found)
-		else
-			Result.Success(course)
 	}
 
 	/**

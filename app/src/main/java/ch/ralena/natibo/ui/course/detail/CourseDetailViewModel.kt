@@ -25,7 +25,7 @@ class CourseDetailViewModel @Inject constructor(
 
 	var course: CourseRoom? = null
 
-	fun fetchCourse(courseId: Int) {
+	fun fetchCourse(courseId: Long) {
 		coroutineScope.launch(Dispatchers.Main) {
 			val result = courseRepository.fetchCourse(courseId)
 			if (result is Result.Success)
