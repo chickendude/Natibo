@@ -1,10 +1,9 @@
 package ch.ralena.natibo.data.room
 
 import ch.ralena.natibo.R
+import ch.ralena.natibo.testutils.*
 import ch.ralena.natibo.data.Result
-import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.CourseRoom
-import ch.ralena.natibo.data.room.`object`.ScheduleRoom
 import ch.ralena.natibo.data.room.dao.CourseDao
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -16,15 +15,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 // region Constants---------------------------------------------------------------------------------
-private val SCHEDULE = ScheduleRoom(10, 0, "01", "6432")
-private val COURSE = CourseRoom(
-	title = "title",
-	baseLanguageCode = "en",
-	targetLanguageCode = "es",
-	schedule = SCHEDULE,
-	session = null
-)
-private val COURSE_ID = COURSE.id
+
 // endregion Constants------------------------------------------------------------------------------
 
 @ExperimentalCoroutinesApi

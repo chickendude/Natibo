@@ -4,16 +4,17 @@ import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.CourseRoom
+import ch.ralena.natibo.ui.base.BaseListener
 import ch.ralena.natibo.ui.base.BaseViewModel
+import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.ScreenNavigator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class CourseDetailViewModel @Inject constructor(
 	private val courseRepository: CourseRepository,
-	private val screenNavigator: ScreenNavigator
+	private val screenNavigator: ScreenNavigator,
+	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<CourseDetailViewModel.Listener>() {
 	interface Listener {
 		fun onCourseFetched(course: CourseRoom)
@@ -23,10 +24,12 @@ class CourseDetailViewModel @Inject constructor(
 		fun onSessionNotStarted()
 	}
 
-	var course: CourseRoom? = null
+	val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
+
+	private var course: CourseRoom? = null
 
 	fun fetchCourse(courseId: Long) {
-		coroutineScope.launch(Dispatchers.Main) {
+		coroutineScope.launch {
 			val result = courseRepository.fetchCourse(courseId)
 			if (result is Result.Success)
 				fetchCourseSuccess(result.data)
@@ -49,7 +52,7 @@ class CourseDetailViewModel @Inject constructor(
 	}
 
 	fun deleteCourse() {
-		coroutineScope.launch(Dispatchers.IO) {
+		coroutineScope.launch(dispatcherProvider.io()) {
 			course?.let { courseRepository.deleteCourse(it) }
 		}
 		screenNavigator.toCourseListFragment()

@@ -1,20 +1,19 @@
 package ch.ralena.natibo.ui.course.create.pick_language
 
 import ch.ralena.natibo.data.room.LanguageRepository
-import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.di.module.LanguageList
 import ch.ralena.natibo.ui.base.BaseViewModel
+import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.ScreenNavigator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class PickLanguagesViewModel @Inject constructor(
 		private val languageRepository: LanguageRepository,
 		private val screenNavigator: ScreenNavigator,
-		@LanguageList private val selectedLanguages: ArrayList<LanguageRoom>
+		@LanguageList private val selectedLanguages: ArrayList<LanguageRoom>,
+		private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<PickLanguagesViewModel.Listener>() {
 	interface Listener {
 		fun onLanguagesLoaded(languages: List<LanguageRoom>)
@@ -22,11 +21,12 @@ class PickLanguagesViewModel @Inject constructor(
 		fun onLanguageAdded(language: LanguageRoom)
 		fun onLanguageRemoved(language: LanguageRoom)
 	}
+	val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
 
 	fun fetchLanguages() {
-		coroutineScope.launch(Dispatchers.Main) {
+		coroutineScope.launch(dispatcherProvider.main()) {
 			var languages: List<LanguageRoom>
-			withContext(Dispatchers.IO) {
+			withContext(dispatcherProvider.io()) {
 				languages = languageRepository.fetchLanguages()
 			}
 			listeners.forEach { it.onLanguagesLoaded(languages) }

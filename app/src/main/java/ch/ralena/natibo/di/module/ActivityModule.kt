@@ -1,10 +1,10 @@
 package ch.ralena.natibo.di.module
 
-import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import ch.ralena.natibo.di.ActivityScope
 import ch.ralena.natibo.ui.MainActivity
+import ch.ralena.natibo.utils.DefaultDispatcherProvider
+import ch.ralena.natibo.utils.DispatcherProvider
 import dagger.Module
 import dagger.Provides
 
@@ -17,4 +17,8 @@ class ActivityModule(val activity: MainActivity) {
 	@ActivityScope
 	@Provides
 	fun fragmentManager(): FragmentManager = activity.supportFragmentManager
+
+	@ActivityScope
+	@Provides
+	fun dispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider()
 }

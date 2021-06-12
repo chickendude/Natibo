@@ -7,29 +7,30 @@ import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
+import ch.ralena.natibo.utils.DispatcherProvider
 import io.realm.Realm
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class StudySessionViewModel @Inject constructor(
-	private val courseRepository: CourseRepository
+	private val courseRepository: CourseRepository,
+	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<StudySessionViewModel.Listener>() {
-
 	interface Listener {
 		fun makeToast(@StringRes stringRes: Int)
 		fun onCourseLoaded(course: CourseRoom)
 		fun onCourseNotFound(@StringRes errorMsgRes: Int?)
 	}
 
+	val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
+
 	fun settingsIconClicked() {
 		listeners.forEach { it.makeToast(R.string.course_settings_not_implemented) }
 	}
 
 	fun fetchCourse(id: Long) {
-		coroutineScope.launch(Dispatchers.Main) {
-			val result = withContext(Dispatchers.IO) { courseRepository.fetchCourse(id) }
+		coroutineScope.launch(dispatcherProvider.main()) {
+			val result = withContext(dispatcherProvider.io()) { courseRepository.fetchCourse(id) }
 			when (result) {
 				is Result.Success -> loadCourse(result.data)
 				is Result.Failure -> listeners.forEach { it.onCourseNotFound(result.stringRes) }

@@ -7,21 +7,23 @@ import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.ui.base.BaseViewModel
+import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.ScreenNavigator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.math.min
 
 class PickScheduleViewModel @Inject constructor(
 	private val screenNavigator: ScreenNavigator,
 	private val languageRepository: LanguageRepository,
-	private val courseRepository: CourseRepository
+	private val courseRepository: CourseRepository,
+	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<PickScheduleViewModel.Listener>() {
 	interface Listener {
 		fun setCourseTitle(title: String)
 	}
+
+	val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
 
 	private lateinit var languages: List<Language>
 
@@ -72,8 +74,8 @@ class PickScheduleViewModel @Inject constructor(
 		val baseLanguageCode = languages.first().languageId
 		val targetLanguageCode = languages.last().languageId
 
-		coroutineScope.launch(Dispatchers.Main) {
-			val course = withContext(Dispatchers.IO) {
+		coroutineScope.launch(dispatcherProvider.main()) {
+			val course = withContext(dispatcherProvider.io()) {
 					courseRepository.createCourse(
 						order,
 						numSentencesPerDay,
