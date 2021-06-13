@@ -1,6 +1,7 @@
 package ch.ralena.natibo.testutils
 
 import ch.ralena.natibo.data.room.`object`.CourseRoom
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.data.room.`object`.ScheduleRoom
 
@@ -23,3 +24,6 @@ val PACK = PackRoom(
 	"en",
 	100
 )
+
+// Language
+val LANGUAGE = LanguageRoom("Basque", "eu", 666)

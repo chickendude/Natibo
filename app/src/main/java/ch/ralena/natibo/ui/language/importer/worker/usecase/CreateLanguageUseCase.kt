@@ -22,10 +22,7 @@ class CreateLanguageUseCase @Inject constructor(
 	suspend fun createLanguage(languageCode: String): Long {
 		// TODO: Make sure language isn't duplicated when creating it
 		val languageId = languageRepository.createLanguage(languageCode)
-		val languages = languageRepository.fetchLanguages()
-		Log.d(PackImporterWorker.TAG, languages.toString())
-		if (languageId == null)
-			throw ImportException("Unable to create language with id: $languageCode")
+			?: throw ImportException("Unable to create language with id: $languageCode")
 		return languageId
 	}
 }
