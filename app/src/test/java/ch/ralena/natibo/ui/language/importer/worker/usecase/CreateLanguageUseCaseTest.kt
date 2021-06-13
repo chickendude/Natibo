@@ -4,6 +4,8 @@ import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.testutils.*
 import ch.ralena.natibo.ui.language.importer.worker.ImportException
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.longs.shouldBeBetween
+import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -44,10 +46,11 @@ internal class CreateLanguageUseCaseTest {
 	    success()
 
 	    // When
-	    SUT.createLanguage(LANGUAGE.code)
+	    val result = SUT.createLanguage(LANGUAGE.code)
 
 	    // Then
 	    coVerify { languageRepository.createLanguage(LANGUAGE.code) }
+		result.shouldBe(LANGUAGE.id)
 	}
 
 	// region Helper functions----------------------------------------------------------------------
