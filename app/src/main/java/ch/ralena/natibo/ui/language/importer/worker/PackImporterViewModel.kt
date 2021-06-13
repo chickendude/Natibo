@@ -2,15 +2,10 @@ package ch.ralena.natibo.ui.language.importer.worker
 
 import android.content.ContentResolver
 import android.net.Uri
-import android.util.Log
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.PackRepository
-import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
-import ch.ralena.natibo.ui.language.importer.worker.usecase.CountMp3sUseCase
-import ch.ralena.natibo.ui.language.importer.worker.usecase.CreateSentencesUseCase
-import ch.ralena.natibo.ui.language.importer.worker.usecase.FetchSentencesUseCase
-import ch.ralena.natibo.ui.language.importer.worker.usecase.ReadPackDataUseCase
+import ch.ralena.natibo.ui.language.importer.worker.usecase.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import java.io.File
@@ -23,11 +18,10 @@ class ImportException(message: String) : Exception(message)
 
 class PackImporterViewModel @Inject constructor(
 	private val contentResolver: ContentResolver,
-	// Repositories
-	private val languageRepository: LanguageRepository,
-	private val packRepository: PackRepository,
 	// Use cases
 	private val countMp3sUseCase: CountMp3sUseCase,
+	private val createLanguageUseCase: CreateLanguageUseCase,
+	private val createPackUseCase: CreatePackUseCase,
 	private val createSentencesUseCase: CreateSentencesUseCase,
 	private val fetchSentencesUseCase: FetchSentencesUseCase,
 	private val readPackDataUseCase: ReadPackDataUseCase
@@ -35,25 +29,22 @@ class PackImporterViewModel @Inject constructor(
 	interface Listener {
 		fun onNotificationUpdate(message: String)
 		fun onError(exception: ImportException)
+		fun onWarning(warningMsg: String)
 	}
 
 	/**
 	 * Pulls the language code and pack name out from the Uri filename.
 	 */
-	suspend fun importPack(uriString: String) {
-		val uri = Uri.parse(uriString)
+	suspend fun importPack(uri: Uri) {
 		try {
 			// Grab language and pack name
 			val (languageCode, packName) = readPackDataUseCase.extractLanguageAndPackName(uri)
-			// TODO: Make sure language isn't duplicated when creating it
-			val language = createLanguage(languageCode)
-			val pack = createPack(packName, languageCode)
-
+			val languageId = createLanguageUseCase.createLanguage(languageCode)
+			val packId = createPackUseCase.createPack(packName, languageCode)
 			val numMp3s = countMp3sUseCase.countMp3Files(getInputStream(uri))
 			val sentences = fetchSentencesUseCase.fetchSentences(getInputStream(uri))
-			// TODO: check if numMp3s == sentences.size
-			updateNotification(sentences.last())
-			createSentencesUseCase.createSentences(language, pack, sentences)
+			checkSentences(numMp3s, sentences)
+			createSentencesUseCase.createSentences(languageId, packId, sentences)
 			createSentencesUseCase.sentenceCount()
 				.onEach { updateNotification("Reading sentence: $it") }.collect()
 			// copy mp3 files over
@@ -64,26 +55,24 @@ class PackImporterViewModel @Inject constructor(
 		}
 	}
 
-	suspend fun createLanguage(languageCode: String): Long {
-		val languageId = languageRepository.createLanguage(languageCode)
-		val languages = languageRepository.fetchLanguages()
-		Log.d(PackImporterWorker.TAG, languages.toString())
-		if (languageId == null)
-			throw ImportException("Unable to create language with id: $languageCode")
-		return languageId
-	}
-
-	private suspend fun createPack(packName: String, languageCode: String): Long {
-		var pack = packRepository.fetchPackByNameAndLanguage(packName, languageCode)
-		// Create the pack if it doesn't exist already
-		if (pack == null) {
-			pack = PackRoom(packName, languageCode)
-			return packRepository.createPack(pack)
-		}
-		return pack.id
-	}
-
 	// region Helper functions----------------------------------------------------------------------
+	/**
+	 * Perform some checks to notify user of any abnormal issues such as missing sentence texts,
+	 * audio files, mismatching numbers, etc.
+	 */
+	private fun checkSentences(numMp3s: Int, sentences: List<String>) {
+		if (sentences.isEmpty()) {
+			sendWarning("Sentence list is empty.")
+		} else if (numMp3s == 0) {
+			sendWarning("No audio files were found.")
+		} else if (numMp3s != sentences.size) {
+			sendWarning("There are $numMp3s mp3s but ${sentences.size} sentences.")
+		} else {
+			// Todo: Probably don't need this in the end.
+			updateNotification(sentences.last())
+		}
+	}
+
 	private fun updateNotification(message: String) {
 		listeners.forEach { it.onNotificationUpdate(message) }
 	}
@@ -94,5 +83,9 @@ class PackImporterViewModel @Inject constructor(
 			else -> contentResolver.openInputStream(uri)!!
 		}
 	}
-	// endregion Helper functions-------------------------------------------------------------------
+
+	private fun sendWarning(msg: String) {
+		for (l in listeners) l.onWarning(msg)
+	}
+// endregion Helper functions-------------------------------------------------------------------
 }

@@ -1,6 +1,7 @@
 package ch.ralena.natibo.testutils
 
 import ch.ralena.natibo.data.room.`object`.CourseRoom
+import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.data.room.`object`.ScheduleRoom
 
 // Schedule
@@ -15,3 +16,10 @@ val COURSE = CourseRoom(
 	session = null
 )
 val COURSE_ID = COURSE.id
+
+// Pack
+val PACK = PackRoom(
+	"pack",
+	"en",
+	100
+)

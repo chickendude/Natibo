@@ -75,7 +75,7 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		val foregroundInfo = createForegroundInfo(uriString)
 		setForeground(foregroundInfo)
 		viewModel.registerListener(this)
-		viewModel.importPack(uriString)
+		viewModel.importPack(Uri.parse(uriString))
 		while (status == Status.IN_PROGRESS) {
 			delay(500)
 		}
@@ -146,6 +146,10 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 	override fun onError(exception: ImportException) {
 		Toast.makeText(applicationContext, "${exception.message}", Toast.LENGTH_SHORT).show()
 		status = Status.FAILURE
+	}
+
+	override fun onWarning(warningMsg: String) {
+		Toast.makeText(applicationContext, warningMsg, Toast.LENGTH_SHORT).show()
 	}
 	// endregion CountFilesUseCase Listener---------------------------------------------------------
 
