@@ -12,5 +12,6 @@ import androidx.room.PrimaryKey
 data class LanguageRoom (
 	val name: String,
 	val code: String,
+	val flagDrawable: Int,
 	@PrimaryKey(autoGenerate = true) val id: Long = 0
 )

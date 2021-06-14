@@ -25,7 +25,7 @@ class LanguageRepository @Inject constructor(
 	suspend fun createLanguage(id: String): Long? =
 		// TODO: Create a new language if the ID isn't in LanguageData
 		LanguageData.getLanguageById(id)?.let {
-			val language = LanguageRoom(it.name, id)
+			val language = LanguageRoom(it.name, id, it.drawable)
 			languageDao.insert(language)
 		}
 

@@ -58,7 +58,7 @@ class LanguageListAdapter @Inject constructor(
 			languageName.text = language.name
 //			numPacks.text = "${language.packs.size}"
 //			numSentences.text = "${language.sentenceCount}"
-//			flagImage.setImageResource(language.languageType.drawable)
+			flagImage.setImageResource(language.flagDrawable)
 		}
 	}
 }

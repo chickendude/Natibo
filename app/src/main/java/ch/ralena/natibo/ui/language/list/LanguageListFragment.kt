@@ -64,6 +64,17 @@ class LanguageListFragment :
 		languageAdapter.unregisterListener(this)
 	}
 
+	override fun onLanguageClicked(language: LanguageRoom) {
+		viewModel.languageSelected(language)
+	}
+
+	// region ViewModel listeners-------------------------------------------------------------------
+	override fun onLanguagesLoaded(languages: List<LanguageRoom>) {
+		languageAdapter.loadLanguages(languages)
+		updateRecyclerView()
+	}
+	// endregion ViewModel listeners----------------------------------------------------------------
+
 	// region Helper functions----------------------------------------------------------------------
 	private fun updateRecyclerView() {
 		binding.recyclerView.apply {
@@ -75,16 +86,4 @@ class LanguageListFragment :
 		binding.noCoursesText.visibility = viewModel.getNoCourseTextVisibility()
 	}
 	// endregion Helper functions-------------------------------------------------------------------
-
-	override fun onLanguageClicked(language: LanguageRoom) {
-		viewModel.languageSelected(language)
-	}
-
-
-	// region ViewModel listeners-------------------------------------------------------------------
-	override fun onLanguagesLoaded(languages: List<LanguageRoom>) {
-		languageAdapter.loadLanguages(languages)
-		updateRecyclerView()
-	}
-	// endregion ViewModel listeners----------------------------------------------------------------
 }
