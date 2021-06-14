@@ -13,6 +13,9 @@ interface LanguageDao {
 	@Query ("SELECT * FROM languageroom WHERE id = :id LIMIT 1")
 	suspend fun getById (id: String) : LanguageRoom
 
+	@Query ("SELECT * FROM languageroom WHERE code = :code LIMIT 1")
+	suspend fun getByCode(code: String): LanguageRoom?
+
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insert(language: LanguageRoom): Long
 

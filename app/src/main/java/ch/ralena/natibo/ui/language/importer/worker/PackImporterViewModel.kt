@@ -2,8 +2,6 @@ package ch.ralena.natibo.ui.language.importer.worker
 
 import android.content.ContentResolver
 import android.net.Uri
-import ch.ralena.natibo.data.room.LanguageRepository
-import ch.ralena.natibo.data.room.PackRepository
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.ui.language.importer.worker.usecase.*
 import kotlinx.coroutines.flow.collect
@@ -39,7 +37,7 @@ class PackImporterViewModel @Inject constructor(
 		try {
 			// Grab language and pack name
 			val (languageCode, packName) = readPackDataUseCase.extractLanguageAndPackName(uri)
-			val languageId = createLanguageUseCase.createLanguage(languageCode)
+			val languageId = createLanguageUseCase.fetchOrCreateLanguage(languageCode)
 			val packId = createPackUseCase.createPack(packName, languageCode)
 			val numMp3s = countMp3sUseCase.countMp3Files(getInputStream(uri))
 			val sentences = fetchSentencesUseCase.fetchSentences(getInputStream(uri))

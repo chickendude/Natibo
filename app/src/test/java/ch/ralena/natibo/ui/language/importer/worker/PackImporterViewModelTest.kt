@@ -52,7 +52,7 @@ internal class PackImporterViewModelTest {
 		SUT.importPack(uri)
 
 		// Then
-		coVerify { createLanguageUseCase.createLanguage(PACK.languageCode) }
+		coVerify { createLanguageUseCase.fetchOrCreateLanguage(PACK.languageCode) }
 	}
 
 	@Test
@@ -87,7 +87,7 @@ internal class PackImporterViewModelTest {
 			PACK.languageCode,
 			PACK.name
 		)
-		coEvery { createLanguageUseCase.createLanguage(any()) } returns LANGUAGE_ID
+		coEvery { createLanguageUseCase.fetchOrCreateLanguage(any()) } returns LANGUAGE_ID
 		coEvery { createPackUseCase.createPack(any(), any()) } returns PACK.id
 		coEvery { fetchSentencesUseCase.fetchSentences(any()) } returns SENTENCE_STRINGS
 	}

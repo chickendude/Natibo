@@ -4,7 +4,6 @@ import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.testutils.*
 import ch.ralena.natibo.ui.language.importer.worker.ImportException
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.longs.shouldBeBetween
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -28,37 +27,60 @@ internal class CreateLanguageUseCaseTest {
 	}
 
 	@Test
-	fun `createLanguage fail throws exception`() = runBlockingTest {
+	fun `fetchOrCreateLanguage failing to create throws exception`() = runBlockingTest {
 		// Given
-		failure()
+		languageNotFound()
+		createFailure()
 
 		// When
 		shouldThrow<ImportException> {
-			SUT.createLanguage(LANGUAGE.code)
+			SUT.fetchOrCreateLanguage(LANGUAGE.code)
 		}
 
 		// Then
 	}
 
 	@Test
-	fun `createLanguage creates language`() = runBlockingTest {
-	    // Given
-	    success()
+	fun `fetchOrCreateLanguage creates new language`() = runBlockingTest {
+		// Given
+		languageNotFound()
+		createSuccess()
 
-	    // When
-	    val result = SUT.createLanguage(LANGUAGE.code)
+		// When
+		val result = SUT.fetchOrCreateLanguage(LANGUAGE.code)
 
-	    // Then
-	    coVerify { languageRepository.createLanguage(LANGUAGE.code) }
+		// Then
+		coVerify { languageRepository.createLanguage(LANGUAGE.code) }
 		result.shouldBe(LANGUAGE.id)
 	}
 
+	@Test
+	fun `fetchOrCreateLanguage returns existing language`() = runBlockingTest {
+		// Given
+		languageFound()
+
+		// When
+		val result = SUT.fetchOrCreateLanguage(LANGUAGE.code)
+
+		// Then
+		result.shouldBe(LANGUAGE.id)
+		coVerify(exactly = 0) { languageRepository.createLanguage(any()) }
+	}
+
 	// region Helper functions----------------------------------------------------------------------
-	private fun success() {
+	private fun languageFound() {
+		coEvery { languageRepository.fetchByCode(LANGUAGE.code) } returns LANGUAGE
+	}
+
+	private fun languageNotFound() {
+		coEvery { languageRepository.fetchByCode(LANGUAGE.code) } returns null
+	}
+
+	private fun createSuccess() {
 		coEvery { languageRepository.createLanguage(LANGUAGE.code) } returns LANGUAGE.id
 	}
 
-	private fun failure() {
+	private fun createFailure() {
 		coEvery { languageRepository.createLanguage(LANGUAGE.code) } returns null
 	}
 	// endregion Helper functions-------------------------------------------------------------------

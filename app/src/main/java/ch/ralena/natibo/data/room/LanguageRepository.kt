@@ -18,13 +18,16 @@ class LanguageRepository @Inject constructor(
 		return languageDao.getById(id)
 	}
 
+	suspend fun fetchByCode(code: String): LanguageRoom? {
+		return languageDao.getByCode(code)
+	}
+
 	suspend fun createLanguage(id: String): Long? =
 		// TODO: Create a new language if the ID isn't in LanguageData
 		LanguageData.getLanguageById(id)?.let {
 			val language = LanguageRoom(it.name, id)
 			languageDao.insert(language)
 		}
-
 
 	suspend fun fetchLanguages(): List<LanguageRoom> =
 		languageDao.getAll()
