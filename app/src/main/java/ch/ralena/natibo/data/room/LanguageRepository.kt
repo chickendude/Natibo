@@ -32,6 +32,8 @@ class LanguageRepository @Inject constructor(
 	suspend fun fetchLanguages(): List<LanguageRoom> =
 		languageDao.getAll()
 
+	suspend fun fetchLanguagesWithPacks() = languageDao.getAllWithPacks()
+
 	fun fetchLanguagesSorted(): List<Language> {
 		val languages = realm.where(Language::class.java).findAll()
 		val languagesSorted = ArrayList<Language>()

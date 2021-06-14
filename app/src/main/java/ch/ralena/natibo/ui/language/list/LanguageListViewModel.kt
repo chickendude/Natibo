@@ -2,8 +2,8 @@ package ch.ralena.natibo.ui.language.list
 
 import android.view.View
 import ch.ralena.natibo.data.room.LanguageRepository
-import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
+import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.ScreenNavigator
@@ -18,19 +18,19 @@ class LanguageListViewModel @Inject constructor(
 	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<LanguageListViewModel.Listener>() {
 	interface Listener {
-		fun onLanguagesLoaded(languages: List<LanguageRoom>)
+		fun onLanguagesLoaded(languagesWithPacks: List<LanguageWithPacks>)
 	}
 
 	val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
 
-	lateinit var languages: List<LanguageRoom>
+	lateinit var languagesWithPacks: List<LanguageWithPacks>
 
 	fun fetchLanguages() {
 		coroutineScope.launch(dispatcherProvider.main()) {
 			withContext(dispatcherProvider.io()) {
-				languages = languageRepository.fetchLanguages()
+				languagesWithPacks = languageRepository.fetchLanguagesWithPacks()
 			}
-			listeners.forEach { it.onLanguagesLoaded(languages) }
+			listeners.forEach { it.onLanguagesLoaded(languagesWithPacks) }
 		}
 	}
 
@@ -39,9 +39,9 @@ class LanguageListViewModel @Inject constructor(
 	}
 
 	fun getRecyclerViewVisibility(): Int =
-		if (languages.isNullOrEmpty()) View.GONE else View.VISIBLE
+		if (languagesWithPacks.isNullOrEmpty()) View.GONE else View.VISIBLE
 
 	fun getNoCourseTextVisibility(): Int =
-		if (languages.isNullOrEmpty()) View.VISIBLE else View.GONE
+		if (languagesWithPacks.isNullOrEmpty()) View.VISIBLE else View.GONE
 
 }

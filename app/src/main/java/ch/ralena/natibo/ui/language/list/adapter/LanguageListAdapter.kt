@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
+import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
 import ch.ralena.natibo.di.module.LanguageList
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
 import io.reactivex.subjects.PublishSubject
@@ -16,7 +17,7 @@ import java.util.*
 import javax.inject.Inject
 
 class LanguageListAdapter @Inject constructor(
-		private val languages: ArrayList<LanguageRoom>
+		private val languages: ArrayList<LanguageWithPacks>
 ) : BaseRecyclerAdapter<LanguageListAdapter.ViewHolder, LanguageListAdapter.Listener>() {
 	interface Listener {
 		fun onLanguageClicked(language: LanguageRoom)
@@ -35,7 +36,7 @@ class LanguageListAdapter @Inject constructor(
 		return languages.size
 	}
 
-	fun loadLanguages(languages: List<LanguageRoom>) {
+	fun loadLanguages(languages: List<LanguageWithPacks>) {
 		this.languages.clear()
 		this.languages.addAll(languages)
 		notifyDataSetChanged()
@@ -47,16 +48,18 @@ class LanguageListAdapter @Inject constructor(
 		private val numSentences: TextView = view.findViewById(R.id.numSentencesLabel)
 		private val flagImage: ImageView = view.findViewById(R.id.flagImageView)
 
-		private lateinit var language: LanguageRoom
+		private lateinit var languageWithPacks: LanguageWithPacks
 
 		init {
-			view.setOnClickListener { for (l in listeners) l.onLanguageClicked(language) }
+			view.setOnClickListener { for (l in listeners) l.onLanguageClicked(languageWithPacks.language) }
 		}
 
-		fun bindView(language: LanguageRoom) {
-			this.language = language
+		fun bindView(languageWithPacks: LanguageWithPacks) {
+			this.languageWithPacks = languageWithPacks
+			val language = languageWithPacks.language
+			val packs = languageWithPacks.packs
 			languageName.text = language.name
-//			numPacks.text = "${language.packs.size}"
+			numPacks.text = "${packs.size}"
 //			numSentences.text = "${language.sentenceCount}"
 			flagImage.setImageResource(language.flagDrawable)
 		}

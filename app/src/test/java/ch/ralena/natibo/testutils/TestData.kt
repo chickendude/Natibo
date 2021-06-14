@@ -21,9 +21,9 @@ val COURSE_ID = COURSE.id
 // Pack
 val PACK = PackRoom(
 	"pack",
-	"en",
+	666,
 	100
 )
 
 // Language
-val LANGUAGE = LanguageRoom("Basque", "eu", 666)
+val LANGUAGE = LanguageRoom("Basque", "eu", 666, 10)

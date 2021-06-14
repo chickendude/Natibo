@@ -2,6 +2,7 @@ package ch.ralena.natibo.ui.language.importer.worker
 
 import android.content.ContentResolver
 import android.net.Uri
+import ch.ralena.natibo.testutils.LANGUAGE
 import ch.ralena.natibo.testutils.PACK
 import ch.ralena.natibo.ui.language.importer.worker.usecase.*
 import io.mockk.*
@@ -11,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 private val SENTENCE_STRINGS = listOf("Sentence one", "Sentence two")
-private const val LANGUAGE_ID = 999L
 
 @ExperimentalCoroutinesApi
 internal class PackImporterViewModelTest {
@@ -52,7 +52,7 @@ internal class PackImporterViewModelTest {
 		SUT.importPack(uri)
 
 		// Then
-		coVerify { createLanguageUseCase.fetchOrCreateLanguage(PACK.languageCode) }
+		coVerify { createLanguageUseCase.fetchOrCreateLanguage(LANGUAGE.code) }
 	}
 
 	@Test
@@ -63,7 +63,7 @@ internal class PackImporterViewModelTest {
 		SUT.importPack(uri)
 
 		// Then
-		coVerify { createPackUseCase.createPack(PACK.name, PACK.languageCode) }
+		coVerify { createPackUseCase.createPack(PACK.name, LANGUAGE.id) }
 	}
 
 	@Test
@@ -74,7 +74,7 @@ internal class PackImporterViewModelTest {
 		SUT.importPack(uri)
 
 		// Then
-		coVerify { createSentencesUseCase.createSentences(LANGUAGE_ID, PACK.id, SENTENCE_STRINGS) }
+		coVerify { createSentencesUseCase.createSentences(LANGUAGE.id, PACK.id, SENTENCE_STRINGS) }
 	}
 	// copy mp3s
 	// mp3 count != sentence count show warning
@@ -84,10 +84,10 @@ internal class PackImporterViewModelTest {
 	// region Helper functions----------------------------------------------------------------------
 	private fun allSuccess() {
 		coEvery { readPackDataUseCase.extractLanguageAndPackName(uri) } returns Pair(
-			PACK.languageCode,
+			LANGUAGE.code,
 			PACK.name
 		)
-		coEvery { createLanguageUseCase.fetchOrCreateLanguage(any()) } returns LANGUAGE_ID
+		coEvery { createLanguageUseCase.fetchOrCreateLanguage(any()) } returns LANGUAGE.id
 		coEvery { createPackUseCase.createPack(any(), any()) } returns PACK.id
 		coEvery { fetchSentencesUseCase.fetchSentences(any()) } returns SENTENCE_STRINGS
 	}

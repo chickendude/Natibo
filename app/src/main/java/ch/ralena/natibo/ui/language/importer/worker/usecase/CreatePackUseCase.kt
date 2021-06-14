@@ -7,11 +7,11 @@ import javax.inject.Inject
 class CreatePackUseCase @Inject constructor(
 	private val packRepository: PackRepository
 ) {
-	suspend fun createPack(packName: String, languageCode: String): Long {
-		var pack = packRepository.fetchPackByNameAndLanguage(packName, languageCode)
+	suspend fun createPack(packName: String, languageId: Long): Long {
+		var pack = packRepository.fetchPackByNameAndLanguage(packName, languageId)
 		// Create the pack if it doesn't exist already
 		if (pack == null) {
-			pack = PackRoom(packName, languageCode)
+			pack = PackRoom(packName, languageId)
 			return packRepository.createPack(pack)
 		}
 		return pack.id

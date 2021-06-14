@@ -38,7 +38,7 @@ class PackImporterViewModel @Inject constructor(
 			// Grab language and pack name
 			val (languageCode, packName) = readPackDataUseCase.extractLanguageAndPackName(uri)
 			val languageId = createLanguageUseCase.fetchOrCreateLanguage(languageCode)
-			val packId = createPackUseCase.createPack(packName, languageCode)
+			val packId = createPackUseCase.createPack(packName, languageId)
 			val numMp3s = countMp3sUseCase.countMp3Files(getInputStream(uri))
 			val sentences = fetchSentencesUseCase.fetchSentences(getInputStream(uri))
 			checkSentences(numMp3s, sentences)

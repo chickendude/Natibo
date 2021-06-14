@@ -10,6 +10,7 @@ import ch.ralena.natibo.ui.language.list.adapter.LanguageListAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
+import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
 import ch.ralena.natibo.databinding.FragmentLanguageListBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
@@ -69,8 +70,8 @@ class LanguageListFragment :
 	}
 
 	// region ViewModel listeners-------------------------------------------------------------------
-	override fun onLanguagesLoaded(languages: List<LanguageRoom>) {
-		languageAdapter.loadLanguages(languages)
+	override fun onLanguagesLoaded(languagesWithPacks: List<LanguageWithPacks>) {
+		languageAdapter.loadLanguages(languagesWithPacks)
 		updateRecyclerView()
 	}
 	// endregion ViewModel listeners----------------------------------------------------------------
