@@ -39,6 +39,7 @@ class SentenceListFragment :
 
 	override fun setupViews(view: View) {
 		viewModel.registerListener(this)
+		sentenceListAdapter.registerListener(this)
 
 		// load language and pack from database
 		val languageId = requireArguments().getLong(TAG_LANGUAGE_ID)
