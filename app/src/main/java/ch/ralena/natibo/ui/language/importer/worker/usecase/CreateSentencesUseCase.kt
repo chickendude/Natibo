@@ -28,6 +28,7 @@ class CreateSentencesUseCase @Inject constructor(
 
 		val sections = sentences[0].split("\t")
 
+		// Go through all sentences except first row which is the header information
 		sentences.drop(1).forEach {
 			createSentence(packId, it.split('\t'), sections, packSentences)
 			sentenceCount++

@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
 import io.realm.RealmList
@@ -18,7 +19,7 @@ class SentenceListAdapter @Inject constructor() :
 		fun onSentenceClicked(sentence: SentenceRoom)
 	}
 
-	private lateinit var language: String
+	private lateinit var languageName: String
 	private val sentences = ArrayList<SentenceRoom>()
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -33,7 +34,8 @@ class SentenceListAdapter @Inject constructor() :
 
 	override fun getItemCount(): Int = sentences.size
 
-	fun loadSentences(sentences: List<SentenceRoom>) {
+	fun loadSentences(sentences: List<SentenceRoom>, language: LanguageRoom) {
+		languageName = language.code
 		this.sentences.clear()
 		this.sentences.addAll(sentences)
 		notifyDataSetChanged()
@@ -53,7 +55,7 @@ class SentenceListAdapter @Inject constructor() :
 		private lateinit var sentence: SentenceRoom
 
 		init {
-			languageCode.text = language
+			languageCode.text = languageName
 			view.setOnClickListener {
 				listeners.forEach { it.onSentenceClicked(sentence) }
 			}

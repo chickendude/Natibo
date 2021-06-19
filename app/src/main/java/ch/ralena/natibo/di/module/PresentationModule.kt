@@ -1,5 +1,6 @@
 package ch.ralena.natibo.di.module
 
+import android.media.MediaPlayer
 import androidx.recyclerview.widget.ItemTouchHelper
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
@@ -53,6 +54,10 @@ class PresentationModule {
 		val callback: ItemTouchHelper.Callback = ItemTouchHelperCallback(selectedAdapter, false)
 		return ItemTouchHelper(callback)
 	}
+
+	@PresentationScope
+	@Provides
+	fun mediaPlayer() = MediaPlayer()
 }
 
 @Qualifier

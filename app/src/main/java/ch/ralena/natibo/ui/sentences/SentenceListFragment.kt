@@ -83,7 +83,7 @@ class SentenceListFragment :
 		// load language name
 		mainActivity.title = language.name
 		binding.seekbar.max = packWithSentences.sentences.size
-		sentenceListAdapter.loadSentences(packWithSentences.sentences)
+		sentenceListAdapter.loadSentences(packWithSentences.sentences, language)
 	}
 
 	override fun onError() {

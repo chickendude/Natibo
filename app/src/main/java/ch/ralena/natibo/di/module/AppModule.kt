@@ -4,7 +4,10 @@ import android.app.Application
 import android.content.ContentResolver
 import androidx.room.Room
 import ch.ralena.natibo.data.room.AppDatabase
+import ch.ralena.natibo.di.ActivityScope
 import ch.ralena.natibo.di.AppScope
+import ch.ralena.natibo.utils.DefaultDispatcherProvider
+import ch.ralena.natibo.utils.DispatcherProvider
 import dagger.Module
 import dagger.Provides
 import io.realm.Realm
@@ -14,6 +17,10 @@ class AppModule(private val application: Application) {
 	@Provides
 	@AppScope
 	fun contentResolver(): ContentResolver = application.contentResolver
+
+	@Provides
+	@AppScope
+	fun dispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider()
 
 	@Provides
 	fun realm(): Realm = Realm.getDefaultInstance()

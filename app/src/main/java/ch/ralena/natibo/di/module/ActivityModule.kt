@@ -17,8 +17,4 @@ class ActivityModule(val activity: MainActivity) {
 	@ActivityScope
 	@Provides
 	fun fragmentManager(): FragmentManager = activity.supportFragmentManager
-
-	@ActivityScope
-	@Provides
-	fun dispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider()
 }

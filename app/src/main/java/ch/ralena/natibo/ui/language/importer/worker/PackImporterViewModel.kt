@@ -4,8 +4,10 @@ import android.content.ContentResolver
 import android.net.Uri
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.ui.language.importer.worker.usecase.*
+import ch.ralena.natibo.utils.DispatcherProvider
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -16,6 +18,7 @@ class ImportException(message: String) : Exception(message)
 
 class PackImporterViewModel @Inject constructor(
 	private val contentResolver: ContentResolver,
+	private val dispatcherProvider: DispatcherProvider,
 	// Use cases
 	private val countMp3sUseCase: CountMp3sUseCase,
 	private val createLanguageUseCase: CreateLanguageUseCase,
@@ -59,12 +62,12 @@ class PackImporterViewModel @Inject constructor(
 	 * Perform some checks to notify user of any abnormal issues such as missing sentence texts,
 	 * audio files, mismatching numbers, etc.
 	 */
-	private fun checkSentences(numMp3s: Int, sentences: List<String>) {
+	private suspend fun checkSentences(numMp3s: Int, sentences: List<String>) {
 		if (sentences.isEmpty()) {
 			sendWarning("Sentence list is empty.")
 		} else if (numMp3s == 0) {
 			sendWarning("No audio files were found.")
-		} else if (numMp3s != sentences.size) {
+		} else if (numMp3s != sentences.size - 1) {
 			sendWarning("There are $numMp3s mp3s but ${sentences.size} sentences.")
 		} else {
 			// Todo: Probably don't need this in the end.
@@ -83,8 +86,10 @@ class PackImporterViewModel @Inject constructor(
 		}
 	}
 
-	private fun sendWarning(msg: String) {
-		for (l in listeners) l.onWarning(msg)
+	private suspend fun sendWarning(msg: String) {
+		withContext(dispatcherProvider.main()) {
+			listeners.forEach { it.onWarning(msg) }
+		}
 	}
 // endregion Helper functions-------------------------------------------------------------------
 }
