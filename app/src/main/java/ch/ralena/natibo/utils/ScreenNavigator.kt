@@ -90,7 +90,7 @@ class ScreenNavigator @Inject constructor(
 		val fragment = SentenceListFragment()
 		fragment.arguments = Bundle().apply {
 			putLong(SentenceListFragment.TAG_LANGUAGE_ID, languageId)
-			putLong(SentenceListFragment.TAG_BASE_PACK_ID, packId)
+			putLong(SentenceListFragment.TAG_PACK_ID, packId)
 		}
 		loadFragment(fragment, SentenceListFragment.TAG)
 	}

@@ -25,8 +25,7 @@ class SentenceListFragment :
 	companion object {
 		val TAG = SentenceListFragment::class.java.simpleName
 		const val TAG_LANGUAGE_ID = "language_id"
-		const val TAG_BASE_PACK_ID = "base_pack_id"
-		const val TAG_TARGET_PACK_ID = "target_pack_id"
+		const val TAG_PACK_ID = "pack_id"
 	}
 
 	@Inject
@@ -43,7 +42,7 @@ class SentenceListFragment :
 
 		// load language and pack from database
 		val languageId = requireArguments().getLong(TAG_LANGUAGE_ID)
-		val basePackId = requireArguments().getLong(TAG_BASE_PACK_ID)
+		val basePackId = requireArguments().getLong(TAG_PACK_ID)
 		viewModel.fetchInfo(languageId, basePackId)
 
 		// prepare seekbar
