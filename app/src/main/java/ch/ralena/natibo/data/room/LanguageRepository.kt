@@ -14,7 +14,7 @@ class LanguageRepository @Inject constructor(
 	private val realm: Realm,
 	private val languageDao: LanguageDao
 ) {
-	suspend fun getById(id: Long): LanguageRoom? {
+	suspend fun fetchLanguage(id: Long): LanguageRoom? {
 		return languageDao.getById(id)
 	}
 

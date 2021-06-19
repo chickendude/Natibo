@@ -21,11 +21,6 @@ class LanguageDetailAdapter @Inject constructor(
 		fun onLanguagePackClicked(pack: PackRoom)
 	}
 
-//	var packSubject = PublishSubject.create<Pack?>()
-//	fun asObservable(): PublishSubject<Pack?> {
-//		return packSubject
-//	}
-
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		val view = LayoutInflater.from(parent.context).inflate(R.layout.item_language_detail, parent, false)
 		return ViewHolder(view)

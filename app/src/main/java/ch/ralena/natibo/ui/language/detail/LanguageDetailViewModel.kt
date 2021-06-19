@@ -44,7 +44,7 @@ class LanguageDetailViewModel @Inject constructor(
 	fun languagePackSelected(pack: PackRoom) {
 		// todo notify invalid pack
 		languageWithPacks?.run {
-			screenNavigator.toSentenceListFragment(pack.id, language.code)
+			screenNavigator.toSentenceListFragment(pack.id, language.id)
 		}
 	}
 }

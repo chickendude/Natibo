@@ -1,102 +1,85 @@
-package ch.ralena.natibo.ui.sentences;
+package ch.ralena.natibo.ui.sentences.adapter
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import ch.ralena.natibo.R
+import ch.ralena.natibo.data.room.`object`.SentenceRoom
+import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
+import io.realm.RealmList
+import javax.inject.Inject
 
-import ch.ralena.natibo.R;
-import ch.ralena.natibo.data.room.object.Sentence;
-import io.reactivex.subjects.PublishSubject;
-import io.realm.RealmList;
-
-public class SentenceListAdapter extends RecyclerView.Adapter<SentenceListAdapter.ViewHolder> {
-
-	private PublishSubject<Sentence> languageSubject = PublishSubject.create();
-
-	public PublishSubject<Sentence> asObservable() {
-		return languageSubject;
+class SentenceListAdapter @Inject constructor() :
+	BaseRecyclerAdapter<SentenceListAdapter.ViewHolder, SentenceListAdapter.Listener>() {
+	interface Listener {
+		fun onSentenceClicked(sentence: SentenceRoom)
 	}
 
-	private RealmList<Sentence> sentences;
-	private String language;
+	private lateinit var language: String
+	private val sentences = ArrayList<SentenceRoom>()
 
-	public SentenceListAdapter(String languageId, RealmList<Sentence> sentences) {
-		this.language = languageId;
-		this.sentences = sentences;
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+		val view: View =
+			LayoutInflater.from(parent.context).inflate(R.layout.item_sentence_list, parent, false)
+		return ViewHolder(view)
 	}
 
-	@NonNull
-	@Override
-	public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-		View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_sentence_list, parent, false);
-		return new ViewHolder(view);
+	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+		if (position < itemCount) holder.bindView(sentences[position])
 	}
 
-	@Override
-	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-		if (position < getItemCount())
-			holder.bindView(sentences.get(position));
+	override fun getItemCount(): Int = sentences.size
+
+	fun loadSentences(sentences: List<SentenceRoom>) {
+		this.sentences.clear()
+		this.sentences.addAll(sentences)
+		notifyDataSetChanged()
 	}
 
-	@Override
-	public int getItemCount() {
-		return sentences.size();
-	}
+	inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+		private val index: TextView = view.findViewById(R.id.indexLabel)
+		private val languageCode: TextView = view.findViewById(R.id.languageCodeLabel)
+		private val sentenceText: TextView = view.findViewById(R.id.sentenceLabel)
+		private val alternateSentence: TextView = view.findViewById(R.id.alternateSentenceLabel)
+		private val alternateSentenceLayout: LinearLayout =
+			view.findViewById(R.id.alternateSentenceLayout)
+		private val romanization: TextView = view.findViewById(R.id.romanizationLabel)
+		private val romanizationLayout: LinearLayout = view.findViewById(R.id.romanizationLayout)
+		private val ipa: TextView = view.findViewById(R.id.ipaLabel)
+		private val ipaLayout: LinearLayout = view.findViewById(R.id.ipaLayout)
+		private lateinit var sentence: SentenceRoom
 
-	class ViewHolder extends RecyclerView.ViewHolder {
-		private View view;
-		private TextView index;
-		private TextView languageCode;
-		private TextView sentenceText;
-		private TextView alternateSentence;
-		private LinearLayout alternateSentenceLayout;
-		private TextView romanization;
-		private LinearLayout romanizationLayout;
-		private TextView ipa;
-		private LinearLayout ipaLayout;
-		private Sentence sentence;
-
-		ViewHolder(View view) {
-			super(view);
-			this.view = view;
-			index = view.findViewById(R.id.indexLabel);
-			languageCode = view.findViewById(R.id.languageCodeLabel);
-			languageCode.setText(language);
-			sentenceText = view.findViewById(R.id.sentenceLabel);
-			alternateSentence = view.findViewById(R.id.alternateSentenceLabel);
-			alternateSentenceLayout = view.findViewById(R.id.alternateSentenceLayout);
-			romanization = view.findViewById(R.id.romanizationLabel);
-			romanizationLayout = view.findViewById(R.id.romanizationLayout);
-			ipa = view.findViewById(R.id.ipaLabel);
-			ipaLayout = view.findViewById(R.id.ipaLayout);
-			this.view.setOnClickListener(v -> languageSubject.onNext(sentence));
+		init {
+			languageCode.text = language
+			view.setOnClickListener {
+				listeners.forEach { it.onSentenceClicked(sentence) }
+			}
 		}
 
-		void bindView(Sentence sentence) {
-			this.sentence = sentence;
-			index.setText("" + sentence.getIndex());
-			sentenceText.setText(sentence.getText());
-			if (sentence.getAlternate() != null) {
-				alternateSentenceLayout.setVisibility(View.VISIBLE);
-				alternateSentence.setText(sentence.getAlternate());
+		fun bindView(sentence: SentenceRoom) {
+			this.sentence = sentence
+			index.text = "${sentence.index}"
+			sentenceText.text = sentence.original
+			if (sentence.alternate.isNotEmpty()) {
+				alternateSentenceLayout.visibility = View.VISIBLE
+				alternateSentence.text = sentence.alternate
 			} else {
-				alternateSentenceLayout.setVisibility(View.GONE);
+				alternateSentenceLayout.visibility = View.GONE
 			}
-			if (sentence.getRomanization() != null) {
-				romanizationLayout.setVisibility(View.VISIBLE);
-				romanization.setText(sentence.getRomanization());
+			if (sentence.romanization.isNotEmpty()) {
+				romanizationLayout.visibility = View.VISIBLE
+				romanization.text = sentence.romanization
 			} else {
-				romanizationLayout.setVisibility(View.GONE);
+				romanizationLayout.visibility = View.GONE
 			}
-			if (sentence.getIpa() != null) {
-				ipaLayout.setVisibility(View.VISIBLE);
-				ipa.setText(sentence.getIpa());
+			if (sentence.ipa.isNotEmpty()) {
+				ipaLayout.visibility = View.VISIBLE
+				ipa.text = sentence.ipa
 			} else {
-				ipaLayout.setVisibility(View.GONE);
+				ipaLayout.visibility = View.GONE
 			}
 		}
 	}

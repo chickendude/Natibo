@@ -1,128 +1,98 @@
-package ch.ralena.natibo.ui.sentences;
+package ch.ralena.natibo.ui.sentences
 
-import android.media.MediaPlayer;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.SeekBar;
-import android.widget.Toast;
+import android.view.View
+import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
+import ch.ralena.natibo.data.room.`object`.PackWithSentences
+import ch.ralena.natibo.data.room.`object`.SentenceRoom
+import ch.ralena.natibo.databinding.FragmentSentenceListBinding
+import ch.ralena.natibo.di.component.PresentationComponent
+import ch.ralena.natibo.ui.MainActivity
+import ch.ralena.natibo.ui.base.BaseFragment
+import ch.ralena.natibo.ui.sentences.adapter.SentenceListAdapter
+import ch.ralena.natibo.ui.sentences.listener.SentenceSeekBarChangeListener
+import javax.inject.Inject
 
-import java.io.IOException;
+class SentenceListFragment :
+	BaseFragment<FragmentSentenceListBinding, SentenceListViewModel.Listener, SentenceListViewModel>(
+		FragmentSentenceListBinding::inflate
+	), SentenceListViewModel.Listener,
+	SentenceSeekBarChangeListener.Listener,
+	SentenceListAdapter.Listener {
 
-import ch.ralena.natibo.ui.MainActivity;
-import ch.ralena.natibo.R;
-import ch.ralena.natibo.data.room.object.Language;
-import ch.ralena.natibo.data.room.object.Pack;
-import ch.ralena.natibo.data.room.object.Sentence;
-import io.realm.Realm;
+	companion object {
+		val TAG = SentenceListFragment::class.java.simpleName
+		const val TAG_LANGUAGE_ID = "language_id"
+		const val TAG_BASE_PACK_ID = "base_pack_id"
+		const val TAG_TARGET_PACK_ID = "target_pack_id"
+	}
 
-public class SentenceListFragment extends Fragment {
-	public static final String TAG = SentenceListFragment.class.getSimpleName();
-	public static final String TAG_LANGUAGE_ID = "language_id";
-	public static final String TAG_BASE_PACK_ID = "base_pack_id";
-	public static final String TAG_TARGET_PACK_ID = "target_pack_id";
+	@Inject
+	lateinit var mainActivity: MainActivity
 
-	Language language;
-	Pack basePack;
+	@Inject
+	lateinit var seekBarChangeListener: SentenceSeekBarChangeListener
 
-	private Realm realm;
+	@Inject
+	lateinit var sentenceListAdapter: SentenceListAdapter
 
-	private MediaPlayer mediaPlayer;
-	private RecyclerView recyclerView;
-	private SeekBar.OnSeekBarChangeListener seekBarChangeListener;
-
-	@Nullable
-	@Override
-	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_sentence_list, container, false);
-
-		realm = Realm.getDefaultInstance();
-		mediaPlayer = new MediaPlayer();
+	override fun setupViews(view: View) {
+		viewModel.registerListener(this)
 
 		// load language and pack from database
-		String languageId = getArguments().getString(TAG_LANGUAGE_ID);
-		String basePackId = getArguments().getString(TAG_BASE_PACK_ID);
-		language = realm.where(Language.class).equalTo("languageId", languageId).findFirst();
-		basePack = realm.where(Pack.class).equalTo("id", basePackId).findFirst();
-
-		// load language name
-		getActivity().setTitle(language.getLanguageType().getName());
+		val languageId = requireArguments().getLong(TAG_LANGUAGE_ID)
+		val basePackId = requireArguments().getLong(TAG_BASE_PACK_ID)
+		viewModel.fetchInfo(languageId, basePackId)
 
 		// prepare seekbar
-		SeekBar seekBar = view.findViewById(R.id.seekbar);
-		seekBar.setMax(basePack.getSentences().size());
-
-		seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				recyclerView.scrollToPosition(progress);
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-
-			}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-				recyclerView.scrollToPosition(seekBar.getProgress());
-			}
-		};
-
-		seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
-
-		// set up recyclerlist and adapter
-		recyclerView = view.findViewById(R.id.recyclerView);
-		SentenceListAdapter adapter = new SentenceListAdapter(language.getLanguageId(), basePack.getSentences());
-		recyclerView.setAdapter(adapter);
-		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-		recyclerView.setLayoutManager(layoutManager);
-
-		adapter.asObservable().subscribe(this::playSentence);
-
-		recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-			@Override
-			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-				super.onScrolled(recyclerView, dx, dy);
-				seekBar.setOnSeekBarChangeListener(null);
-				seekBar.setProgress(((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition());
-				seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
-			}
-
-			@Override
-			public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-				super.onScrollStateChanged(recyclerView, newState);
-			}
-		});
-
-		return view;
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		((MainActivity) getActivity()).setMenuToLanguages();
-	}
-
-	private void playSentence(Sentence sentence) {
-		if (sentence.getUri() == null) {
-			Toast.makeText(getContext(), String.format("Audio file not found for '%s'", sentence.getText()), Toast.LENGTH_SHORT).show();
-			return;
+		seekBarChangeListener.registerListener(this)
+		binding.seekbar.apply {
+			setOnSeekBarChangeListener(seekBarChangeListener)
 		}
-		try {
-			mediaPlayer.reset();
-			mediaPlayer.setDataSource(sentence.getUri());
-			mediaPlayer.prepare();
-			mediaPlayer.start();
-		} catch (IOException e) {
-			e.printStackTrace();
+
+		// set up RecyclerView
+		binding.recyclerView.apply {
+			adapter = sentenceListAdapter
+			layoutManager = LinearLayoutManager(context)
+			addOnScrollListener(object : RecyclerView.OnScrollListener() {
+				override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+					super.onScrolled(recyclerView, dx, dy)
+					binding.seekbar.apply {
+						setOnSeekBarChangeListener(null)
+						progress =
+							(binding.recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+						setOnSeekBarChangeListener(seekBarChangeListener)
+					}
+				}
+			})
 		}
 	}
 
+	override fun injectDependencies(injector: PresentationComponent) {
+		injector.inject(this)
+	}
+
+
+	// region Listener overrides -------------------------------------------------------------------
+	override fun onProgressChanged(progress: Int) {
+		binding.recyclerView.scrollToPosition(progress)
+	}
+
+	override fun onInfoFetched(language: LanguageRoom, packWithSentences: PackWithSentences) {
+		// load language name
+		mainActivity.title = language.name
+		binding.seekbar.max = packWithSentences.sentences.size
+		sentenceListAdapter.loadSentences(packWithSentences.sentences)
+	}
+
+	override fun onError() {
+		Toast.makeText(context, "Error loading sentences", Toast.LENGTH_SHORT).show()
+	}
+
+	override fun onSentenceClicked(sentence: SentenceRoom) {
+		viewModel.playSentence(sentence)
+	}
+	// endregion Listener overrides ----------------------------------------------------------------
 }
