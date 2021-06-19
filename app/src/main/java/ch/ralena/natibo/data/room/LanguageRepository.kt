@@ -14,7 +14,7 @@ class LanguageRepository @Inject constructor(
 	private val realm: Realm,
 	private val languageDao: LanguageDao
 ) {
-	suspend fun getById(id: String): LanguageRoom {
+	suspend fun getById(id: Long): LanguageRoom? {
 		return languageDao.getById(id)
 	}
 
@@ -22,15 +22,17 @@ class LanguageRepository @Inject constructor(
 		return languageDao.getByCode(code)
 	}
 
-	suspend fun createLanguage(id: String): Long? =
+	suspend fun createLanguage(languageCode: String): Long? =
 		// TODO: Create a new language if the ID isn't in LanguageData
-		LanguageData.getLanguageById(id)?.let {
-			val language = LanguageRoom(it.name, id, it.drawable)
+		LanguageData.getLanguageById(languageCode)?.let {
+			val language = LanguageRoom(it.name, languageCode, it.drawable)
 			languageDao.insert(language)
 		}
 
 	suspend fun fetchLanguages(): List<LanguageRoom> =
 		languageDao.getAll()
+
+	suspend fun fetchLanguageWithPacks(id: Long) = languageDao.getByIdWithPacks(id)
 
 	suspend fun fetchLanguagesWithPacks() = languageDao.getAllWithPacks()
 

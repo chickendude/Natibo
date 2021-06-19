@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.course.list.CourseListFragment
@@ -87,11 +86,11 @@ class ScreenNavigator @Inject constructor(
 		loadFragment(MainSettingsFragment(), MainSettingsFragment.TAG)
 	}
 
-	fun toSentenceListFragment(packId: String, languageId: String) {
+	fun toSentenceListFragment(packId: Long, languageId: String) {
 		val fragment = SentenceListFragment()
 		fragment.arguments = Bundle().apply {
 			putString(SentenceListFragment.TAG_LANGUAGE_ID, languageId)
-			putString(SentenceListFragment.TAG_BASE_PACK_ID, packId)
+			putLong(SentenceListFragment.TAG_BASE_PACK_ID, packId)
 		}
 		loadFragment(fragment, SentenceListFragment.TAG)
 	}

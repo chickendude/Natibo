@@ -4,8 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.Language
-import ch.ralena.natibo.data.room.`object`.Pack
+import ch.ralena.natibo.data.room.`object`.*
 import ch.ralena.natibo.databinding.FragmentLanguageDetailBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.base.BaseFragment
@@ -31,7 +30,7 @@ class LanguageDetailFragment :
 	override fun setupViews(view: View) {
 		viewModel.registerListener(this)
 
-		val id = arguments?.getString(TAG_LANGUAGE_ID)
+		val id = arguments?.getLong(TAG_LANGUAGE_ID)
 		viewModel.loadLanguage(id)
 
 		binding.recyclerView.apply {
@@ -58,13 +57,19 @@ class LanguageDetailFragment :
 
 	// ViewModel and Adapter listener functions
 
-	override fun onLanguageLoaded(language: Language) {
-		binding.languageLabel.text = language.longName
-		binding.flagImageView.setImageResource(language.languageType.drawable)
-		rvAdapter.loadLanguagePacks(language.packs.toList())
+	override fun onLanguageLoaded(languageWithPacks: LanguageWithPacks) {
+		val language = languageWithPacks.language
+		val packs = languageWithPacks.packs
+		binding.languageLabel.text = language.name
+		binding.flagImageView.setImageResource(language.flagDrawable)
+		rvAdapter.loadLanguagePacks(packs)
 	}
 
-	override fun onLanguagePackClicked(pack: Pack) {
+	override fun onLanguageNotFound() {
+		TODO("Not yet implemented")
+	}
+
+	override fun onLanguagePackClicked(pack: PackRoom) {
 		viewModel.languagePackSelected(pack)
 	}
 }

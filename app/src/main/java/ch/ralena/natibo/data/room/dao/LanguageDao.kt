@@ -8,18 +8,24 @@ import ch.ralena.natibo.data.room.`object`.PackRoom
 
 @Dao
 interface LanguageDao {
+	// region Get
 	@Query("SELECT * FROM languageroom")
 	suspend fun getAll(): List<LanguageRoom>
 
 	@Transaction
+	@Query("SELECT * FROM languageroom WHERE id = :id LIMIT 1")
+	suspend fun getByIdWithPacks(id: Long): LanguageWithPacks?
+
+	@Transaction
 	@Query("SELECT * FROM languageroom")
-	fun getAllWithPacks(): List<LanguageWithPacks>
+	suspend fun getAllWithPacks(): List<LanguageWithPacks>
 
-	@Query ("SELECT * FROM languageroom WHERE id = :id LIMIT 1")
-	suspend fun getById (id: String) : LanguageRoom
+	@Query("SELECT * FROM languageroom WHERE id = :id LIMIT 1")
+	suspend fun getById(id: Long): LanguageRoom?
 
-	@Query ("SELECT * FROM languageroom WHERE code = :code LIMIT 1")
+	@Query("SELECT * FROM languageroom WHERE code = :code LIMIT 1")
 	suspend fun getByCode(code: String): LanguageRoom?
+	// endregion Get
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insert(language: LanguageRoom): Long

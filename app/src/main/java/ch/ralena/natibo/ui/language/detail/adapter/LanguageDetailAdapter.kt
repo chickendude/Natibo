@@ -7,15 +7,18 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.Pack
+import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
 import io.reactivex.subjects.PublishSubject
 import io.realm.RealmList
 import javax.inject.Inject
 
-class LanguageDetailAdapter @Inject constructor(private val packs: ArrayList<Pack>) :
+class LanguageDetailAdapter @Inject constructor(
+	private val packs: ArrayList<PackRoom>
+	) :
 		BaseRecyclerAdapter<LanguageDetailAdapter.ViewHolder, LanguageDetailAdapter.Listener>() {
 	interface Listener {
-		fun onLanguagePackClicked(pack: Pack)
+		fun onLanguagePackClicked(pack: PackRoom)
 	}
 
 //	var packSubject = PublishSubject.create<Pack?>()
@@ -36,7 +39,7 @@ class LanguageDetailAdapter @Inject constructor(private val packs: ArrayList<Pac
 		return packs.size
 	}
 
-	fun loadLanguagePacks(packs: List<Pack>) {
+	fun loadLanguagePacks(packs: List<PackRoom>) {
 		this.packs.clear()
 		this.packs.addAll(packs)
 		notifyDataSetChanged()
@@ -45,12 +48,13 @@ class LanguageDetailAdapter @Inject constructor(private val packs: ArrayList<Pac
 	inner class ViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 		private val book: TextView
 		private val numSentences: TextView
-		private lateinit var pack: Pack
+		private lateinit var pack: PackRoom
 
-		fun bindView(pack: Pack) {
+		fun bindView(pack: PackRoom) {
 			this.pack = pack
-			book.text = pack.book
-			numSentences.text = pack.sentences.size.toString()
+			book.text = pack.name
+			// todo show sentence count
+//			numSentences.text = pack.sentences.size.toString()
 		}
 
 		init {

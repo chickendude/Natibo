@@ -34,6 +34,7 @@ class PackImporterViewModel @Inject constructor(
 	 * Pulls the language code and pack name out from the Uri filename.
 	 */
 	suspend fun importPack(uri: Uri) {
+		// todo notify completed
 		try {
 			// Grab language and pack name
 			val (languageCode, packName) = readPackDataUseCase.extractLanguageAndPackName(uri)
