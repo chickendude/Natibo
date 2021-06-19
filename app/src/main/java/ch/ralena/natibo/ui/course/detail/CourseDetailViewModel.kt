@@ -43,6 +43,7 @@ class CourseDetailViewModel @Inject constructor(
 	}
 
 	fun startSession() {
+		// todo alert no packs selected
 //			if (course?.packs.size == 0)
 //				for (l in listeners)
 //					l.noPacksSelected()
