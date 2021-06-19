@@ -2,6 +2,7 @@ package ch.ralena.natibo.ui.language.detail
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.*
@@ -66,7 +67,7 @@ class LanguageDetailFragment :
 	}
 
 	override fun onLanguageNotFound() {
-		TODO("Not yet implemented")
+		Toast.makeText(context, getString(R.string.no_language_found), Toast.LENGTH_SHORT).show()
 	}
 
 	override fun onLanguagePackClicked(pack: PackRoom) {
