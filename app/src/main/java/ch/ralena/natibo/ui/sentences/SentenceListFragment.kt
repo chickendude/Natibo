@@ -23,7 +23,7 @@ class SentenceListFragment :
 	SentenceListAdapter.Listener {
 
 	companion object {
-		val TAG = SentenceListFragment::class.java.simpleName
+		val TAG: String = SentenceListFragment::class.java.simpleName
 		const val TAG_LANGUAGE_ID = "language_id"
 		const val TAG_PACK_ID = "pack_id"
 	}
