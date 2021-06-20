@@ -107,7 +107,7 @@ class PickLanguagesFragment :
 		return super.onOptionsItemSelected(item)
 	}
 
-	// ViewModel/Adapter listeners
+	// region ViewModel/Adapter listeners ----------------------------------------------------------
 	override fun onLanguageClicked(language: LanguageRoom) {
 		viewModel.addRemoveLanguage(language)
 	}
@@ -127,4 +127,5 @@ class PickLanguagesFragment :
 	override fun onLanguagesLoaded(languages: List<LanguageRoom>) {
 		availableAdapter.loadLanguages(languages)
 	}
+	// endregion ViewModel/Adapter listeners -------------------------------------------------------
 }

@@ -43,35 +43,36 @@ class CourseDetailFragment
 
 	private val singleThreadContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
-
 	override fun setupViews(view: View) {
 		activity.enableBackButton()
 
 		packAdapter.registerListener(this)
 		viewModel.registerListener(this)
 
-		binding.booksRecyclerView.apply {
-			adapter = packAdapter
-			layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+		binding.apply {
+			booksRecyclerView.apply {
+				adapter = packAdapter
+				layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+			}
+
+			startSessionButton.setOnClickListener {
+				viewModel.startSession()
+			}
+
+			deleteIcon.setOnClickListener {
+				Snackbar.make(view, R.string.confirm_delete, Snackbar.LENGTH_INDEFINITE)
+					.setAction(R.string.delete) {
+						viewModel.deleteCourse()
+						activity.stopSession()
+					}.show()
+			}
+
+			settingsIcon.setOnClickListener {
+				viewModel.openSettings()
+			}
 		}
 
-		binding.startSessionButton.setOnClickListener {
-			viewModel.startSession()
-		}
-
-		binding.deleteIcon.setOnClickListener {
-			Snackbar.make(view, R.string.confirm_delete, Snackbar.LENGTH_INDEFINITE)
-				.setAction(R.string.delete) {
-					viewModel.deleteCourse()
-					activity.stopSession()
-				}.show()
-		}
-
-		binding.settingsIcon.setOnClickListener {
-			viewModel.openSettings()
-		}
-
-		arguments?.getLong(TAG_COURSE_ID)?.let {
+		requireArguments().getLong(TAG_COURSE_ID).let {
 			viewModel.fetchCourse(it)
 		}
 	}
@@ -82,6 +83,7 @@ class CourseDetailFragment
 
 	override fun onBookClicked(pack: Pack) {
 		val packId = pack.id
+		// todo clean up with Room
 		// We have to use our own single thread context, otherwise Realm complains about access on
 		// other threads. Can't wait to switch over to Room...
 		lifecycleScope.launch(Dispatchers.Main) {

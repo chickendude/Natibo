@@ -6,6 +6,7 @@ import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.ScreenNavigator
@@ -25,20 +26,28 @@ class PickScheduleViewModel @Inject constructor(
 
 	val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
 
-	private lateinit var languages: List<Language>
+	private val languages = ArrayList<LanguageRoom>()
 
 	companion object {
 		const val MAX_REPETITIONS = 99
 	}
 
-	fun fetchLanguages(languageIds: Array<String>?) {
+	fun fetchLanguages(languageIds: LongArray?) {
 		// TODO: throw error if null or empty
-		if (languageIds.isNullOrEmpty())
+		if (languageIds == null || languageIds.isEmpty())
 			return
-		languages = languageRepository.fetchLanguagesFromIds(languageIds)
-		val title = languages.joinToString(" → ") { it.longName }
-		for (l in listeners)
-			l.setCourseTitle(title)
+		coroutineScope.launch {
+			languages.clear()
+			languageIds.forEach {
+				languageRepository.fetchLanguage(it)?.run {
+					languages.add(this)
+				}
+			}
+			val title = languages.joinToString(" → ") { it.name }
+			withContext(dispatcherProvider.main()) {
+				listeners.forEach { it.setCourseTitle(title) }
+			}
+		}
 	}
 
 	fun createCourse(
@@ -71,24 +80,24 @@ class PickScheduleViewModel @Inject constructor(
 				"$i"
 		}.joinToString("")
 
-		val baseLanguageCode = languages.first().languageId
-		val targetLanguageCode = languages.last().languageId
+		val baseLanguageCode = languages.first().code
+		val targetLanguageCode = languages.last().code
 
 		coroutineScope.launch(dispatcherProvider.main()) {
-			val course = withContext(dispatcherProvider.io()) {
-					courseRepository.createCourse(
-						order,
-						numSentencesPerDay,
-						startingSentence,
-						dailyReviews,
-						title,
-						baseLanguageCode,
-						targetLanguageCode
-					)
+			val courseId = withContext(dispatcherProvider.io()) {
+				courseRepository.createCourse(
+					order,
+					numSentencesPerDay,
+					startingSentence,
+					dailyReviews,
+					title,
+					baseLanguageCode,
+					targetLanguageCode
+				)
 			}
 			// TODO: perhaps wait for response from courseRepository and send signal back to fragment
 			//  sharing whether or not it was successful
-			screenNavigator.toCourseListFragment(course.id)
+			screenNavigator.toCourseListFragment(courseId)
 		}
 	}
 

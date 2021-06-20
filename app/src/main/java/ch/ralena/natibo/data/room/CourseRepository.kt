@@ -33,7 +33,7 @@ class CourseRepository @Inject constructor(
 		title: String,
 		baseLanguageCode: String,
 		targetLanguageCode: String
-	): CourseRoom {
+	): Long {
 		val scheduleRoom = ScheduleRoom(
 			numSentencesPerDay,
 			startingSentence,
@@ -41,7 +41,7 @@ class CourseRepository @Inject constructor(
 			dailyReviews.joinToString(" ")
 		)
 		val courseRoom = CourseRoom(title, baseLanguageCode, targetLanguageCode, scheduleRoom, null)
-		courseDao.insert(courseRoom)
+		val courseId = courseDao.insert(courseRoom)
 
 //		// --- begin transaction
 //		realm.beginTransaction()
@@ -72,7 +72,7 @@ class CourseRepository @Inject constructor(
 //		for (set in course.currentDay.sentenceSets)
 //			set.buildSentences(realm)
 
-		return courseRoom
+		return courseId
 	}
 
 	/**

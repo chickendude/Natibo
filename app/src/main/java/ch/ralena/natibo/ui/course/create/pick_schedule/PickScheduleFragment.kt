@@ -22,6 +22,11 @@ class PickScheduleFragment :
 	ScheduleTextWatcher.Listener,
 	SentencesPerDayTextWatcher.Listener {
 
+	companion object {
+		val TAG: String = PickScheduleFragment::class.java.simpleName
+		const val TAG_LANGUAGE_IDS = "tag_language_ids"
+	}
+
 	@Inject
 	lateinit var activity: MainActivity
 
@@ -30,11 +35,6 @@ class PickScheduleFragment :
 
 	@Inject
 	lateinit var sentencesPerDayTextWatcher: SentencesPerDayTextWatcher
-
-	companion object {
-		val TAG: String = PickScheduleFragment::class.java.simpleName
-		const val TAG_LANGUAGE_IDS = "tag_language_ids"
-	}
 
 	override fun setupViews(view: View) {
 		viewModel.registerListener(this)
@@ -45,7 +45,7 @@ class PickScheduleFragment :
 		// We have a check button
 		setHasOptionsMenu(true)
 
-		viewModel.fetchLanguages(arguments?.getStringArray(TAG_LANGUAGE_IDS))
+		viewModel.fetchLanguages(requireArguments().getLongArray(TAG_LANGUAGE_IDS))
 
 		binding.courseTitleEdit.setOnClickListener {
 			binding.courseTitleEdit.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS

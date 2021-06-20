@@ -2,9 +2,7 @@ package ch.ralena.natibo.ui.course.detail
 
 import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.CourseRepository
-import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.CourseRoom
-import ch.ralena.natibo.ui.base.BaseListener
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.ScreenNavigator
@@ -28,13 +26,15 @@ class CourseDetailViewModel @Inject constructor(
 
 	private var course: CourseRoom? = null
 
-	fun fetchCourse(courseId: Long) {
+	fun fetchCourse(id: Long) {
 		coroutineScope.launch {
-			val result = courseRepository.fetchCourse(courseId)
+			val result = courseRepository.fetchCourse(id)
 			if (result is Result.Success)
 				fetchCourseSuccess(result.data)
 			else
-				for (l in listeners) l.onCourseNotFound()
+				withContext(dispatcherProvider.main()) {
+					listeners.forEach { it.onCourseNotFound() }
+				}
 		}
 	}
 

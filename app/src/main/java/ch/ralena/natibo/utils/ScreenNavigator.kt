@@ -55,7 +55,7 @@ class ScreenNavigator @Inject constructor(
 
 	fun toCourseListFragment(courseId: Long? = null) {
 		val fragment = CourseListFragment()
-		courseId?.let {
+		courseId?.run {
 			clearBackStack()
 			fragment.arguments = Bundle().apply {
 				putLong(CourseListFragment.TAG_COURSE_ID, courseId)

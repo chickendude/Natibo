@@ -12,7 +12,7 @@ interface CourseDao {
 	suspend fun getCourseById(id: Long): CourseRoom?
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	suspend fun insert(course: CourseRoom)
+	suspend fun insert(course: CourseRoom): Long
 
 	@Update
 	suspend fun update(course: CourseRoom)
