@@ -3,6 +3,7 @@ package ch.ralena.natibo.ui.language.importer.worker
 import android.content.ContentResolver
 import android.net.Uri
 import ch.ralena.natibo.ui.base.BaseViewModel
+import ch.ralena.natibo.ui.language.importer.worker.listener.PackImporterListener
 import ch.ralena.natibo.ui.language.importer.worker.usecase.*
 import ch.ralena.natibo.utils.DispatcherProvider
 import kotlinx.coroutines.*
@@ -15,6 +16,12 @@ import javax.inject.Inject
 
 class ImportException(message: String) : Exception(message)
 
+/**
+ * ViewModel for [PackImporterWorker].
+ *
+ * Its main job is to handle the actual importing process and to send progress reports back to the
+ * main worker.
+ */
 class PackImporterViewModel @Inject constructor(
 	private val contentResolver: ContentResolver,
 	private val dispatcherProvider: DispatcherProvider,
@@ -25,22 +32,15 @@ class PackImporterViewModel @Inject constructor(
 	private val createSentencesUseCase: CreateSentencesUseCase,
 	private val fetchSentencesUseCase: FetchSentencesUseCase,
 	private val readPackDataUseCase: ReadPackDataUseCase
-) : BaseViewModel<PackImporterViewModel.Listener>() {
-	interface Listener {
-		fun onNotificationUpdate(message: String)
-		fun onActionTextUpdate(message: String)
-		fun onProgressUpdate(progress: Int)
-		fun onError(exception: ImportException)
-		fun onWarning(warningMsg: String)
-		fun onImportComplete()
-	}
-
+) : BaseViewModel<PackImporterListener>() {
 	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
 
 	private var numMp3s = 0
 
 	/**
 	 * Pulls the language code and pack name out from the Uri filename.
+	 *
+	 * @param uri The Uri pointing to the file to be imported.
 	 */
 	suspend fun importPack(uri: Uri) {
 		coroutineScope.launch {

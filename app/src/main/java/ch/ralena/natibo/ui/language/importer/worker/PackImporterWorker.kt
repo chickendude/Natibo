@@ -14,6 +14,7 @@ import ch.ralena.natibo.R
 import ch.ralena.natibo.di.module.WorkerModule
 import ch.ralena.natibo.ui.language.importer.ImportProgress
 import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
+import ch.ralena.natibo.ui.language.importer.worker.listener.PackImporterListener
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
@@ -25,11 +26,11 @@ enum class Status {
 }
 
 /**
- * Methods for importing a .gls file into the database.
+ * A worker that imports a pack into the database in the background.
  */
 class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 	CoroutineWorker(context, parameters),
-	PackImporterViewModel.Listener {
+	PackImporterListener {
 	companion object {
 		val TAG: String = PackImporterWorker::class.java.simpleName
 		const val NOTIFICATION_ID = 1
@@ -110,9 +111,6 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 	// endregion Notification Setup-----------------------------------------------------------------
 
 	// region ViewModel Listener------------------------------------------------------------
-	private fun getData(type: ImportProgress) =
-		Data.Builder().putInt(LanguageImportFragment.WORKER_ACTION, type.ordinal)
-
 	override fun onNotificationUpdate(message: String) {
 		updateNotification(message)
 	}
@@ -149,6 +147,9 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 	// endregion CountFilesUseCase Listener---------------------------------------------------------
 
 	// region Helper functions----------------------------------------------------------------------
+	private fun getData(type: ImportProgress) =
+		Data.Builder().putInt(LanguageImportFragment.WORKER_ACTION, type.ordinal)
+
 	private fun updateNotification(text: String) {
 		notificationBuilder.setContentText(text)
 		notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
