@@ -1,66 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:layout_margin="8dp"
-	android:gravity="center"
-	android:orientation="vertical">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="8dp"
+    android:gravity="center"
+    android:orientation="vertical">
 
-	<LinearLayout
-		android:id="@+id/progressLayout"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:gravity="center_horizontal"
-		android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/progressLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
-		<TextView
-			android:id="@+id/fileNameText"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_margin="8dp"
-			tools:text="EN-ZS-F1.gls"/>
+        <TextView
+            android:id="@+id/fileNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            tools:text="EN-ZS-F1.gls" />
 
-		<ProgressBar
-			android:id="@+id/progressBar"
-			style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"/>
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100" />
 
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:gravity="center"
-			android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-			<TextView
-				android:id="@+id/actionText"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_marginEnd="3dp"
-				android:text="@string/opening_file"/>
+            <TextView
+                android:id="@+id/actionText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="3dp"
+                android:text="@string/opening_file" />
 
-			<TextView
-				android:id="@+id/counterText"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:visibility="gone"
-				tools:text="1"/>
+            <TextView
+                android:id="@+id/counterText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:text="1" />
 
-			<TextView
-				android:id="@+id/dividerBarLabel"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="/"
-				android:visibility="gone"/>
+            <TextView
+                android:id="@+id/dividerBarLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/"
+                android:visibility="gone" />
 
-			<TextView
-				android:id="@+id/totalText"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:visibility="gone"
-				tools:text="2000"/>
-		</LinearLayout>
-	</LinearLayout>
+            <TextView
+                android:id="@+id/totalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:text="2000" />
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

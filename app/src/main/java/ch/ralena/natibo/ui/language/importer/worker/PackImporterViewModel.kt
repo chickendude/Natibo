@@ -2,12 +2,13 @@ package ch.ralena.natibo.ui.language.importer.worker
 
 import android.content.ContentResolver
 import android.net.Uri
+import android.util.Log
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.ui.language.importer.worker.usecase.*
 import ch.ralena.natibo.utils.DispatcherProvider
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -29,28 +30,51 @@ class PackImporterViewModel @Inject constructor(
 ) : BaseViewModel<PackImporterViewModel.Listener>() {
 	interface Listener {
 		fun onNotificationUpdate(message: String)
+		fun onProgressUpdate(progress: Int)
 		fun onError(exception: ImportException)
 		fun onWarning(warningMsg: String)
 	}
 
+	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
+
+	private var numMp3s = 0
 	/**
 	 * Pulls the language code and pack name out from the Uri filename.
 	 */
 	suspend fun importPack(uri: Uri) {
 		// todo notify completed
+		coroutineScope.launch {
+			createSentencesUseCase.sentenceCount()
+				.collect { updateNotification("Reading sentence: $it") }
+		}
+		coroutineScope.launch {
+			countMp3sUseCase.mp3Count()
+				.collect {
+					updateNotification("Copying mp3: $it")
+					updateProgress((it * (100 - 25)) / numMp3s + 25)
+				}
+		}
+
 		try {
 			// Grab language and pack name
 			val (languageCode, packName) = readPackDataUseCase.extractLanguageAndPackName(uri)
+			updateProgress(2)
 			val languageId = createLanguageUseCase.fetchOrCreateLanguage(languageCode)
+			updateProgress(4)
 			val packId = createPackUseCase.createPack(packName, languageId)
-			val numMp3s = countMp3sUseCase.countMp3Files(getInputStream(uri))
+			updateProgress(6)
+			numMp3s = countMp3sUseCase.countMp3Files(getInputStream(uri))
+			updateProgress(10)
 			val sentences = fetchSentencesUseCase.fetchSentences(getInputStream(uri))
+			updateProgress(15)
 			checkSentences(numMp3s, sentences)
+			updateNotification("Creating sentences")
 			createSentencesUseCase.createSentences(languageId, packId, sentences)
-			createSentencesUseCase.sentenceCount()
-				.onEach { updateNotification("Reading sentence: $it") }.collect()
+			updateProgress(25)
 			// copy mp3 files over
-			countMp3sUseCase.copyMp3s(getInputStream(uri))
+			updateNotification("Extracting mp3s")
+			countMp3sUseCase.copyMp3s(packId, getInputStream(uri))
+			updateProgress(100)
 			updateNotification("Mp3s copied over")
 		} catch (e: ImportException) {
 			listeners.forEach { it.onError(e) }
@@ -69,9 +93,6 @@ class PackImporterViewModel @Inject constructor(
 			sendWarning("No audio files were found.")
 		} else if (numMp3s != sentences.size - 1) {
 			sendWarning("There are $numMp3s mp3s but ${sentences.size} sentences.")
-		} else {
-			// Todo: Probably don't need this in the end.
-			updateNotification(sentences.last())
 		}
 	}
 
@@ -90,6 +111,11 @@ class PackImporterViewModel @Inject constructor(
 		withContext(dispatcherProvider.main()) {
 			listeners.forEach { it.onWarning(msg) }
 		}
+	}
+
+	private fun updateProgress(progress: Int) {
+		Log.d("HIIIII", progress.toString())
+		listeners.forEach { it.onProgressUpdate(progress) }
 	}
 // endregion Helper functions-------------------------------------------------------------------
 }

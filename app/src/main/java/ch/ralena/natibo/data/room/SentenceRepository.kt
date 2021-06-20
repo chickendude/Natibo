@@ -9,6 +9,8 @@ class SentenceRepository @Inject constructor(
 ) {
 	suspend fun createSentence(sentence: SentenceRoom) = sentenceDao.insert(sentence)
 
+	suspend fun fetchSentence(id: Long): SentenceRoom = sentenceDao.getById(id)
+
 	suspend fun fetchSentences(): List<SentenceRoom> =
 		sentenceDao.getAll()
 
@@ -17,4 +19,7 @@ class SentenceRepository @Inject constructor(
 
 	suspend fun updateSentence(sentence: SentenceRoom) =
 		sentenceDao.update(sentence)
+
+	suspend fun updateSentenceMp3(packId: Long, index: Int, mp3Uri: String, mp3Length: Int) =
+		sentenceDao.updateMp3(packId, index, mp3Uri, mp3Length)
 }

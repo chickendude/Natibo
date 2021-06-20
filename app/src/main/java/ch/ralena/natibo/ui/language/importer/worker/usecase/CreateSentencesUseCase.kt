@@ -1,11 +1,13 @@
 package ch.ralena.natibo.ui.language.importer.worker.usecase
 
+import android.util.Log
 import ch.ralena.natibo.data.room.SentenceRepository
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker
 import ch.ralena.natibo.utils.Utils.readZip
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.ByteArrayOutputStream
@@ -17,13 +19,19 @@ class CreateSentencesUseCase @Inject constructor(
 	private val sentenceRepository: SentenceRepository
 ) {
 	private var sentenceCount: Int = 0
+	private var totalSentences: Int = 1
 
 	fun sentenceCount(): Flow<Int> = flow {
-		emit(sentenceCount)
-		kotlinx.coroutines.delay(100)
+		while (sentenceCount < totalSentences) {
+			if (sentenceCount > 0) {
+				emit(sentenceCount)
+			}
+			delay(500)
+		}
 	}
 
 	suspend fun createSentences(languageId: Long, packId: Long, sentences: List<String>) {
+		totalSentences = sentences.size - 1
 		val packSentences = sentenceRepository.fetchSentencesInPack(packId)
 
 		val sections = sentences[0].split("\t")

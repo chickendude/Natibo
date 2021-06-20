@@ -101,6 +101,7 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 			createChannel()
 
 		notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+			.setOnlyAlertOnce(true)
 			.setContentTitle(title)
 			.setTicker(title)
 			.setContentText(contentText)
@@ -139,6 +140,14 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		setProgressAsync(
 			getData(ImportProgress.ACTION_TEXT)
 				.putString(LanguageImportFragment.WORKER_VALUE, message)
+				.build()
+		)
+	}
+
+	override fun onProgressUpdate(progress: Int) {
+		setProgressAsync(
+			getData(ImportProgress.ACTION_PROGRESS)
+				.putInt(LanguageImportFragment.WORKER_PROGRESS, progress)
 				.build()
 		)
 	}

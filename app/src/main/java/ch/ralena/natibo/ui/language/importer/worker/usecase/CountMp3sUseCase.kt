@@ -3,7 +3,12 @@ package ch.ralena.natibo.ui.language.importer.worker.usecase
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.util.Log
+import ch.ralena.natibo.data.room.SentenceRepository
+import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.Utils.readZip
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.io.*
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
@@ -13,10 +18,26 @@ private const val BUFFER_SIZE = 1024
 class CountMp3sUseCase @Inject constructor(
 	// used to calculate length of mp3 file
 	private val metadataRetriever: MediaMetadataRetriever,
+	private val sentenceRepository: SentenceRepository,
+	dispatcherProvider: DispatcherProvider,
 	private val context: Context
 ) {
 	companion object {
 		private val TAG = CountMp3sUseCase::class.java.simpleName
+	}
+
+	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
+
+	private var currentFile: Int = 0
+	private var isProcessing = true
+
+	fun mp3Count(): Flow<Int> = flow {
+		while (isProcessing) {
+			if (currentFile > 0) {
+				emit(currentFile)
+			}
+			delay(200)
+		}
 	}
 
 	fun countMp3Files(inputStream: InputStream): Int {
@@ -32,13 +53,11 @@ class CountMp3sUseCase @Inject constructor(
 		return numFiles
 	}
 
-	fun copyMp3s(inputStream: InputStream) {
-		var bos: BufferedOutputStream
+	fun copyMp3s(packId: Long, inputStream: InputStream) {
 		readZip(inputStream) { zis ->
 			var zipEntry = zis.nextEntry
 
 			// loop through files in the archive
-			var fileNumber = 0
 			while (zipEntry != null) {
 				val entryName = zipEntry.name
 				if (entryName.contains(".mp3")) {
@@ -58,35 +77,27 @@ class CountMp3sUseCase @Inject constructor(
 
 					// now set up database objects which we will fill in after extracting all mp3s
 					val index = indexDotMp3.replace(".mp3", "").toInt()
-//					val lang = realm.where(
-//						Language::class.java
-//					).equalTo("languageId", language).findFirst()
 
 					// calculate mp3s length
 					val mp3Uri = audioFile.absolutePath
 					metadataRetriever.setDataSource(mp3Uri)
 					val mp3LengthMs =
 						metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-							?.toInt()
-//					val pack: Pack = lang!!.getPack(book)
-//					pack.createSentenceOrUpdate(
-//						realm,
-//						index,
-//						null,
-//						null,
-//						null,
-//						mp3Uri,
-//						mp3Length
-//					)
+							?.toInt() ?: 0
+
+					coroutineScope.launch {
+						sentenceRepository.updateSentenceMp3(packId, index, mp3Uri, mp3LengthMs)
+					}
+					currentFile++
 				} else {
 					Log.d(TAG, "Skipping: $entryName")
 				}
-//				progressSubject.onNext(++fileNumber)
 				zipEntry = zis.nextEntry
 			}
 			inputStream.close()
 			zis.close()
 		}
+		isProcessing = false
 	}
 
 	// region Helper functions----------------------------------------------------------------------
