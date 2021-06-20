@@ -11,7 +11,6 @@ import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 class LanguageRepository @Inject constructor(
-	private val realm: Realm,
 	private val languageDao: LanguageDao
 ) {
 	suspend fun fetchLanguage(id: Long): LanguageRoom? {
@@ -35,30 +34,4 @@ class LanguageRepository @Inject constructor(
 	suspend fun fetchLanguageWithPacks(id: Long) = languageDao.getByIdWithPacks(id)
 
 	suspend fun fetchLanguagesWithPacks() = languageDao.getAllWithPacks()
-
-	fun fetchLanguagesSorted(): List<Language> {
-		val languages = realm.where(Language::class.java).findAll()
-		val languagesSorted = ArrayList<Language>()
-		languagesSorted.addAll(languages)
-		languagesSorted.sortWith(Comparator { lang1: Language, lang2: Language ->
-			lang1.longName.compareTo(
-				lang2.longName
-			)
-		})
-		return languagesSorted
-	}
-
-	fun fetchLanguagesFromIds(languageIds: Array<String>): List<Language> {
-		val languages = ArrayList<Language>()
-		for (languageId in languageIds) {
-			realm.where(Language::class.java).equalTo("languageId", languageId).findFirst()
-				?.let { languages.add(it) }
-		}
-		return languages
-	}
-
-	fun setLanguages(course: Course, languages: List<Language>) {
-		course.languages.clear()
-		course.languages.addAll(languages)
-	}
 }

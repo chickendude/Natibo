@@ -26,7 +26,6 @@ import javax.inject.Inject
 
 class ScreenNavigator @Inject constructor(
 	private val fragmentManager: FragmentManager,
-	private val realm: Realm,
 	private val languageRepository: LanguageRepository,
 	private val activity: MainActivity,
 	private val dispatcherProvider: DispatcherProvider

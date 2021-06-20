@@ -12,7 +12,6 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class LanguageListViewModel @Inject constructor(
-	private val realm: Realm,
 	private val screenNavigator: ScreenNavigator,
 	private val languageRepository: LanguageRepository,
 	private val dispatcherProvider: DispatcherProvider
@@ -43,5 +42,4 @@ class LanguageListViewModel @Inject constructor(
 
 	fun getNoCourseTextVisibility(): Int =
 		if (languagesWithPacks.isNullOrEmpty()) View.VISIBLE else View.GONE
-
 }

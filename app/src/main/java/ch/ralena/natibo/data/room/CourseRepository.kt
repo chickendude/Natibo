@@ -176,43 +176,6 @@ class CourseRepository @Inject constructor(
 	}
 
 	// region Helper functions----------------------------------------------------------------------
-	private fun buildFirstDay(course: Course) {
-		val day = realm.createObject(Day::class.java, UUID.randomUUID().toString())
-
-		val reviewPattern: RealmList<Int> = course.schedule.reviewPattern
-		val numSentences = course.schedule.numSentences
-		var sentenceIndex: Int = course.schedule.sentenceIndex
-
-		for (pattern in reviewPattern) {
-			val reviews = RealmList<Int>().apply {
-				addAll(reviewPattern.subList(reviewPattern.indexOf(pattern), reviewPattern.size))
-			}
-			val sentenceSet = SentenceSet().apply {
-				this.reviews = reviews
-				order = course.schedule.order
-				sentenceSet =
-					getSentenceGroups(sentenceIndex, numSentences, course.languages, course.packs)
-			}
-
-			sentenceIndex -= numSentences
-			if (sentenceIndex < 0)
-				break
-			day.sentenceSets.add(sentenceSet)
-		}
-
-		// Move first sentence set (new sentences) to end
-		if (day.sentenceSets.size > 0) {
-			day.sentenceSets.add(day.sentenceSets.removeFirst())
-			day.sentenceSets.last()?.isFirstDay = true
-		}
-
-		// add sentence set to list of sentencesets for the next day's studies
-		day.isCompleted = false
-		day.pauseMillis = course.pauseMillis
-		day.setPlaybackSpeed(course.playbackSpeed)
-		course.currentDay = day
-	}
-
 	private fun getSentenceGroups(
 		index: Int,
 		numSentences: Int,
