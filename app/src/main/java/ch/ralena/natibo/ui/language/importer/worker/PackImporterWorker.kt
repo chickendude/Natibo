@@ -115,6 +115,9 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 
 	override fun onNotificationUpdate(message: String) {
 		updateNotification(message)
+	}
+
+	override fun onActionTextUpdate(message: String) {
 		setProgressAsync(
 			getData(ImportProgress.ACTION_TEXT)
 				.putString(LanguageImportFragment.WORKER_MESSAGE, message)
