@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import ch.ralena.natibo.R
+import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.course.list.CourseListFragment
@@ -17,13 +18,21 @@ import ch.ralena.natibo.ui.sentences.SentenceListFragment
 import ch.ralena.natibo.ui.settings_course.CourseSettingsFragment
 import ch.ralena.natibo.ui.study.insession.StudySessionFragment
 import io.realm.Realm
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ScreenNavigator @Inject constructor(
 	private val fragmentManager: FragmentManager,
 	private val realm: Realm,
-	private val activity: MainActivity
+	private val languageRepository: LanguageRepository,
+	private val activity: MainActivity,
+	private val dispatcherProvider: DispatcherProvider
 ) {
+	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
+
 	fun toCourseDetailFragment(courseId: Long) {
 		val fragment = CourseDetailFragment()
 		fragment.arguments = Bundle().apply {
@@ -33,10 +42,14 @@ class ScreenNavigator @Inject constructor(
 	}
 
 	fun toCourseCreateFragment() {
-		if (realm.where(Language::class.java).count() == 0L) {
-			activity.snackBar(R.string.no_languages)
-		} else {
-			loadFragment(PickLanguagesFragment(), PickLanguagesFragment.TAG)
+		coroutineScope.launch {
+			if (languageRepository.fetchLanguages().isEmpty()) {
+				activity.snackBar(R.string.no_languages)
+			} else {
+				withContext(dispatcherProvider.main()) {
+					loadFragment(PickLanguagesFragment(), PickLanguagesFragment.TAG)
+				}
+			}
 		}
 	}
 
