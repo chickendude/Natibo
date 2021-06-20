@@ -67,7 +67,7 @@ class AvailableLanguagesAdapter(
 				checkedImage.animate().scaleX(0f).setDuration(200).start()
 			}
 			languageName.text = language.name
-//			flagImage.setImageResource(language.languageType.drawable)
+			flagImage.setImageResource(language.flagDrawable)
 		}
 	}
 }
