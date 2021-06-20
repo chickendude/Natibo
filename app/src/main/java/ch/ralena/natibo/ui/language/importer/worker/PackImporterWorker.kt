@@ -106,6 +106,7 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 			.setTicker(title)
 			.setContentText(contentText)
 			.setSmallIcon(R.drawable.ic_logo)
+			.setSilent(true)
 			.setOngoing(true)
 			.addAction(android.R.drawable.ic_delete, cancel, intent)
 		return ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build())
