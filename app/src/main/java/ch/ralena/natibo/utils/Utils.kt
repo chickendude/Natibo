@@ -36,15 +36,17 @@ object Utils {
 				return preferences.getString(KEY_DAY_ID, "")
 			}
 
-		fun putCourseId(dayId: String?) {
-			val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-			preferences.edit().putString(KEY_COURSE_ID, dayId).apply()
+		fun putCourseId(id: Long) {
 		}
 
-		val courseId: String?
+		var courseId: Long
 			get() {
 				val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-				return preferences.getString(KEY_COURSE_ID, "")
+				return preferences.getLong(KEY_COURSE_ID, 0L)
+			}
+			set(value) {
+				val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+				preferences.edit().putLong(KEY_COURSE_ID, value).apply()
 			}
 
 		companion object {

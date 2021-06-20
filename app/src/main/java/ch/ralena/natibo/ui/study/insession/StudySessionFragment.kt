@@ -7,16 +7,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.Day
 import ch.ralena.natibo.data.room.`object`.SentenceGroup
@@ -28,7 +22,6 @@ import ch.ralena.natibo.ui.adapter.SentenceGroupAdapter
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.study.overview.StudySessionOverviewFragment
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
 import io.realm.Realm
 import java.util.*
 import javax.inject.Inject
@@ -49,7 +42,7 @@ class StudySessionFragment :
 	@Inject
 	lateinit var activity: MainActivity
 
-	lateinit var course: Course
+	lateinit var course: CourseRoom
 	private lateinit var realm: Realm
 
 	// fields
@@ -61,43 +54,37 @@ class StudySessionFragment :
 	var adapter: SentenceGroupAdapter? = null
 
 	var serviceDisposable: Disposable? = null
-	var sentenceDisposable: Disposable? = null
+//	var sentenceDisposable: Disposable? = null
 	var finishDisposable: Disposable? = null
 
 	override fun setupViews(view: View) {
 		// load schedules from database
-		val id = requireArguments().getString(KEY_COURSE_ID)
-		realm = Realm.getDefaultInstance()
-		course = realm.where(Course::class.java).equalTo("id", id).findFirst()!!
-		activity.startSession(course)
+		val id = requireArguments().getLong(KEY_COURSE_ID)
+		viewModel.fetchCourse(id)
 
 		// connect to the studySessionService and start the session
 		connectToService()
 
-		// if the current day is done, start the next one
-		if (course.currentDay == null || course.currentDay.isCompleted)
-			course.prepareNextDay(realm)
+//		// if the current day is done, start the next one
+//		if (course.currentDay == null || course.currentDay.isCompleted)
+//			course.prepareNextDay(realm)
 
-		// hide sentences layout until a sentence has been loaded
-		binding.sentencesLayout.visibility = View.VISIBLE
+		binding.apply {
+			// hide sentences layout until a sentence has been loaded
+			sentencesLayout.visibility = View.VISIBLE
 
-		// load course title
-		binding.courseTitleText.text = course.title
+			settingsIcon.setOnClickListener {
+				viewModel.settingsIconClicked()
+			}
 
-		binding.settingsIcon.setOnClickListener {
-			viewModel.settingsIconClicked()
+			recyclerView.apply {
+				adapter = SentenceGroupAdapter()
+				layoutManager = LinearLayoutManager(context)
+			}
+
+			// handle playing/pausing
+			playPauseImage.setOnClickListener { v: View -> playPause(v) }
 		}
-
-		// set up recycler view
-		binding.recyclerView.apply {
-			adapter = SentenceGroupAdapter()
-			layoutManager = LinearLayoutManager(context)
-		}
-
-		// handle playing/pausing
-		binding.playPauseImage.setOnClickListener { v: View -> playPause(v) }
-
-		activity.startSession(course)
 	}
 
 	override fun injectDependencies(injector: PresentationComponent) {
@@ -115,24 +102,24 @@ class StudySessionFragment :
 
 	private fun connectToService() {
 		serviceDisposable =
-			activity.sessionPublish.subscribe({ service: StudySessionService ->
+			activity.sessionPublish.subscribe { service: StudySessionService ->
 				studySessionService = service
-				if (course.getCurrentDay().getCurrentSentenceGroup() != null) nextSentence(
-					course.getCurrentDay().getCurrentSentenceGroup()
-				) else sessionFinished(course.getCurrentDay())
-				sentenceDisposable = studySessionService.sentenceObservable()
-					.subscribe({ sentenceGroup: SentenceGroup ->
-						nextSentence(sentenceGroup)
-					})
-				finishDisposable = studySessionService.finishObservable()
-					.subscribe(Consumer<Day> { day: Day -> sessionFinished(day) })
+//				if (course.getCurrentDay().getCurrentSentenceGroup() != null) nextSentence(
+//					course.getCurrentDay().getCurrentSentenceGroup()
+//				) else sessionFinished(course.getCurrentDay())
+//				sentenceDisposable = studySessionService.sentenceObservable()
+//					.subscribe({ sentenceGroup: SentenceGroup ->
+//						nextSentence(sentenceGroup)
+//					})
+//				finishDisposable = studySessionService.finishObservable()
+//					.subscribe(Consumer<Day> { day: Day -> sessionFinished(day) })
 				setPaused(studySessionService.getPlaybackStatus() == null || studySessionService.getPlaybackStatus() == StudySessionService.PlaybackStatus.PAUSED)
 				if (!isPaused) {
 					startTimer()
 				}
 				updateTime()
 				updatePlayPauseImage()
-			})
+			}
 	}
 
 	private fun playPause(view: View) {
@@ -159,14 +146,14 @@ class StudySessionFragment :
 
 	private fun sessionFinished(day: Day) {
 		// mark day as completed
-		realm.executeTransaction { r: Realm? ->
-			course.addReps(course.currentDay.totalReviews)
-			day.isCompleted = true
-		}
+//		realm.executeTransaction { r: Realm? ->
+//			course.addReps(course.currentDay.totalReviews)
+//			day.isCompleted = true
+//		}
 		val fragment = StudySessionOverviewFragment()
-		val bundle = Bundle()
-		bundle.putString(StudySessionOverviewFragment.KEY_COURSE_ID, course.getId())
-		fragment.arguments = bundle
+		fragment.arguments = Bundle().apply {
+			putLong(StudySessionOverviewFragment.KEY_COURSE_ID, course.id)
+		}
 		parentFragmentManager.beginTransaction()
 			.replace(R.id.fragmentPlaceHolder, fragment)
 			.commit()
@@ -178,23 +165,23 @@ class StudySessionFragment :
 		adapter?.updateSentenceGroup(sentenceGroup)
 
 		// update number of reps remaining
-		binding.remainingRepsText.setText(
-			String.format(
-				Locale.getDefault(),
-				"%d",
-				course.getCurrentDay().getNumReviewsLeft()
-			)
-		)
-		binding.totalRepsText.setText(
-			String.format(
-				Locale.getDefault(),
-				"%d",
-				course.getTotalReps()
-			)
-		)
+//		binding.remainingRepsText.setText(
+//			String.format(
+//				Locale.getDefault(),
+//				"%d",
+//				course.getCurrentDay().getNumReviewsLeft()
+//			)
+//		)
+//		binding.totalRepsText.setText(
+//			String.format(
+//				Locale.getDefault(),
+//				"%d",
+//				course.getTotalReps()
+//			)
+//		)
 
 		// update time left
-		millisLeft = course.currentDay.timeLeft.toLong()
+//		millisLeft = course.currentDay.timeLeft.toLong()
 	}
 
 	private fun startTimer() {
@@ -226,7 +213,7 @@ class StudySessionFragment :
 	override fun onPause() {
 		super.onPause()
 		if (serviceDisposable != null) serviceDisposable!!.dispose()
-		if (sentenceDisposable != null) sentenceDisposable!!.dispose()
+//		if (sentenceDisposable != null) sentenceDisposable!!.dispose()
 		if (finishDisposable != null) finishDisposable!!.dispose()
 		countDownTimer?.cancel()
 	}
@@ -247,7 +234,8 @@ class StudySessionFragment :
 	}
 
 	override fun onCourseLoaded(course: CourseRoom) {
-
+		activity.startSession(course)
+		binding.courseTitleText.text = course.title
 	}
 
 	override fun onCourseNotFound(errorMsgRes: Int?) {

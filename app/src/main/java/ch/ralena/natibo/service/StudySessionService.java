@@ -98,7 +98,7 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 				stopSelf();
 		}
 
-		String courseId = new Utils.Storage(getApplicationContext()).getCourseId();
+		Long courseId = new Utils.Storage(getApplicationContext()).getCourseId();
 		if (course == null) {
 			course = realm.where(Course.class).equalTo("id", courseId).findFirst();
 			if (course == null)

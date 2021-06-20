@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import ch.ralena.natibo.MainApplication
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.Course
+import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.di.module.ActivityModule
 import ch.ralena.natibo.service.StudySessionService
 import ch.ralena.natibo.service.StudySessionService.StudyBinder
@@ -24,7 +24,7 @@ import com.google.android.material.snackbar.Snackbar
 import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(), MainActivityViewModel.Listener {
+class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 	val activityComponent by lazy {
 		(application as MainApplication).appComponent.newActivityComponent(ActivityModule(this))
 	}
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity(), MainActivityViewModel.Listener {
 	}
 
 	@Inject
-	lateinit var viewModel: MainActivityViewModel
+	lateinit var viewModel: MainViewModel
 
 	@Inject
 	lateinit var screenNavigator: ScreenNavigator
@@ -203,10 +203,11 @@ class MainActivity : AppCompatActivity(), MainActivityViewModel.Listener {
 	}
 
 	// --- study session service methods ---
-	fun startSession(course: Course) {
+	fun startSession(course: CourseRoom) {
+		// TODO: inject and/or move into ViewModel
 		val storage = Utils.Storage(this)
-		storage.putCourseId(course.getId())
-		storage.putDayId(course.getCurrentDay().getId())
+		storage.courseId = course.id
+//		storage.putDayId(course.getCurrentDay().getId())
 
 		// if we aren't bound to the service, start it if necessary and bind to it so that we can interact with it.
 		// if we are bound to it, we need to tell it to start a new session

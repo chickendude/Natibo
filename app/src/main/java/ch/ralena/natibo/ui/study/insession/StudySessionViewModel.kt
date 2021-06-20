@@ -30,7 +30,9 @@ class StudySessionViewModel @Inject constructor(
 
 	fun fetchCourse(id: Long) {
 		coroutineScope.launch(dispatcherProvider.main()) {
-			val result = withContext(dispatcherProvider.io()) { courseRepository.fetchCourse(id) }
+			val result = withContext(dispatcherProvider.io()) {
+				courseRepository.fetchCourse(id)
+			}
 			when (result) {
 				is Result.Success -> loadCourse(result.data)
 				is Result.Failure -> listeners.forEach { it.onCourseNotFound(result.stringRes) }
