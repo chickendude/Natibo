@@ -103,8 +103,7 @@ class ScreenNavigator @Inject constructor(
 		loadFragment(fragment, StudySessionFragment.TAG)
 	}
 
-	// Private functions
-
+	// region Helper functions----------------------------------------------------------------------
 	private fun loadFragment(fragment: Fragment, name: String) {
 		val transaction = fragmentManager
 			.beginTransaction()
@@ -129,4 +128,5 @@ class ScreenNavigator @Inject constructor(
 			fragmentManager.popBackStackImmediate(entryId, FragmentManager.POP_BACK_STACK_INCLUSIVE)
 		}
 	}
+	// endregion Helper functions-------------------------------------------------------------------
 }

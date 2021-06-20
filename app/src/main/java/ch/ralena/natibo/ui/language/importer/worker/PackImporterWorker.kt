@@ -2,33 +2,19 @@ package ch.ralena.natibo.ui.language.importer.worker
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.ContentResolver
 import android.content.Context
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
-import android.provider.OpenableColumns
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.work.*
 import ch.ralena.natibo.MainApplication
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.LanguageData
-import ch.ralena.natibo.data.room.`object`.Language
-import ch.ralena.natibo.data.room.`object`.Pack
 import ch.ralena.natibo.di.module.WorkerModule
-import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.language.importer.ImportProgress
 import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
-import io.reactivex.subjects.PublishSubject
-import io.realm.Realm
 import kotlinx.coroutines.delay
-import java.io.*
-import java.util.*
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
 
@@ -48,10 +34,6 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		val TAG: String = PackImporterWorker::class.java.simpleName
 		const val NOTIFICATION_ID = 1
 		const val CHANNEL_ID = "pack_importer_id"
-
-		private const val STATUS_OK = 0
-		private const val STATUS_MISSING_GSP = 1
-		private const val STATUS_INVALID_LANGUAGE = 2
 		const val BUFFER_SIZE = 1024
 	}
 
@@ -76,9 +58,13 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		setForeground(foregroundInfo)
 		viewModel.registerListener(this)
 		viewModel.importPack(Uri.parse(uriString))
+
+		// Poll for status changes
 		while (status == Status.IN_PROGRESS) {
 			delay(500)
 		}
+		// Give us some time to handle post-completion cleanup before killing the worker
+		delay(500)
 		return when (status) {
 			Status.SUCCESS -> Result.success()
 			else -> Result.failure()
@@ -91,11 +77,10 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 
 	// region Notification Setup--------------------------------------------------------------------
 	private fun createForegroundInfo(contentText: String): ForegroundInfo {
-//		val id = applicationContext.getString(R.string.notification_channel_id)
 		val title = "Loading pack"
 		val cancel = "Cancel"
 		val intent = WorkManager.getInstance(applicationContext)
-			.createCancelPendingIntent(getId())
+			.createCancelPendingIntent(id)
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
 			createChannel()
@@ -124,14 +109,6 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 	}
 	// endregion Notification Setup-----------------------------------------------------------------
 
-
-	// region Helper functions----------------------------------------------------------------------
-	private fun updateNotification(text: String) {
-		notificationBuilder.setContentText(text)
-		notificationManager.notify(1, notificationBuilder.build())
-	}
-	// endregion Helper functions-------------------------------------------------------------------
-
 	// region ViewModel Listener------------------------------------------------------------
 	private fun getData(type: ImportProgress) =
 		Data.Builder().putInt(LanguageImportFragment.WORKER_ACTION, type.ordinal)
@@ -140,7 +117,7 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		updateNotification(message)
 		setProgressAsync(
 			getData(ImportProgress.ACTION_TEXT)
-				.putString(LanguageImportFragment.WORKER_VALUE, message)
+				.putString(LanguageImportFragment.WORKER_MESSAGE, message)
 				.build()
 		)
 	}
@@ -161,6 +138,17 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 	override fun onWarning(warningMsg: String) {
 		Toast.makeText(applicationContext, warningMsg, Toast.LENGTH_SHORT).show()
 	}
+
+	override fun onImportComplete() {
+		setProgressAsync(getData(ImportProgress.ACTION_COMPLETED).build())
+		status = Status.SUCCESS
+	}
 	// endregion CountFilesUseCase Listener---------------------------------------------------------
 
+	// region Helper functions----------------------------------------------------------------------
+	private fun updateNotification(text: String) {
+		notificationBuilder.setContentText(text)
+		notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+	}
+	// endregion Helper functions-------------------------------------------------------------------
 }

@@ -1,23 +1,21 @@
 package ch.ralena.natibo.ui.language.importer
 
-import android.annotation.SuppressLint
 import android.net.Uri
-import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.work.*
 import androidx.work.WorkManager
-import ch.ralena.natibo.R
 import ch.ralena.natibo.databinding.FragmentLanguageImportBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker
-import ch.ralena.natibo.ui.language.list.LanguageListFragment
 
 enum class ImportProgress {
 	ACTION_TEXT,
 	ACTION_PROGRESS,
-	SENTENCES_LOADED
+	ACTION_COMPLETED
 }
+
 class LanguageImportFragment :
 	BaseFragment<
 			FragmentLanguageImportBinding,
@@ -28,7 +26,7 @@ class LanguageImportFragment :
 	companion object {
 		const val EXTRA_URI = "extra_uri"
 		const val WORKER_ACTION = "worker_action"
-		const val WORKER_VALUE = "worker_value"
+		const val WORKER_MESSAGE = "worker_message"
 		const val WORKER_PROGRESS = "worker_progress"
 		const val ACTION_OPENING_FILE = 0
 		const val ACTION_COUNTING_SENTENCES = 1
@@ -52,10 +50,15 @@ class LanguageImportFragment :
 	// region Helper functions----------------------------------------------------------------------
 	private fun launchWorker() {
 		val uri = requireArguments().getParcelable<Uri>(EXTRA_URI)
+//		if (uri == null) {
+//			requireActivity().supportFragmentManager.popBackStack()
+//			return
+//		}
+//		requireArguments().remove(EXTRA_URI)
 
-		val data = Data.Builder().apply {
-			putString("uri", uri.toString())
-		}.build()
+		val data = Data.Builder()
+			.putString("uri", uri.toString())
+			.build()
 
 		val workRequest = OneTimeWorkRequestBuilder<PackImporterWorker>()
 			.setInputData(data)
@@ -67,16 +70,15 @@ class LanguageImportFragment :
 				if (workInfo != null) {
 					val progress = workInfo.progress
 					val updateType = progress.getInt(WORKER_ACTION, -1)
-					when(updateType) {
+					when (updateType) {
 						ImportProgress.ACTION_TEXT.ordinal -> {
-							val message = progress.getString(WORKER_VALUE)
-							binding.actionText.text = message
+							binding.actionText.text = progress.getString(WORKER_MESSAGE)
 						}
 						ImportProgress.ACTION_PROGRESS.ordinal -> {
 							binding.progressBar.progress = progress.getInt(WORKER_PROGRESS, 0)
 						}
-						ImportProgress.SENTENCES_LOADED.ordinal -> {
-							binding.actionText.text = "Sentences loaded"
+						ImportProgress.ACTION_COMPLETED.ordinal -> {
+							viewModel.workComplete()
 						}
 					}
 				}

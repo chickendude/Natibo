@@ -33,44 +33,45 @@ class PackImporterViewModel @Inject constructor(
 		fun onProgressUpdate(progress: Int)
 		fun onError(exception: ImportException)
 		fun onWarning(warningMsg: String)
+		fun onImportComplete()
 	}
 
 	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
 
 	private var numMp3s = 0
+
 	/**
 	 * Pulls the language code and pack name out from the Uri filename.
 	 */
 	suspend fun importPack(uri: Uri) {
-		// todo notify completed
 		coroutineScope.launch {
 			createSentencesUseCase.sentenceCount()
-				.collect { updateNotification("Reading sentence: $it") }
+				.collect { updateNotification("Creating sentences: $it") }
 		}
 		coroutineScope.launch {
 			countMp3sUseCase.mp3Count()
 				.collect {
-					updateNotification("Copying mp3: $it")
+					updateNotification("Copying mp3: $it / $numMp3s")
 					updateProgress((it * (100 - 25)) / numMp3s + 25)
 				}
 		}
 
 		try {
 			// Grab language and pack name
+			updateNotification("Reading file")
 			val (languageCode, packName) = readPackDataUseCase.extractLanguageAndPackName(uri)
-			updateProgress(2)
+			updateProgress(1)
 			val languageId = createLanguageUseCase.fetchOrCreateLanguage(languageCode)
-			updateProgress(4)
+			updateProgress(2)
 			val packId = createPackUseCase.createPack(packName, languageId)
-			updateProgress(6)
+			updateProgress(3)
 			numMp3s = countMp3sUseCase.countMp3Files(getInputStream(uri))
-			updateProgress(10)
+			updateProgress(4)
 			val sentences = fetchSentencesUseCase.fetchSentences(getInputStream(uri))
-			updateProgress(15)
+			updateProgress(6)
 			checkSentences(numMp3s, sentences)
-			updateNotification("Creating sentences")
 			createSentencesUseCase.createSentences(languageId, packId, sentences)
-			updateProgress(25)
+			updateProgress(20)
 			// copy mp3 files over
 			updateNotification("Extracting mp3s")
 			countMp3sUseCase.copyMp3s(packId, getInputStream(uri))
@@ -79,6 +80,7 @@ class PackImporterViewModel @Inject constructor(
 		} catch (e: ImportException) {
 			listeners.forEach { it.onError(e) }
 		}
+		listeners.forEach { it.onImportComplete() }
 	}
 
 	// region Helper functions----------------------------------------------------------------------
@@ -100,6 +102,10 @@ class PackImporterViewModel @Inject constructor(
 		listeners.forEach { it.onNotificationUpdate(message) }
 	}
 
+	private fun updateProgress(progress: Int) {
+		listeners.forEach { it.onProgressUpdate(progress) }
+	}
+
 	private fun getInputStream(uri: Uri): InputStream {
 		return when (uri.scheme) {
 			"file" -> FileInputStream(File(uri.path!!))
@@ -112,10 +118,5 @@ class PackImporterViewModel @Inject constructor(
 			listeners.forEach { it.onWarning(msg) }
 		}
 	}
-
-	private fun updateProgress(progress: Int) {
-		Log.d("HIIIII", progress.toString())
-		listeners.forEach { it.onProgressUpdate(progress) }
-	}
-// endregion Helper functions-------------------------------------------------------------------
+	// endregion Helper functions-------------------------------------------------------------------
 }
