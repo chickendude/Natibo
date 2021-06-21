@@ -4,16 +4,18 @@ import androidx.annotation.StringRes
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.CourseRepository
-import ch.ralena.natibo.data.room.`object`.Course
+import ch.ralena.natibo.data.room.SessionRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
+import ch.ralena.natibo.data.room.`object`.SentenceRoom
+import ch.ralena.natibo.data.room.`object`.SessionRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.DispatcherProvider
-import io.realm.Realm
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class StudySessionViewModel @Inject constructor(
 	private val courseRepository: CourseRepository,
+	private val sessionRepository: SessionRepository,
 	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<StudySessionViewModel.Listener>() {
 	interface Listener {
@@ -40,9 +42,39 @@ class StudySessionViewModel @Inject constructor(
 		}
 	}
 
+	// region Helper functions ---------------------------------------------------------------------
 	private fun loadCourse(course: CourseRoom) {
-//	if (course.session == null || course.session.isCompleted)
-//		courseRepository.prepareNextDay(course)
+		if (course.sessionId == 0L)
+			createSession(course)
 		listeners.forEach { it.onCourseLoaded(course) }
 	}
+
+	private fun createSession(course: CourseRoom) {
+		coroutineScope.launch {
+			val numSessions = courseRepository.countSessions(course.id)
+			val session = SessionRoom(
+				index = numSessions + 1,
+				progress = 0,
+				courseId = course.id
+			)
+			val sessionId = sessionRepository.createSession(session)
+			addSentencesToSession(course, sessionId)
+		}
+	}
+
+	private suspend fun addSentencesToSession(course: CourseRoom, sessionId: Long) {
+		var curSentenceIndex = course.schedule.curSentenceIndex
+		val order = course.schedule.order
+		val reviewPattern = course.schedule.reviewPattern
+		val numSentences = course.schedule.numSentences
+
+		val newSentences = ArrayList<SentenceRoom>()
+		reviewPattern.forEach { numTimesStr: Char ->
+			val numTimes = Character.getNumericValue(numTimesStr)
+
+		}
+
+//		sessionRepository.addSentencesToSession(sessionId, )
+	}
+	// endregion Helper functions ------------------------------------------------------------------
 }

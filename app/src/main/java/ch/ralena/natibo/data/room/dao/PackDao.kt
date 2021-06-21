@@ -19,7 +19,7 @@ interface PackDao {
 
 	@Transaction
 	@Query("SELECT * FROM packroom WHERE id = :id LIMIT 1")
-	fun getWithSentencesById(id: Long): PackWithSentences?
+	suspend fun getWithSentencesById(id: Long): PackWithSentences?
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insert(pack: PackRoom): Long

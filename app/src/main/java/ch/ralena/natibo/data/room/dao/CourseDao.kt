@@ -19,4 +19,7 @@ interface CourseDao {
 
 	@Delete
 	suspend fun delete(course: CourseRoom)
+
+	@Query("SELECT COUNT(id) FROM sessionroom WHERE courseId = :courseId")
+	suspend fun getSessionCount(courseId: Long): Int
 }

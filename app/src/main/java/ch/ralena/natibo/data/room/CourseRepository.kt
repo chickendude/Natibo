@@ -32,7 +32,8 @@ class CourseRepository @Inject constructor(
 		dailyReviews: List<String>,
 		title: String,
 		baseLanguageCode: String,
-		targetLanguageCode: String
+		targetLanguageCode: String,
+		packName: String
 	): Long {
 		val scheduleRoom = ScheduleRoom(
 			numSentencesPerDay,
@@ -40,7 +41,7 @@ class CourseRepository @Inject constructor(
 			order,
 			dailyReviews.joinToString(" ")
 		)
-		val courseRoom = CourseRoom(title, baseLanguageCode, targetLanguageCode, scheduleRoom, 0)
+		val courseRoom = CourseRoom(title, baseLanguageCode, targetLanguageCode, packName, scheduleRoom, 0)
 		val courseId = courseDao.insert(courseRoom)
 
 //		// --- begin transaction
@@ -174,6 +175,8 @@ class CourseRepository @Inject constructor(
 	suspend fun deleteCourse(course: CourseRoom) {
 		courseDao.delete(course)
 	}
+
+	suspend fun countSessions(courseId: Long): Int = courseDao.getSessionCount(courseId)
 
 	// region Helper functions----------------------------------------------------------------------
 	private fun getSentenceGroups(

@@ -3,6 +3,7 @@ package ch.ralena.natibo.data.room.`object`
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 
 @Entity
 data class CourseRoom(
@@ -15,6 +16,13 @@ data class CourseRoom(
 
 	/** Abbreviation of the target language. The language the user is studying. */
 	val targetLanguageCode: String,
+
+	/**
+	 * The name of the pack to pull sentences from.
+	 *
+	 * The pack name must be the same for both the base and target language.
+	 */
+	val packName: String,
 
 	/** Contains information on the scheduling of the course. */
 	@Embedded
@@ -60,4 +68,13 @@ data class ScheduleRoom(
 	 *  sentences 40 times, and 60 new sentences, etc.
 	 */
 	val reviewPattern: String
+)
+
+data class CourseWithPacks(
+	@Embedded val course: CourseRoom,
+	@Relation(
+		parentColumn = "id",
+		entityColumn = "courseId"
+	)
+	val packs: List<PackRoom>
 )

@@ -92,7 +92,8 @@ class PickScheduleViewModel @Inject constructor(
 					dailyReviews,
 					title,
 					baseLanguageCode,
-					targetLanguageCode
+					targetLanguageCode,
+					"" // TODO: Fix
 				)
 			}
 			// TODO: perhaps wait for response from courseRepository and send signal back to fragment
