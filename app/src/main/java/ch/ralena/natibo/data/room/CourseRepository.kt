@@ -40,7 +40,7 @@ class CourseRepository @Inject constructor(
 			order,
 			dailyReviews.joinToString(" ")
 		)
-		val courseRoom = CourseRoom(title, baseLanguageCode, targetLanguageCode, scheduleRoom, null)
+		val courseRoom = CourseRoom(title, baseLanguageCode, targetLanguageCode, scheduleRoom, 0)
 		val courseId = courseDao.insert(courseRoom)
 
 //		// --- begin transaction

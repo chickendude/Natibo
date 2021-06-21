@@ -37,5 +37,5 @@ data class SentenceRoom(
 	/** The pack the sentence belongs to. */
 	val packId: Long,
 
-	@PrimaryKey(autoGenerate = true) val id: Int = 0
+	@PrimaryKey(autoGenerate = true) val id: Long = 0
 )

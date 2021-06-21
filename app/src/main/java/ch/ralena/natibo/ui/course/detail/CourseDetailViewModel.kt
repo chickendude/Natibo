@@ -67,7 +67,7 @@ class CourseDetailViewModel @Inject constructor(
 	private fun fetchCourseSuccess(course: CourseRoom) {
 		this.course = course
 		for (l in listeners) l.onCourseFetched(course)
-		if (course.session == null)
+		if (course.sessionId == 0L)
 			for (l in listeners) l.onSessionNotStarted()
 		else
 			for (l in listeners) l.onSessionStarted()
