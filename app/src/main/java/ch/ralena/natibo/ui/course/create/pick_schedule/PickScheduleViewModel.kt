@@ -73,11 +73,11 @@ class PickScheduleViewModel @Inject constructor(
 
 		// "base-target-target" if chorus enabled, otherwise "base-target"
 		// TODO: handle Course.Chorus.NEW, perhaps create "order_review" and "order_new"
-		val order = languages.mapIndexed { i, _ ->
-			if (chorus == Course.Chorus.ALL && (i > 0 || languages.size == 1))
-				"$i$i"
+		val order = languages.mapIndexed { index, _ ->
+			if (chorus == Course.Chorus.ALL && (index > 0 || languages.size == 1))
+				"$index$index"
 			else
-				"$i"
+				"$index"
 		}.joinToString("")
 
 		val baseLanguageCode = languages.first().code

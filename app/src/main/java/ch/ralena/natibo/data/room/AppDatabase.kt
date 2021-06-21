@@ -18,7 +18,7 @@ import ch.ralena.natibo.data.room.dao.SentenceDao
 		PackRoom::class,
 		SentenceRoom::class
 	],
-	version = 2
+	version = 1
 )
 abstract class AppDatabase : RoomDatabase() {
 	abstract fun courseDao(): CourseDao

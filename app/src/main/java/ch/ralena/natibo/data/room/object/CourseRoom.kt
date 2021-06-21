@@ -9,6 +9,7 @@ data class CourseRoom(
 	/** Title of the course, e.g. "English -> Cantonese". */
 	val title: String,
 
+	// TODO: Switch to use id instead of code
 	/** Abbreviation of the base language. Generally the user's native language. */
 	val baseLanguageCode: String,
 
