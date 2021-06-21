@@ -1,4 +1,4 @@
-package ch.ralena.natibo.ui.course.detail.adapter
+package ch.ralena.natibo.ui.course.create.pick_schedule.adapter
 
 import android.view.LayoutInflater
 import android.view.View

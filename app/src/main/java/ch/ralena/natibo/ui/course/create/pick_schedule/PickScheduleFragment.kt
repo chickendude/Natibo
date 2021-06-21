@@ -4,11 +4,13 @@ import android.text.InputType
 import android.view.*
 import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
+import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
 import ch.ralena.natibo.databinding.FragmentCoursePickScheduleBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
+import ch.ralena.natibo.ui.course.create.pick_schedule.adapter.PackAdapter
 import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.ScheduleTextWatcher
 import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.SentencesPerDayTextWatcher
 import javax.inject.Inject
@@ -31,6 +33,9 @@ class PickScheduleFragment :
 	lateinit var activity: MainActivity
 
 	@Inject
+	lateinit var packAdapter: PackAdapter
+
+	@Inject
 	lateinit var scheduleTextWatcher: ScheduleTextWatcher
 
 	@Inject
@@ -47,33 +52,40 @@ class PickScheduleFragment :
 
 		viewModel.fetchLanguages(requireArguments().getLongArray(TAG_LANGUAGE_IDS))
 
-		binding.courseTitleEdit.setOnClickListener {
-			binding.courseTitleEdit.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-		}
+		binding.apply {
+			packRecyclerview.apply {
+				layoutManager = LinearLayoutManager(context)
+				adapter = packAdapter
+			}
 
-		// Custom schedule edit should start off gone
-		binding.customScheduleEdit.apply {
-			visibility = View.GONE
-			addTextChangedListener(scheduleTextWatcher)
-		}
+			courseTitleEdit.setOnClickListener {
+				binding.courseTitleEdit.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+			}
 
-		// Set up sentencesPerDay EditText and SeekBar
-		binding.sentencesPerDayEdit.addTextChangedListener(sentencesPerDayTextWatcher)
-		binding.sentencesPerDaySeekbar.apply {
-			setOnSeekBarChangeListener(seekBarChangeListener)
-			progress = 9
-		}
+			// Custom schedule edit should start off gone
+			customScheduleEdit.apply {
+				visibility = View.GONE
+				addTextChangedListener(scheduleTextWatcher)
+			}
 
-		// set up radio listeners
-		binding.reviewScheduleRadioGroup.apply {
-			check(binding.fourDayRadio.id)
-			setOnCheckedChangeListener { _: RadioGroup?, checkedId: Int ->
-				binding.customScheduleEdit.apply {
-					if (checkedId == binding.customDayRadio.id) {
-						visibility = View.VISIBLE
-						requestFocus()
-					} else
-						visibility = View.GONE
+			// Set up sentencesPerDay EditText and SeekBar
+			sentencesPerDayEdit.addTextChangedListener(sentencesPerDayTextWatcher)
+			sentencesPerDaySeekbar.apply {
+				setOnSeekBarChangeListener(seekBarChangeListener)
+				progress = 9
+			}
+
+			// set up radio listeners
+			reviewScheduleRadioGroup.apply {
+				check(binding.fourDayRadio.id)
+				setOnCheckedChangeListener { _: RadioGroup?, checkedId: Int ->
+					binding.customScheduleEdit.apply {
+						if (checkedId == binding.customDayRadio.id) {
+							visibility = View.VISIBLE
+							requestFocus()
+						} else
+							visibility = View.GONE
+					}
 				}
 			}
 		}

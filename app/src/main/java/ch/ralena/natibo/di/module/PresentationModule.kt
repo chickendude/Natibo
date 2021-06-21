@@ -2,13 +2,12 @@ package ch.ralena.natibo.di.module
 
 import android.media.MediaPlayer
 import androidx.recyclerview.widget.ItemTouchHelper
-import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.di.PresentationScope
 import ch.ralena.natibo.ui.callback.ItemTouchHelperCallback
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailableLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.SelectedLanguagesAdapter
-import ch.ralena.natibo.ui.course.detail.adapter.PackAdapter
+import ch.ralena.natibo.ui.course.create.pick_schedule.adapter.PackAdapter
 import ch.ralena.natibo.ui.course.list.adapter.CourseListAdapter
 import ch.ralena.natibo.ui.language.detail.adapter.LanguageDetailAdapter
 import ch.ralena.natibo.ui.language.list.adapter.LanguageListAdapter

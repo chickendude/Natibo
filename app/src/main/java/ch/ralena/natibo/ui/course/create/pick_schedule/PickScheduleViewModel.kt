@@ -4,6 +4,7 @@ import androidx.annotation.IdRes
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
+import ch.ralena.natibo.data.room.PackRepository
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
@@ -18,6 +19,7 @@ class PickScheduleViewModel @Inject constructor(
 	private val screenNavigator: ScreenNavigator,
 	private val languageRepository: LanguageRepository,
 	private val courseRepository: CourseRepository,
+	private val packRepository: PackRepository,
 	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<PickScheduleViewModel.Listener>() {
 	interface Listener {
@@ -37,6 +39,13 @@ class PickScheduleViewModel @Inject constructor(
 		if (languageIds == null || languageIds.isEmpty())
 			return
 		coroutineScope.launch {
+			// ------------------------------------------------
+			// TODO: Fetch packs with matching languages and names
+			val packs = packRepository.fetchPacks().filter {
+				languageIds.contains(it.languageId)
+			}.groupingBy { it }.eachCount().filter { it.value > 1 }
+			// ------------------------------------------------
+
 			languages.clear()
 			languageIds.forEach {
 				languageRepository.fetchLanguage(it)?.run {

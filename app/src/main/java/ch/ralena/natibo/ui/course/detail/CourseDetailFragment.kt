@@ -6,15 +6,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.LanguageData
-import ch.ralena.natibo.data.LanguageType
-import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.Pack
 import ch.ralena.natibo.databinding.FragmentCourseDetailBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
-import ch.ralena.natibo.ui.course.detail.adapter.PackAdapter
+import ch.ralena.natibo.ui.course.create.pick_schedule.adapter.PackAdapter
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import java.util.*
