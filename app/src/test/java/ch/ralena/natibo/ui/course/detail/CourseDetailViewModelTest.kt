@@ -2,6 +2,7 @@ package ch.ralena.natibo.ui.course.detail
 
 import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.CourseRepository
+import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.testutils.*
 import ch.ralena.natibo.ui.course.detail.CourseDetailViewModel.*
@@ -23,6 +24,7 @@ internal class CourseDetailViewModelTest {
 	private val listener1 = mockk<Listener>(relaxed = true)
 	private val listener2 = mockk<Listener>(relaxed = true)
 	private val courseRepository = mockk<CourseRepository>(relaxed = true)
+	private val languageRepository = mockk<LanguageRepository>(relaxed = true)
 	private val screenNavigator = mockk<ScreenNavigator>(relaxed = true)
 	private val testDispatcher = TestCoroutineDispatcher()
 	private val testDispatcherProvider = TestDispatcherProvider(testDispatcher)
@@ -33,7 +35,7 @@ internal class CourseDetailViewModelTest {
 	@BeforeEach
 	fun setUp() {
 		Dispatchers.setMain(testDispatcher)
-		SUT = CourseDetailViewModel(courseRepository, screenNavigator, testDispatcherProvider)
+		SUT = CourseDetailViewModel(courseRepository, languageRepository, screenNavigator, testDispatcherProvider)
 		listenersRegistered()
 	}
 

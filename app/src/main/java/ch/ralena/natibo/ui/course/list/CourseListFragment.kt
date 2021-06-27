@@ -4,6 +4,7 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.CourseRoom
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.databinding.FragmentCourseListBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
@@ -72,8 +73,8 @@ class CourseListFragment :
 	}
 
 	// region ViewModel listeners ------------------------------------------------------------------
-	override fun showCourses(courses: List<CourseRoom>) {
-		courseListAdapter.loadCourses(courses)
+	override fun showCourses(courses: List<CourseRoom>, languages: List<LanguageRoom>) {
+		courseListAdapter.loadData(courses, languages)
 	}
 
 	override fun showNoCourses() {

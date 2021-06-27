@@ -4,6 +4,8 @@ import androidx.annotation.StringRes
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.CourseRepository
+import ch.ralena.natibo.data.room.PackRepository
+import ch.ralena.natibo.data.room.SentenceRepository
 import ch.ralena.natibo.data.room.SessionRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
@@ -15,6 +17,8 @@ import javax.inject.Inject
 
 class StudySessionViewModel @Inject constructor(
 	private val courseRepository: CourseRepository,
+	private val packRepository: PackRepository,
+	private val sentenceRepository: SentenceRepository,
 	private val sessionRepository: SessionRepository,
 	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<StudySessionViewModel.Listener>() {
@@ -59,6 +63,7 @@ class StudySessionViewModel @Inject constructor(
 			)
 			val sessionId = sessionRepository.createSession(session)
 			addSentencesToSession(course, sessionId)
+//			courseRepository.updateCourse(course.copy(sessionId = sessionId))
 		}
 	}
 
@@ -68,6 +73,9 @@ class StudySessionViewModel @Inject constructor(
 		val reviewPattern = course.schedule.reviewPattern
 		val numSentences = course.schedule.numSentences
 
+		val sentenceSets = ArrayList<List<SentenceRoom>>()
+//		val packSentences = sentenceRepository.fetchSentencesInPack(course.packName)
+		val packs = packRepository.fetchPackWithSentencesByNameAndLanguages(course.packName, listOf(course.baseLanguageId, course.targetLanguageId))
 		val newSentences = ArrayList<SentenceRoom>()
 		reviewPattern.forEach { numTimesStr: Char ->
 			val numTimes = Character.getNumericValue(numTimesStr)

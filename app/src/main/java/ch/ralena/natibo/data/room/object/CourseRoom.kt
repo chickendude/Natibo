@@ -10,12 +10,11 @@ data class CourseRoom(
 	/** Title of the course, e.g. "English -> Cantonese". */
 	val title: String,
 
-	// TODO: Switch to use id instead of code
 	/** Abbreviation of the base language. Generally the user's native language. */
-	val baseLanguageCode: String,
+	val baseLanguageId: Long,
 
 	/** Abbreviation of the target language. The language the user is studying. */
-	val targetLanguageCode: String,
+	val targetLanguageId: Long,
 
 	/**
 	 * The name of the pack to pull sentences from.

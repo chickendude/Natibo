@@ -2,7 +2,9 @@ package ch.ralena.natibo.ui.course.detail
 
 import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.CourseRepository
+import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.ScreenNavigator
@@ -11,11 +13,13 @@ import javax.inject.Inject
 
 class CourseDetailViewModel @Inject constructor(
 	private val courseRepository: CourseRepository,
+	private val languageRepository: LanguageRepository,
 	private val screenNavigator: ScreenNavigator,
 	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<CourseDetailViewModel.Listener>() {
 	interface Listener {
 		fun onCourseFetched(course: CourseRoom)
+		fun onLanguageFetched(language: LanguageRoom)
 		fun onCourseNotFound()
 		fun noPacksSelected()
 		fun onSessionStarted()
@@ -35,6 +39,16 @@ class CourseDetailViewModel @Inject constructor(
 				withContext(dispatcherProvider.main()) {
 					listeners.forEach { it.onCourseNotFound() }
 				}
+		}
+	}
+
+	fun fetchLanguage(id: Long) {
+		coroutineScope.launch {
+			languageRepository.fetchLanguage(id)?.let { language ->
+				withContext(dispatcherProvider.main()) {
+					listeners.forEach { it.onLanguageFetched(language) }
+				}
+			}
 		}
 	}
 

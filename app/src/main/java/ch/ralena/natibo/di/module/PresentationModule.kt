@@ -39,7 +39,7 @@ class PresentationModule {
 
 	@PresentationScope
 	@Provides
-	fun courseListAdapter() = CourseListAdapter(arrayListOf())
+	fun courseListAdapter() = CourseListAdapter(arrayListOf(), arrayListOf())
 
 	@PresentationScope
 	@Provides

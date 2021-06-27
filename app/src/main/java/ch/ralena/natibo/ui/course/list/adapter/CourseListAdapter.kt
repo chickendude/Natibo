@@ -7,14 +7,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.LanguageData
-import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.CourseRoom
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
-import io.reactivex.subjects.PublishSubject
-import io.realm.RealmResults
 
-class CourseListAdapter(private val courses: ArrayList<CourseRoom>) :
+class CourseListAdapter(
+	private val courses: ArrayList<CourseRoom>,
+	private val languages: ArrayList<LanguageRoom>
+) :
 	BaseRecyclerAdapter<CourseListAdapter.ViewHolder, CourseListAdapter.Listener>() {
 	interface Listener {
 		fun onCourseClicked(course: CourseRoom)
@@ -32,9 +32,11 @@ class CourseListAdapter(private val courses: ArrayList<CourseRoom>) :
 
 	override fun getItemCount() = courses.size
 
-	fun loadCourses(courses: List<CourseRoom>) {
+	fun loadData(courses: List<CourseRoom>, languages: List<LanguageRoom>) {
 		this.courses.clear()
 		this.courses.addAll(courses)
+		this.languages.clear()
+		this.languages.addAll(languages)
 		notifyDataSetChanged()
 	}
 
@@ -57,10 +59,10 @@ class CourseListAdapter(private val courses: ArrayList<CourseRoom>) :
 			courseTitle.text = course.title
 			// TODO: Use String resource instead
 //			numReps.text = String.format("%d reps", course.totalReps)
-			val language = LanguageData.languages.find { it.id == course.targetLanguageCode }
+			val language = languages.find { it.id == course.targetLanguageId }
 			language?.let {
 				languageName.text = it.name
-				flagImage.setImageResource(it.drawable)
+				flagImage.setImageResource(it.flagDrawable)
 			}
 		}
 	}

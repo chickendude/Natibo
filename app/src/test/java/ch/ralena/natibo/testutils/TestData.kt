@@ -11,10 +11,11 @@ val SCHEDULE = ScheduleRoom(10, 0, "01", "6432")
 // Course
 val COURSE = CourseRoom(
 	title = "title",
-	baseLanguageCode = "en",
-	targetLanguageCode = "es",
+	baseLanguageId = 1,
+	targetLanguageId = 2,
 	schedule = SCHEDULE,
-	session = null
+	sessionId = 1,
+	packName = "F1"
 )
 val COURSE_ID = COURSE.id
 

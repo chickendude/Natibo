@@ -1,10 +1,7 @@
 package ch.ralena.natibo.data.room
 
 import ch.ralena.natibo.data.LanguageData
-import ch.ralena.natibo.data.room.`object`.Course
-import ch.ralena.natibo.data.room.`object`.Language
-import ch.ralena.natibo.data.room.`object`.LanguageRoom
-import ch.ralena.natibo.data.room.`object`.PackRoom
+import ch.ralena.natibo.data.room.`object`.*
 import ch.ralena.natibo.data.room.dao.PackDao
 import java.util.*
 import javax.inject.Inject
@@ -24,4 +21,13 @@ class PackRepository @Inject constructor(
 
 	suspend fun fetchPacks(): List<PackRoom> =
 		packDao.getAll()
+
+	suspend fun fetchPackWithSentencesByNameAndLanguages(
+		packName: String,
+		languageIds: List<Long>
+	): List<PackWithSentences> {
+		return arrayListOf<PackWithSentences>().apply {
+			packDao.getWithSentencesByNameAndLanguage(packName, languageIds)?.let { add(it) }
+		}
+	}
 }

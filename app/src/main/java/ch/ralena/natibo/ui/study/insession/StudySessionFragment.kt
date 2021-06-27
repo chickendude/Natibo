@@ -43,7 +43,6 @@ class StudySessionFragment :
 	lateinit var activity: MainActivity
 
 	lateinit var course: CourseRoom
-	private lateinit var realm: Realm
 
 	// fields
 	private val prefs: SharedPreferences? = null

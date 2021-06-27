@@ -1,6 +1,5 @@
 package ch.ralena.natibo.data.room
 
-import android.util.Log
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.`object`.*
@@ -31,8 +30,8 @@ class CourseRepository @Inject constructor(
 		startingSentence: Int,
 		dailyReviews: List<String>,
 		title: String,
-		baseLanguageCode: String,
-		targetLanguageCode: String,
+		baseLanguageId: Long,
+		targetLanguageId: Long,
 		packName: String
 	): Long {
 		val scheduleRoom = ScheduleRoom(
@@ -41,7 +40,8 @@ class CourseRepository @Inject constructor(
 			order,
 			dailyReviews.joinToString(" ")
 		)
-		val courseRoom = CourseRoom(title, baseLanguageCode, targetLanguageCode, packName, scheduleRoom, 0)
+		val courseRoom =
+			CourseRoom(title, baseLanguageId, targetLanguageId, packName, scheduleRoom, 0)
 		val courseId = courseDao.insert(courseRoom)
 
 //		// --- begin transaction
@@ -93,6 +93,17 @@ class CourseRepository @Inject constructor(
 			Result.Success(course)
 	}
 
+	suspend fun deleteCourse(course: CourseRoom) {
+		courseDao.delete(course)
+	}
+
+	suspend fun updateCourse(course: CourseRoom) {
+		courseDao.update(course)
+	}
+
+	suspend fun countSessions(courseId: Long): Int = courseDao.getSessionCount(courseId)
+
+	// region Old Realm stuff
 	/**
 	 * Toggles a pack in a course.
 	 *
@@ -171,14 +182,9 @@ class CourseRepository @Inject constructor(
 			course.currentDay.sentenceSets.removeAll(emptySentenceSets)
 		}
 	}
+	// endregion
 
-	suspend fun deleteCourse(course: CourseRoom) {
-		courseDao.delete(course)
-	}
-
-	suspend fun countSessions(courseId: Long): Int = courseDao.getSessionCount(courseId)
-
-	// region Helper functions----------------------------------------------------------------------
+	// region Helper function ----------------------------------------------------------------------
 	private fun getSentenceGroups(
 		index: Int,
 		numSentences: Int,
@@ -218,6 +224,6 @@ class CourseRepository @Inject constructor(
 		}
 		return results
 	}
-// endregion Helper functions-------------------------------------------------------------------
+// endregion Helper functions ----------------------------------------------------------------------
 
 }

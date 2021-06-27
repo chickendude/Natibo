@@ -6,7 +6,6 @@ import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.PackRepository
 import ch.ralena.natibo.data.room.`object`.Course
-import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.DispatcherProvider
@@ -89,8 +88,8 @@ class PickScheduleViewModel @Inject constructor(
 				"$index"
 		}.joinToString("")
 
-		val baseLanguageCode = languages.first().code
-		val targetLanguageCode = languages.last().code
+		val baseLanguageId = languages.first().id
+		val targetLanguageId = languages.last().id
 
 		coroutineScope.launch(dispatcherProvider.main()) {
 			val courseId = withContext(dispatcherProvider.io()) {
@@ -100,8 +99,8 @@ class PickScheduleViewModel @Inject constructor(
 					startingSentence,
 					dailyReviews,
 					title,
-					baseLanguageCode,
-					targetLanguageCode,
+					baseLanguageId,
+					targetLanguageId,
 					"" // TODO: Fix
 				)
 			}

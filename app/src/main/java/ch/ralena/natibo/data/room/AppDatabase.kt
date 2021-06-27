@@ -14,7 +14,7 @@ import ch.ralena.natibo.data.room.dao.*
 		SessionRoom::class,
 		SessionSentenceCrossRef::class
 	],
-	version = 2
+	version = 1
 )
 abstract class AppDatabase : RoomDatabase() {
 	abstract fun courseDao(): CourseDao

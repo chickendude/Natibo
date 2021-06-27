@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.LanguageData
 import ch.ralena.natibo.data.room.`object`.CourseRoom
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.Pack
 import ch.ralena.natibo.databinding.FragmentCourseDetailBinding
 import ch.ralena.natibo.di.component.PresentationComponent
@@ -94,7 +95,7 @@ class CourseDetailFragment
 
 	override fun onCourseFetched(course: CourseRoom) {
 		activity.title = course.title
-		val targetLanguage = getLanguage(course.targetLanguageCode)
+//		val targetLanguage = getLanguage(course.targetLanguageId)
 		loadCourseInfo(course)
 //		val matchingPacks: List<Pack> =
 //			targetLanguage.getMatchingPacks(course.languages.last())
@@ -117,6 +118,10 @@ class CourseDetailFragment
 		binding.startSessionButton.text = getString(R.string.start_session)
 	}
 
+	override fun onLanguageFetched(language: LanguageRoom) {
+		binding.flagImageView.setImageResource(language.flagDrawable)
+	}
+
 	// region Helper functions----------------------------------------------------------------------
 	private fun getLanguage(code: String) = LanguageData.getLanguageById(code)
 
@@ -124,9 +129,7 @@ class CourseDetailFragment
 		binding.totalRepsText.text = String.format(Locale.US, "%d", course.repCount)
 //		binding.totalSentencesSeenText.text =
 //			String.format(Locale.US, "%d", course.numSentencesSeen)
-		getLanguage(course.targetLanguageCode)?.run {
-			binding.flagImageView.setImageResource(drawable)
-		}
+		viewModel.fetchLanguage(course.targetLanguageId)
 	}
 	// endregion Helper functions-------------------------------------------------------------------
 }

@@ -4,9 +4,12 @@ import android.content.ContentResolver
 import android.net.Uri
 import ch.ralena.natibo.testutils.LANGUAGE
 import ch.ralena.natibo.testutils.PACK
+import ch.ralena.natibo.testutils.TestDispatcherProvider
+import ch.ralena.natibo.ui.language.importer.worker.listener.PackImporterListener
 import ch.ralena.natibo.ui.language.importer.worker.usecase.*
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,9 +19,10 @@ private val SENTENCE_STRINGS = listOf("Sentence one", "Sentence two")
 @ExperimentalCoroutinesApi
 internal class PackImporterViewModelTest {
 	// region Helper fields-------------------------------------------------------------------------
-	private val listener1 = mockk<PackImporterViewModel.Listener>(relaxed = true)
-	private val listener2 = mockk<PackImporterViewModel.Listener>(relaxed = true)
+	private val listener1 = mockk<PackImporterListener>(relaxed = true)
+	private val listener2 = mockk<PackImporterListener>(relaxed = true)
 	private val uri = mockk<Uri>(relaxed = true)
+	private val dispatcherProvider = TestDispatcherProvider(TestCoroutineDispatcher())
 	private val contentResolver = mockk<ContentResolver>(relaxed = true)
 	private val countMp3sUseCase = mockk<CountMp3sUseCase>(relaxed = true)
 	private val createLanguageUseCase = mockk<CreateLanguageUseCase>(relaxed = true)
@@ -34,6 +38,7 @@ internal class PackImporterViewModelTest {
 	fun setUp() {
 		SUT = PackImporterViewModel(
 			contentResolver,
+			dispatcherProvider,
 			countMp3sUseCase,
 			createLanguageUseCase,
 			createPackUseCase,
