@@ -1,7 +1,6 @@
 package ch.ralena.natibo.data.room.dao
 
 import androidx.room.*
-import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.SessionRoom
 import ch.ralena.natibo.data.room.`object`.SessionSentenceCrossRef
 import ch.ralena.natibo.data.room.`object`.SessionWithSentences

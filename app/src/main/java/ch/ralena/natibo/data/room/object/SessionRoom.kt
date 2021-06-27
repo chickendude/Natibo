@@ -26,8 +26,12 @@ data class SessionWithSentences(
 	@Embedded val session: SessionRoom,
 	@Relation(
 		parentColumn = "id",
-		entityColumn = "sentenceId",
-		associateBy = Junction(SessionSentenceCrossRef::class)
+		entityColumn = "id",
+		associateBy = Junction(
+			SessionSentenceCrossRef::class,
+			parentColumn = "sessionId",
+			entityColumn = "sentenceId"
+		)
 	)
 	val sentences: List<SentenceRoom>
 )

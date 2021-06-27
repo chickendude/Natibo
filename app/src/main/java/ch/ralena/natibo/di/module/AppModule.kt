@@ -49,4 +49,8 @@ class AppModule(private val application: Application) {
 	@Provides
 	@AppScope
 	fun sentenceDao(database: AppDatabase) = database.sentenceDao()
+
+	@Provides
+	@AppScope
+	fun sesseionDao(database: AppDatabase) = database.sessionDao()
 }
