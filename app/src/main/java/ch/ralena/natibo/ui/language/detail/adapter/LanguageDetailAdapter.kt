@@ -6,11 +6,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.Pack
 import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
-import io.reactivex.subjects.PublishSubject
-import io.realm.RealmList
 import javax.inject.Inject
 
 class LanguageDetailAdapter @Inject constructor(
@@ -53,7 +50,7 @@ class LanguageDetailAdapter @Inject constructor(
 		}
 
 		init {
-			book = view.findViewById(R.id.packTitleLabel)
+			book = view.findViewById(R.id.pack_name_label)
 			numSentences = view.findViewById(R.id.numSentencesLabel)
 			view.setOnClickListener {
 				for (l in listeners)

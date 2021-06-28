@@ -7,10 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
-import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 class AvailableLanguagesAdapter(
@@ -32,7 +30,7 @@ class AvailableLanguagesAdapter(
 
 	override fun getItemCount() = languages.size
 
-	fun loadLanguages(langs: List<LanguageRoom>) {
+	fun loadLanguagesWithPacks(langs: List<LanguageRoom>) {
 		languages.clear()
 		languages.addAll(langs)
 		notifyDataSetChanged()
@@ -41,6 +39,7 @@ class AvailableLanguagesAdapter(
 	inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 		private val languageName: TextView = view.findViewById(R.id.languageLabel)
 		private val flagImage: ImageView = view.findViewById(R.id.flagImageView)
+		// todo: perhaps change to text view and set text to base/target
 		private val checkedImage: ImageView = view.findViewById(R.id.checkedImage)
 
 		private lateinit var language: LanguageRoom

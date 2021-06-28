@@ -38,7 +38,7 @@ class CreateSentencesUseCase @Inject constructor(
 
 		// Go through all sentences except first row which is the header information
 		sentences.drop(1).forEach {
-			createSentence(packId, it.split('\t'), sections, packSentences)
+			createSentence(packId, languageId, it.split('\t'), sections, packSentences)
 			sentenceCount++
 		}
 	}
@@ -46,6 +46,7 @@ class CreateSentencesUseCase @Inject constructor(
 	// region Helper functions----------------------------------------------------------------------
 	private suspend fun createSentence(
 		packId: Long,
+		languageId: Long,
 		parts: List<String>,
 		sections: List<String>,
 		packSentences: List<SentenceRoom>
@@ -80,7 +81,7 @@ class CreateSentencesUseCase @Inject constructor(
 			)
 		} else {
 			sentenceRepository.createSentence(
-				SentenceRoom(index, original, alternate, romanization, ipa, "", 0, packId)
+				SentenceRoom(index, original, alternate, romanization, ipa, "", 0, packId, languageId)
 			)
 		}
 	}

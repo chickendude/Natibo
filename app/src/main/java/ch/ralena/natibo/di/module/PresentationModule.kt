@@ -6,7 +6,7 @@ import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.di.PresentationScope
 import ch.ralena.natibo.ui.callback.ItemTouchHelperCallback
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailableLanguagesAdapter
-import ch.ralena.natibo.ui.course.create.pick_language.adapter.SelectedLanguagesAdapter
+import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailablePacksAdapter
 import ch.ralena.natibo.ui.course.create.pick_schedule.adapter.PackAdapter
 import ch.ralena.natibo.ui.course.list.adapter.CourseListAdapter
 import ch.ralena.natibo.ui.language.detail.adapter.LanguageDetailAdapter
@@ -23,7 +23,7 @@ class PresentationModule {
 
 	@PresentationScope
 	@Provides
-	fun selectedLanguagesAdapter() = SelectedLanguagesAdapter(arrayListOf())
+	fun selectedLanguagesAdapter() = AvailablePacksAdapter(arrayListOf())
 
 	@PresentationScope
 	@Provides
@@ -45,14 +45,6 @@ class PresentationModule {
 	@Provides
 	@LanguageList
 	fun selectedLanguages() = arrayListOf<LanguageRoom>()
-
-	@PresentationScope
-	@Provides
-	@SelectedLanguagesItemTouchHelper
-	fun itemTouchHelper(selectedAdapter: SelectedLanguagesAdapter): ItemTouchHelper {
-		val callback: ItemTouchHelper.Callback = ItemTouchHelperCallback(selectedAdapter, false)
-		return ItemTouchHelper(callback)
-	}
 
 	@PresentationScope
 	@Provides

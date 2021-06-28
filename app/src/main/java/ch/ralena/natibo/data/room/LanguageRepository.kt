@@ -3,6 +3,7 @@ package ch.ralena.natibo.data.room
 import ch.ralena.natibo.data.LanguageData
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.Language
+import ch.ralena.natibo.data.room.`object`.LanguagePackCrossRef
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.dao.LanguageDao
 import io.realm.Realm
@@ -27,6 +28,9 @@ class LanguageRepository @Inject constructor(
 			val language = LanguageRoom(it.name, languageCode, it.drawable)
 			languageDao.insert(language)
 		}
+
+	suspend fun createLanguagePackCrossRef(languageId: Long, packId: Long) =
+		languageDao.insertLanguagePackCrossRef(LanguagePackCrossRef(languageId, packId))
 
 	suspend fun fetchLanguages(): List<LanguageRoom> =
 		languageDao.getAll()

@@ -48,21 +48,18 @@ public class CourseBookAdapter extends RecyclerView.Adapter<CourseBookAdapter.Vi
 	class ViewHolder extends RecyclerView.ViewHolder {
 		private View view;
 		private TextView packTitle;
-		private TextView progress;
 		private Pack pack;
 
 		ViewHolder(View view) {
 			super(view);
 			this.view = view;
-			packTitle = view.findViewById(R.id.packTitleLabel);
-			progress = view.findViewById(R.id.progressLabel);
+			packTitle = view.findViewById(R.id.pack_name_label);
 			this.view.setOnClickListener(v -> packSubject.onNext(pack));
 		}
 
 		void bindView(Pack pack) {
 			this.pack = pack;
 			packTitle.setText(pack.getBook());
-			progress.setText("");
 		}
 	}
 }

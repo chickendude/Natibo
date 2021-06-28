@@ -13,7 +13,7 @@
 	tools:background="@color/colorPrimaryDark">
 
 	<TextView
-		android:id="@+id/packTitleLabel"
+		android:id="@+id/pack_name_label"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:textAlignment="center"

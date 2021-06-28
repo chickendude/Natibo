@@ -9,6 +9,7 @@ import ch.ralena.natibo.data.room.dao.*
 	entities = [
 		CourseRoom::class,
 		LanguageRoom::class,
+		LanguagePackCrossRef::class,
 		PackRoom::class,
 		SentenceRoom::class,
 		SessionRoom::class,

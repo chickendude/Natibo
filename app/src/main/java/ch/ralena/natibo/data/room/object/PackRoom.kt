@@ -10,8 +10,6 @@ import androidx.room.PrimaryKey
 data class PackRoom(
 	val name: String,
 
-	/** ID of the matching [LanguageRoom] object */
-	val languageId: Long,
-
 	@PrimaryKey(autoGenerate = true) val id: Long = 0
 )
+

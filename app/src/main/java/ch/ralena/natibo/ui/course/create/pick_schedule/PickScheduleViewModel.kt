@@ -38,13 +38,6 @@ class PickScheduleViewModel @Inject constructor(
 		if (languageIds == null || languageIds.isEmpty())
 			return
 		coroutineScope.launch {
-			// ------------------------------------------------
-			// TODO: Fetch packs with matching languages and names
-			val packs = packRepository.fetchPacks().filter {
-				languageIds.contains(it.languageId)
-			}.groupingBy { it }.eachCount().filter { it.value > 1 }
-			// ------------------------------------------------
-
 			languages.clear()
 			languageIds.forEach {
 				languageRepository.fetchLanguage(it)?.run {

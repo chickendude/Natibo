@@ -45,7 +45,7 @@ class PackAdapter(
 	}
 
 	inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-		private val book: CheckedTextView = view.findViewById(R.id.packTitleLabel)
+		private val book: CheckedTextView = view.findViewById(R.id.pack_name_label)
 
 		private lateinit var pack: Pack
 

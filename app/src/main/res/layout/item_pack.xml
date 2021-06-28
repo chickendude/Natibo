@@ -9,20 +9,11 @@
 	android:padding="10dp">
 
 	<TextView
-		android:id="@+id/packTitleLabel"
+		android:id="@+id/pack_name_label"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:textAlignment="center"
 		android:textColor="@color/colorTextDark"
 		android:textSize="24sp"
 		tools:text="F1"/>
-
-	<TextView
-		android:id="@+id/progressLabel"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:textAlignment="center"
-		android:textColor="@color/colorTextLight"
-		android:textSize="14sp"
-		tools:text="10/1000"/>
 </LinearLayout>

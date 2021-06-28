@@ -1,10 +1,7 @@
 package ch.ralena.natibo.data.room.dao
 
 import androidx.room.*
-import ch.ralena.natibo.data.room.`object`.CourseRoom
-import ch.ralena.natibo.data.room.`object`.LanguageRoom
-import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
-import ch.ralena.natibo.data.room.`object`.PackRoom
+import ch.ralena.natibo.data.room.`object`.*
 
 @Dao
 interface LanguageDao {
@@ -29,6 +26,9 @@ interface LanguageDao {
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insert(language: LanguageRoom): Long
+
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	suspend fun insertLanguagePackCrossRef(languagePackCrossRef: LanguagePackCrossRef)
 
 	@Update
 	suspend fun update(language: LanguageRoom)

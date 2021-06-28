@@ -3,17 +3,17 @@ package ch.ralena.natibo.ui.course.create.pick_language
 import android.view.*
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
+import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
+import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.databinding.FragmentCoursePickLanguagesBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.di.module.SelectedLanguagesItemTouchHelper
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailableLanguagesAdapter
-import ch.ralena.natibo.ui.course.create.pick_language.adapter.SelectedLanguagesAdapter
+import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailablePacksAdapter
 import ch.ralena.natibo.ui.base.BaseFragment
 import javax.inject.Inject
 
@@ -37,15 +37,11 @@ class PickLanguagesFragment :
 	lateinit var availableAdapter: AvailableLanguagesAdapter
 
 	@Inject
-	lateinit var selectedAdapter: SelectedLanguagesAdapter
-
-	@Inject
-	@SelectedLanguagesItemTouchHelper
-	lateinit var itemTouchHelper: ItemTouchHelper
+	lateinit var packsAdapter: AvailablePacksAdapter
 
 	// views
 	private lateinit var availableRecyclerView: RecyclerView
-	private lateinit var selectedRecyclerView: RecyclerView
+	private lateinit var packsRecyclerView: RecyclerView
 	private lateinit var checkMenu: MenuItem
 
 
@@ -61,20 +57,21 @@ class PickLanguagesFragment :
 		setHasOptionsMenu(true)
 
 		// recycler views
-		availableRecyclerView = view.findViewById(R.id.availableLanguagesRecyclerView)
+		availableRecyclerView = view.findViewById(R.id.available_languages_recycler_view)
 		availableRecyclerView.apply {
 			adapter = availableAdapter
 			layoutManager = GridLayoutManager(context, 3)
 		}
 
-		selectedRecyclerView = view.findViewById(R.id.selectedLanguagesRecyclerView)
-		selectedRecyclerView.apply {
-			adapter = selectedAdapter
-			layoutManager = LinearLayoutManager(context)
+		packsRecyclerView = view.findViewById(R.id.available_packs_recycler_view)
+		packsRecyclerView.apply {
+			adapter = packsAdapter
+			layoutManager = GridLayoutManager(context, 3)
 		}
 
-		// attach ItemTouchHelper
-		itemTouchHelper.attachToRecyclerView(selectedRecyclerView)
+		// -----------------------------------------------------------------------------------------
+		// TODO: Switch to "Native Language" and "Target Language"
+		// -----------------------------------------------------------------------------------------
 	}
 
 	override fun injectDependencies(injector: PresentationComponent) {
@@ -113,11 +110,11 @@ class PickLanguagesFragment :
 	}
 
 	override fun onLanguageAdded(language: LanguageRoom) {
-		selectedAdapter.addLanguage(language)
+//		packsAdapter.addLanguage(language)
 	}
 
 	override fun onLanguageRemoved(language: LanguageRoom) {
-		selectedAdapter.removeLanguage(language)
+//		packsAdapter.removeLanguage(language)
 	}
 
 	override fun onUpdateCheckMenuVisibility(isVisible: Boolean) {
@@ -125,7 +122,11 @@ class PickLanguagesFragment :
 	}
 
 	override fun onLanguagesLoaded(languages: List<LanguageRoom>) {
-		availableAdapter.loadLanguages(languages)
+		availableAdapter.loadLanguagesWithPacks(languages)
+	}
+
+	override fun onPacksUpdated(packs: List<PackRoom>) {
+		packsAdapter.loadPacks(packs)
 	}
 	// endregion ViewModel/Adapter listeners -------------------------------------------------------
 }

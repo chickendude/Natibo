@@ -7,12 +7,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
-import ch.ralena.natibo.di.module.LanguageList
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
-import io.reactivex.subjects.PublishSubject
 import java.util.*
 import javax.inject.Inject
 

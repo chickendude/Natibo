@@ -75,7 +75,7 @@ class StudySessionViewModel @Inject constructor(
 
 		val sentenceSets = ArrayList<List<SentenceRoom>>()
 //		val packSentences = sentenceRepository.fetchSentencesInPack(course.packName)
-		val packs = packRepository.fetchPackWithSentencesByNameAndLanguages(course.packName, listOf(course.baseLanguageId, course.targetLanguageId))
+//		val packs = packRepository.fetchPackWithSentencesByNameAndLanguages(course.packName, listOf(course.baseLanguageId, course.targetLanguageId))
 		val newSentences = ArrayList<SentenceRoom>()
 		reviewPattern.forEach { numTimesStr: Char ->
 			val numTimes = Character.getNumericValue(numTimesStr)

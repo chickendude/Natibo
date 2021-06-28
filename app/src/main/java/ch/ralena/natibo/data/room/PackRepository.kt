@@ -14,20 +14,11 @@ class PackRepository @Inject constructor(
 
 	suspend fun fetchPack(id: Long) = packDao.getById(id)
 
-	suspend fun fetchPackByNameAndLanguage(name: String, languageId: Long) =
-		packDao.getByNameAndLanguage(name, languageId)
+	suspend fun fetchPackByName(name: String) =
+		packDao.getByName(name)
 
 	suspend fun fetchPackWithSentences(id: Long) = packDao.getWithSentencesById(id)
 
 	suspend fun fetchPacks(): List<PackRoom> =
 		packDao.getAll()
-
-	suspend fun fetchPackWithSentencesByNameAndLanguages(
-		packName: String,
-		languageIds: List<Long>
-	): List<PackWithSentences> {
-		return arrayListOf<PackWithSentences>().apply {
-			packDao.getWithSentencesByNameAndLanguage(packName, languageIds)?.let { add(it) }
-		}
-	}
 }

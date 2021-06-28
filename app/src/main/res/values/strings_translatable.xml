@@ -73,4 +73,6 @@
 	<string name="strings_none">None</string>
 	<string name="chorus_description">If enabled, you will hear the target language twice instead of once. \"All\" sets it for all sentences, \"New sentences\" only sets it the first session a sentence is shown. This can be changed later, however sentenceGroups that have already been studied one way will remain like that for all reviews.</string>
     <string name="no_language_found">No language found</string>
+    <string name="selected_languages">Selected Languages</string>
+    <string name="available_packs">Available Packs</string>
 </resources>
