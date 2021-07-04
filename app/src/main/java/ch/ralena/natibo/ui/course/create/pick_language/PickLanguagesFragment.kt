@@ -2,19 +2,17 @@ package ch.ralena.natibo.ui.course.create.pick_language
 
 import android.view.*
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
-import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
 import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.databinding.FragmentCoursePickLanguagesBinding
 import ch.ralena.natibo.di.component.PresentationComponent
-import ch.ralena.natibo.di.module.SelectedLanguagesItemTouchHelper
 import ch.ralena.natibo.ui.MainActivity
-import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailableLanguagesAdapter
+import ch.ralena.natibo.ui.course.create.pick_language.adapter.NativeLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailablePacksAdapter
 import ch.ralena.natibo.ui.base.BaseFragment
+import ch.ralena.natibo.ui.course.create.pick_language.adapter.TargetLanguagesAdapter
 import javax.inject.Inject
 
 /**
@@ -24,26 +22,27 @@ import javax.inject.Inject
  * one or more target languages.
  */
 class PickLanguagesFragment :
-		BaseFragment<FragmentCoursePickLanguagesBinding,
-				PickLanguagesViewModel.Listener,
-				PickLanguagesViewModel>(FragmentCoursePickLanguagesBinding::inflate),
-		AvailableLanguagesAdapter.Listener,
-		PickLanguagesViewModel.Listener {
+	BaseFragment<FragmentCoursePickLanguagesBinding,
+			PickLanguagesViewModel.Listener,
+			PickLanguagesViewModel>(FragmentCoursePickLanguagesBinding::inflate),
+	NativeLanguagesAdapter.Listener,
+	TargetLanguagesAdapter.Listener,
+	PickLanguagesViewModel.Listener {
 
 	@Inject
 	lateinit var mainActivity: MainActivity
 
 	@Inject
-	lateinit var availableAdapter: AvailableLanguagesAdapter
+	lateinit var nativeAdapter: NativeLanguagesAdapter
 
 	@Inject
 	lateinit var packsAdapter: AvailablePacksAdapter
 
-	// views
-	private lateinit var availableRecyclerView: RecyclerView
-	private lateinit var packsRecyclerView: RecyclerView
-	private lateinit var checkMenu: MenuItem
+	@Inject
+	lateinit var targetAdapter: TargetLanguagesAdapter
 
+	// views
+	private lateinit var checkMenu: MenuItem
 
 	companion object {
 		val TAG: String = PickLanguagesFragment::class.java.simpleName
@@ -56,22 +55,23 @@ class PickLanguagesFragment :
 		mainActivity.enableBackButton()
 		setHasOptionsMenu(true)
 
-		// recycler views
-		availableRecyclerView = view.findViewById(R.id.available_languages_recycler_view)
-		availableRecyclerView.apply {
-			adapter = availableAdapter
-			layoutManager = GridLayoutManager(context, 3)
-		}
+		binding.apply {
+			// Set up RecyclerViews
+			nativeLanguagesRecyclerView.apply {
+				adapter = nativeAdapter
+				layoutManager = GridLayoutManager(context, 3)
+			}
 
-		packsRecyclerView = view.findViewById(R.id.available_packs_recycler_view)
-		packsRecyclerView.apply {
-			adapter = packsAdapter
-			layoutManager = GridLayoutManager(context, 3)
-		}
+			targetLanguagesRecyclerView.apply {
+				adapter = targetAdapter
+				layoutManager = GridLayoutManager(context, 3)
+			}
 
-		// -----------------------------------------------------------------------------------------
-		// TODO: Switch to "Native Language" and "Target Language"
-		// -----------------------------------------------------------------------------------------
+			availablePacksRecyclerView.apply {
+				adapter = packsAdapter
+				layoutManager = GridLayoutManager(context, 3)
+			}
+		}
 	}
 
 	override fun injectDependencies(injector: PresentationComponent) {
@@ -80,14 +80,16 @@ class PickLanguagesFragment :
 
 	override fun onStart() {
 		super.onStart()
-		availableAdapter.registerListener(this)
+		nativeAdapter.registerListener(this)
+		targetAdapter.registerListener(this)
 		viewModel.registerListener(this)
 		viewModel.fetchLanguages()
 	}
 
 	override fun onStop() {
 		super.onStop()
-		availableAdapter.unregisterListener(this)
+		nativeAdapter.unregisterListener(this)
+		targetAdapter.unregisterListener(this)
 		viewModel.unregisterListener(this)
 	}
 
@@ -105,16 +107,20 @@ class PickLanguagesFragment :
 	}
 
 	// region ViewModel/Adapter listeners ----------------------------------------------------------
-	override fun onLanguageClicked(language: LanguageRoom) {
-		viewModel.addRemoveLanguage(language)
+	override fun onNativeLanguageClicked(language: LanguageRoom) {
+		viewModel.changeNativeLanguage(language)
 	}
 
-	override fun onLanguageAdded(language: LanguageRoom) {
-//		packsAdapter.addLanguage(language)
+	override fun onNativeLanguageChanged(language: LanguageRoom?) {
+		nativeAdapter.setSelectedLanguage(language)
 	}
 
-	override fun onLanguageRemoved(language: LanguageRoom) {
-//		packsAdapter.removeLanguage(language)
+	override fun onTargetLanguageClicked(language: LanguageRoom) {
+		viewModel.changeTargetLanguage(language)
+	}
+
+	override fun onTargetLanguageChanged(language: LanguageRoom?) {
+		targetAdapter.setSelectedLanguage(language)
 	}
 
 	override fun onUpdateCheckMenuVisibility(isVisible: Boolean) {
@@ -122,11 +128,21 @@ class PickLanguagesFragment :
 	}
 
 	override fun onLanguagesLoaded(languages: List<LanguageRoom>) {
-		availableAdapter.loadLanguagesWithPacks(languages)
+		nativeAdapter.loadLanguagesWithPacks(languages)
+	}
+
+	override fun onTargetLanguagesChanged(languages: List<LanguageRoom>) {
+		binding.selectLanguageLabel.visibility =
+			if (languages.isEmpty()) View.VISIBLE else View.GONE
+		targetAdapter.loadLanguagesWithPacks(languages)
 	}
 
 	override fun onPacksUpdated(packs: List<PackRoom>) {
 		packsAdapter.loadPacks(packs)
 	}
 	// endregion ViewModel/Adapter listeners -------------------------------------------------------
+
+	// region Helper functions ---------------------------------------------------------------------
+
+	// endregion Helper functions ------------------------------------------------------------------
 }

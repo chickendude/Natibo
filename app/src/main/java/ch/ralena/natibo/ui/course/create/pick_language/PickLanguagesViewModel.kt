@@ -14,19 +14,22 @@ import javax.inject.Inject
 class PickLanguagesViewModel @Inject constructor(
 	private val languageRepository: LanguageRepository,
 	private val screenNavigator: ScreenNavigator,
-	@LanguageList private val selectedLanguages: ArrayList<LanguageRoom>,
 	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<PickLanguagesViewModel.Listener>() {
 	interface Listener {
 		fun onLanguagesLoaded(languages: List<LanguageRoom>)
+		fun onTargetLanguagesChanged(languages: List<LanguageRoom>)
 		fun onPacksUpdated(packs: List<PackRoom>)
 		fun onUpdateCheckMenuVisibility(isVisible: Boolean)
-		fun onLanguageAdded(language: LanguageRoom)
-		fun onLanguageRemoved(language: LanguageRoom)
+		fun onNativeLanguageChanged(language: LanguageRoom?)
+		fun onTargetLanguageChanged(language: LanguageRoom?)
 	}
 
 	val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
 	private lateinit var languagesWithPacks: List<LanguageWithPacks>
+	private var nativeLanguage: LanguageRoom? = null
+	private var targetLanguage: LanguageRoom? = null
+	private var selectedPack: PackRoom? = null
 
 	fun fetchLanguages() {
 		coroutineScope.launch(dispatcherProvider.main()) {
@@ -38,44 +41,51 @@ class PickLanguagesViewModel @Inject constructor(
 		}
 	}
 
-	fun addRemoveLanguage(language: LanguageRoom) {
-		if (selectedLanguages.contains(language)) {
-			selectedLanguages.remove(language)
-			for (l in listeners)
-				l.onLanguageRemoved(language)
-		} else {
-			selectedLanguages.add(language)
-			for (l in listeners)
-				l.onLanguageAdded(language)
-		}
+	fun changeNativeLanguage(language: LanguageRoom) {
+		nativeLanguage = language
+		listeners.forEach { it.onNativeLanguageChanged(language) }
 
-		// Find packs common to both languages
-		val packs = languagesWithPacks
-			.filter { it.language in selectedLanguages }
-			.flatMap { it.packs }
-			.groupBy { it }
-			.filterValues { it.size == selectedLanguages.size }
-			.keys
-			.toList()
-			.sortedBy { it.name }
-
-		listeners.forEach { it.onPacksUpdated(packs) }
-		val possibleLanguages = languagesWithPacks.filter {
-			it.packs.any { it in packs } || packs.isEmpty()
-		}.map { it.language }.sortedBy { it.name }
-		listeners.forEach { it.onLanguagesLoaded(possibleLanguages) }
-
-		updateCheckMenuVisibility()
+		// Clear the target language.
+		changeTargetLanguage(null)
 	}
 
 	fun updateCheckMenuVisibility() {
-		if (selectedLanguages.size <= 1)
-			for (l in listeners)
-				l.onUpdateCheckMenuVisibility(selectedLanguages.size > 0)
+		listeners.forEach {
+			it.onUpdateCheckMenuVisibility(nativeLanguage != null && selectedPack != null)
+		}
 	}
 
 	fun languagesConfirmed() {
-		val languageIds = selectedLanguages.map { it.id }
-		screenNavigator.toCoursePreparationFragment(languageIds)
+		nativeLanguage?.let {
+			// We may not have a target language set if the user is creating a monolingual course.
+			val languageIds = listOfNotNull(it.id, targetLanguage?.id)
+			screenNavigator.toCoursePreparationFragment(languageIds)
+		}
+	}
+
+	fun changeTargetLanguage(language: LanguageRoom?) {
+		targetLanguage = if (language == targetLanguage) null else language
+		listeners.forEach { it.onTargetLanguageChanged(targetLanguage) }
+		updateLanguagesAndPacks()
+	}
+
+	private fun updateLanguagesAndPacks() {
+		// Find packs common to both languages.
+		val nativePacks = languagesWithPacks.first { it.language == nativeLanguage }.packs
+		val targetPacks = languagesWithPacks.firstOrNull { it.language == targetLanguage }?.packs
+
+		// If no target language is set, show all packs from native language.
+		val sharedPacks = nativePacks.filter { it in targetPacks ?: nativePacks }
+		listeners.forEach { it.onPacksUpdated(sharedPacks) }
+
+		// Grab list of languages with a matching pack.
+		val possibleLanguages = languagesWithPacks
+			.filter {
+				it.packs.any { it in nativePacks }
+			}.filterNot { it.language == nativeLanguage }
+			.map { it.language }.sortedBy { it.name }
+		listeners.forEach { it.onTargetLanguagesChanged(possibleLanguages) }
+
+		updateCheckMenuVisibility()
 	}
 }

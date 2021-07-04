@@ -1,12 +1,11 @@
 package ch.ralena.natibo.di.module
 
 import android.media.MediaPlayer
-import androidx.recyclerview.widget.ItemTouchHelper
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.di.PresentationScope
-import ch.ralena.natibo.ui.callback.ItemTouchHelperCallback
-import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailableLanguagesAdapter
+import ch.ralena.natibo.ui.course.create.pick_language.adapter.NativeLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailablePacksAdapter
+import ch.ralena.natibo.ui.course.create.pick_language.adapter.TargetLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.pick_schedule.adapter.PackAdapter
 import ch.ralena.natibo.ui.course.list.adapter.CourseListAdapter
 import ch.ralena.natibo.ui.language.detail.adapter.LanguageDetailAdapter
@@ -19,7 +18,11 @@ import javax.inject.Qualifier
 class PresentationModule {
 	@PresentationScope
 	@Provides
-	fun availableLanguagesAdapter() = AvailableLanguagesAdapter(arrayListOf(), arrayListOf())
+	fun nativeLanguagesAdapter() = NativeLanguagesAdapter(arrayListOf())
+
+	@PresentationScope
+	@Provides
+	fun targetLanguagesAdapter() = TargetLanguagesAdapter(arrayListOf())
 
 	@PresentationScope
 	@Provides

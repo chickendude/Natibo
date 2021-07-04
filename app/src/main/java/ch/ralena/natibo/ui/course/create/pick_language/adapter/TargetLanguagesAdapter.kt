@@ -11,16 +11,18 @@ import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
 import kotlin.collections.ArrayList
 
-class AvailableLanguagesAdapter(
-		private val languages: ArrayList<LanguageRoom>,
-		private val selectedLanguages: ArrayList<LanguageRoom>
-) : BaseRecyclerAdapter<AvailableLanguagesAdapter.ViewHolder, AvailableLanguagesAdapter.Listener>() {
+class TargetLanguagesAdapter(
+	private val languages: ArrayList<LanguageRoom>,
+) : BaseRecyclerAdapter<TargetLanguagesAdapter.ViewHolder, TargetLanguagesAdapter.Listener>() {
 	interface Listener {
-		fun onLanguageClicked(language: LanguageRoom)
+		fun onTargetLanguageClicked(language: LanguageRoom)
 	}
 
+	private var selectedLanguage: LanguageRoom? = null
+
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-		val view = LayoutInflater.from(parent.context).inflate(R.layout.item_available_language_list, parent, false)
+		val view = LayoutInflater.from(parent.context)
+			.inflate(R.layout.item_available_language_list, parent, false)
 		return ViewHolder(view)
 	}
 
@@ -36,30 +38,27 @@ class AvailableLanguagesAdapter(
 		notifyDataSetChanged()
 	}
 
+	fun setSelectedLanguage(language: LanguageRoom?) {
+		selectedLanguage = language
+		notifyDataSetChanged()
+	}
+
 	inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 		private val languageName: TextView = view.findViewById(R.id.languageLabel)
 		private val flagImage: ImageView = view.findViewById(R.id.flagImageView)
-		// todo: perhaps change to text view and set text to base/target
 		private val checkedImage: ImageView = view.findViewById(R.id.checkedImage)
 
 		private lateinit var language: LanguageRoom
 
 		init {
-			view.setOnClickListener { v: View? ->
-				if (selectedLanguages.contains(language)) {
-					selectedLanguages.remove(language)
-				} else {
-					selectedLanguages.add(language)
-				}
-				for (listener in listeners)
-					listener.onLanguageClicked(language)
-				notifyDataSetChanged()
+			view.setOnClickListener {
+				listeners.forEach { it.onTargetLanguageClicked(language) }
 			}
 		}
 
 		fun bindView(language: LanguageRoom) {
 			this.language = language
-			if (selectedLanguages.contains(language)) {
+			if (language == selectedLanguage) {
 				checkedImage.visibility = View.VISIBLE
 				checkedImage.animate().scaleX(1f).setDuration(200).start()
 			} else {

@@ -1,48 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:layout_margin="4dp"
-	android:clickable="true"
-	android:focusable="true">
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    android:clickable="true"
+    android:focusable="true">
 
-	<RelativeLayout
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:background="@color/colorBackgroundDark">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBackgroundDark">
 
-		<ImageView
-			android:id="@+id/flagImageView"
-			android:layout_width="match_parent"
-			android:layout_height="60dp"
-			android:layout_alignParentTop="true"
-			android:layout_gravity="center"
-			android:contentDescription="@string/language_flag"
-			android:scaleType="fitXY"
-			tools:src="@drawable/flag_french"/>
+        <ImageView
+            android:id="@+id/flagImageView"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="center"
+            android:contentDescription="@string/language_flag"
+            android:scaleType="fitXY"
+            tools:src="@drawable/flag_french" />
 
-		<TextView
-			android:id="@+id/languageLabel"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_below="@id/flagImageView"
-			android:padding="4dp"
-			android:textAlignment="center"
-			android:textColor="@color/colorTextDark"
-			android:textSize="14sp"
-			tools:text="Arabic (Egyptian)"/>
+        <TextView
+            android:id="@+id/languageLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/flagImageView"
+            android:padding="4dp"
+            android:textAlignment="center"
+            android:textColor="@color/colorTextDark"
+            android:textSize="14sp"
+            tools:text="Arabic (Egyptian)" />
 
-		<ImageView
-			android:visibility="gone"
-			android:id="@+id/checkedImage"
-			android:layout_width="30dp"
-			android:layout_height="30dp"
-			android:layout_centerInParent="true"
-			android:background="@drawable/checked_background"
-			android:padding="5dp"
-			android:src="@drawable/ic_confirm"
-			android:tint="@color/colorAccentLight"/>
-	</RelativeLayout>
+        <ImageView
+            android:id="@+id/checkedImage"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/checked_background"
+            android:padding="5dp"
+            android:src="@drawable/ic_confirm"
+            android:visibility="gone"
+            app:tint="@color/colorAccentLight"
+            android:contentDescription="@string/image_checked" />
+    </RelativeLayout>
 </androidx.cardview.widget.CardView>

@@ -11,32 +11,61 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:padding="4dp"
-        android:text="Available Languages"
+        android:text="@string/native_language"
         android:textColor="@color/colorTextWhite"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/available_languages_recycler_view"
+        android:id="@+id/native_languages_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/guideline_50"
+        app:layout_constraintBottom_toTopOf="@id/guideline_40"
         app:layout_constraintTop_toBottomOf="@id/available_languages_label" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_33"
+        android:id="@+id/guideline_40"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".33" />
+        app:layout_constraintGuide_percent=".40" />
+
+    <TextView
+        android:id="@+id/target_languages_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:padding="4dp"
+        android:text="@string/target_language"
+        android:textColor="@color/colorTextWhite"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/guideline_40" />
+
+    <TextView
+        android:id="@+id/select_language_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_your_native_language"
+        app:layout_constraintBottom_toTopOf="@id/available_packs_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/target_languages_label" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/target_languages_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/guideline_80"
+        app:layout_constraintTop_toBottomOf="@id/target_languages_label" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_50"
+        android:id="@+id/guideline_80"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".5" />
+        app:layout_constraintGuide_percent=".80" />
 
     <TextView
         android:id="@+id/available_packs_label"
@@ -48,7 +77,7 @@
         android:textColor="@color/colorTextWhite"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/guideline_50" />
+        app:layout_constraintTop_toBottomOf="@id/guideline_80" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/available_packs_recycler_view"
