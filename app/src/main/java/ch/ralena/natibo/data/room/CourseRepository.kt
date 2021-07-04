@@ -31,7 +31,7 @@ class CourseRepository @Inject constructor(
 		dailyReviews: List<String>,
 		title: String,
 		baseLanguageId: Long,
-		targetLanguageId: Long,
+		targetLanguageId: Long?,
 		packName: String
 	): Long {
 		val scheduleRoom = ScheduleRoom(

@@ -26,7 +26,9 @@ class PickScheduleFragment :
 
 	companion object {
 		val TAG: String = PickScheduleFragment::class.java.simpleName
-		const val TAG_LANGUAGE_IDS = "tag_language_ids"
+		const val TAG_NATIVE_ID = "tag_native_id"
+		const val TAG_TARGET_ID = "tag_target_id"
+		const val TAG_PACK_ID = "tag_pack_id"
 	}
 
 	@Inject
@@ -50,7 +52,12 @@ class PickScheduleFragment :
 		// We have a check button
 		setHasOptionsMenu(true)
 
-		viewModel.fetchLanguages(requireArguments().getLongArray(TAG_LANGUAGE_IDS))
+		requireArguments().apply {
+			val nativeId = getLong(TAG_NATIVE_ID)
+			val targetId = getLong(TAG_TARGET_ID)
+			val packId = getLong(TAG_PACK_ID)
+			viewModel.fetchData(nativeId, targetId, packId)
+		}
 
 		binding.apply {
 			packRecyclerview.apply {

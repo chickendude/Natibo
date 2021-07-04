@@ -11,10 +11,10 @@ data class CourseRoom(
 	val title: String,
 
 	/** Abbreviation of the base language. Generally the user's native language. */
-	val baseLanguageId: Long,
+	val nativeLanguageId: Long,
 
 	/** Abbreviation of the target language. The language the user is studying. */
-	val targetLanguageId: Long,
+	val targetLanguageId: Long?,
 
 	/**
 	 * The name of the pack to pull sentences from.
@@ -55,16 +55,16 @@ data class ScheduleRoom(
 	/**
 	 * How many times to see each sentence.
 	 *
-	 * For example: 6, 4, 3, 2
+	 * For example: "6 4 3 2"
 	 *  1. Day 1: See sentence 6 times.
 	 *  2. Day 2: See sentence 4 times.
 	 *  3. Day 3: See sentence 3 times.
 	 *  4. Day 4: See sentence 2 times.
 	 *
-	 *  Remember that previous sentences will be added, so if you have 10 new sentences a day, on
-	 *  day 1 you will see 60 sentences. On day 2, you will see day 1's sentences 40 times and a new
-	 *  set of sentences 60 times. On day 3, you will see day 1's sentences 30 times, day 2's
-	 *  sentences 40 times, and 60 new sentences, etc.
+	 *  Remember that previous sentences will be added, so if you have 10 new sentences a day:
+	 *   - Day 1: 60 sentences.
+	 *   - Day 2: Day 1's sentences 40 times + a new set of sentences 60 times.
+	 *   - Day 3: Day 1's sentences 30 times + Day 2's sentences 40 times + 60 new sentences, etc.
 	 */
 	val reviewPattern: String
 )

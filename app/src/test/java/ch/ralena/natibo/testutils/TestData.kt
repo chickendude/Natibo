@@ -11,7 +11,7 @@ val SCHEDULE = ScheduleRoom(10, 0, "01", "6432")
 // Course
 val COURSE = CourseRoom(
 	title = "title",
-	baseLanguageId = 1,
+	nativeLanguageId = 1,
 	targetLanguageId = 2,
 	schedule = SCHEDULE,
 	sessionId = 1,

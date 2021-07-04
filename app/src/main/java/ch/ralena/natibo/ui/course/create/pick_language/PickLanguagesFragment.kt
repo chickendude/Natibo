@@ -18,8 +18,8 @@ import javax.inject.Inject
 /**
  * The first screen when creating a new course.
  *
- * You will be given a list of available languages and must select a base language and optionally
- * one or more target languages.
+ * You will be given a list of languages to select for your native and target language. Once you
+ * have selected your native and (optionally) target language, select the pack you want to study.
  */
 class PickLanguagesFragment :
 	BaseFragment<FragmentCoursePickLanguagesBinding,
@@ -27,6 +27,7 @@ class PickLanguagesFragment :
 			PickLanguagesViewModel>(FragmentCoursePickLanguagesBinding::inflate),
 	NativeLanguagesAdapter.Listener,
 	TargetLanguagesAdapter.Listener,
+	AvailablePacksAdapter.Listener,
 	PickLanguagesViewModel.Listener {
 
 	@Inject
@@ -53,7 +54,6 @@ class PickLanguagesFragment :
 		// enable back button and set title
 		mainActivity.title = getString(R.string.select_languages)
 		mainActivity.enableBackButton()
-		setHasOptionsMenu(true)
 
 		binding.apply {
 			// Set up RecyclerViews
@@ -82,6 +82,7 @@ class PickLanguagesFragment :
 		super.onStart()
 		nativeAdapter.registerListener(this)
 		targetAdapter.registerListener(this)
+		packsAdapter.registerListener(this)
 		viewModel.registerListener(this)
 		viewModel.fetchLanguages()
 	}
@@ -90,20 +91,8 @@ class PickLanguagesFragment :
 		super.onStop()
 		nativeAdapter.unregisterListener(this)
 		targetAdapter.unregisterListener(this)
+		packsAdapter.unregisterListener(this)
 		viewModel.unregisterListener(this)
-	}
-
-	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-		inflater.inflate(R.menu.check_toolbar, menu)
-		checkMenu = menu.getItem(0)
-		viewModel.updateCheckMenuVisibility()
-		super.onCreateOptionsMenu(menu, inflater)
-	}
-
-	override fun onOptionsItemSelected(item: MenuItem): Boolean {
-		if (item.itemId == R.id.action_confirm)
-			viewModel.languagesConfirmed()
-		return super.onOptionsItemSelected(item)
 	}
 
 	// region ViewModel/Adapter listeners ----------------------------------------------------------
@@ -139,6 +128,10 @@ class PickLanguagesFragment :
 
 	override fun onPacksUpdated(packs: List<PackRoom>) {
 		packsAdapter.loadPacks(packs)
+	}
+
+	override fun onPackSelected(pack: PackRoom) {
+		viewModel.packSelected(pack)
 	}
 	// endregion ViewModel/Adapter listeners -------------------------------------------------------
 

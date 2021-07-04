@@ -4,8 +4,8 @@ import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
 import ch.ralena.natibo.data.room.`object`.PackRoom
-import ch.ralena.natibo.di.module.LanguageList
 import ch.ralena.natibo.ui.base.BaseViewModel
+import ch.ralena.natibo.ui.course.create.pick_schedule.PickScheduleFragment
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.ScreenNavigator
 import kotlinx.coroutines.*
@@ -49,24 +49,22 @@ class PickLanguagesViewModel @Inject constructor(
 		changeTargetLanguage(null)
 	}
 
-	fun updateCheckMenuVisibility() {
-		listeners.forEach {
-			it.onUpdateCheckMenuVisibility(nativeLanguage != null && selectedPack != null)
-		}
-	}
-
-	fun languagesConfirmed() {
-		nativeLanguage?.let {
-			// We may not have a target language set if the user is creating a monolingual course.
-			val languageIds = listOfNotNull(it.id, targetLanguage?.id)
-			screenNavigator.toCoursePreparationFragment(languageIds)
-		}
-	}
-
 	fun changeTargetLanguage(language: LanguageRoom?) {
 		targetLanguage = if (language == targetLanguage) null else language
 		listeners.forEach { it.onTargetLanguageChanged(targetLanguage) }
 		updateLanguagesAndPacks()
+	}
+
+	/**
+	 * A pack has been selected.
+	 *
+	 * Send the native language, target language (optional), and pack to the [PickScheduleFragment].
+	 */
+	fun packSelected(pack: PackRoom) {
+		nativeLanguage?.let {
+			// We may not have a target language set if the user is creating a monolingual course.
+			screenNavigator.toCoursePreparationFragment(it.id, targetLanguage?.id, pack.id)
+		}
 	}
 
 	private fun updateLanguagesAndPacks() {
@@ -85,7 +83,5 @@ class PickLanguagesViewModel @Inject constructor(
 			}.filterNot { it.language == nativeLanguage }
 			.map { it.language }.sortedBy { it.name }
 		listeners.forEach { it.onTargetLanguagesChanged(possibleLanguages) }
-
-		updateCheckMenuVisibility()
 	}
 }

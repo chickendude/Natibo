@@ -18,7 +18,9 @@ class AvailablePacksAdapter @Inject constructor(
 ) : BaseRecyclerAdapter<
 		AvailablePacksAdapter.ViewHolder,
 		AvailablePacksAdapter.Listener>() {
-	interface Listener {}
+	interface Listener {
+		fun onPackSelected(pack: PackRoom)
+	}
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		val view: View =
@@ -27,7 +29,7 @@ class AvailablePacksAdapter @Inject constructor(
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-		holder.bindView(packs[position], position)
+		holder.bindView(packs[position])
 	}
 
 	override fun getItemCount(): Int {
@@ -40,17 +42,18 @@ class AvailablePacksAdapter @Inject constructor(
 		notifyDataSetChanged()
 	}
 
-	@SuppressLint("ClickableViewAccessibility")
-	inner class ViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+	inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 		private val packName: TextView = view.findViewById(R.id.pack_name_label)
-		private var pack: PackRoom? = null
+
+		private lateinit var pack: PackRoom
 
 		init {
-			// todo: notify listeners of click
-			view.setOnClickListener { }
+			view.setOnClickListener {
+				listeners.forEach { it.onPackSelected(pack) }
+			}
 		}
 
-		fun bindView(pack: PackRoom, position: Int) {
+		fun bindView(pack: PackRoom) {
 			this.pack = pack
 			packName.text = pack.name
 		}

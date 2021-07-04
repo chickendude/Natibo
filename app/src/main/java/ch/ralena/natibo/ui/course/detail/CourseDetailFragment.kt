@@ -129,7 +129,8 @@ class CourseDetailFragment
 		binding.totalRepsText.text = String.format(Locale.US, "%d", course.repCount)
 //		binding.totalSentencesSeenText.text =
 //			String.format(Locale.US, "%d", course.numSentencesSeen)
-		viewModel.fetchLanguage(course.targetLanguageId)
+		// Use native language if there is no target language.
+		viewModel.fetchLanguage(course.targetLanguageId ?: course.nativeLanguageId)
 	}
 	// endregion Helper functions-------------------------------------------------------------------
 }

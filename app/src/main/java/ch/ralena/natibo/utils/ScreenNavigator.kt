@@ -63,11 +63,13 @@ class ScreenNavigator @Inject constructor(
 		loadFragment(fragment, CourseListFragment.TAG)
 	}
 
-	fun toCoursePreparationFragment(languageIds: List<Long>) {
+	fun toCoursePreparationFragment(nativeId: Long, targetId: Long?, packId: Long) {
 		val fragment = PickScheduleFragment()
 		fragment.arguments = Bundle().apply {
 			// add language ids in a bundle
-			putLongArray(PickScheduleFragment.TAG_LANGUAGE_IDS, languageIds.toLongArray())
+			putLong(PickScheduleFragment.TAG_NATIVE_ID, nativeId)
+			putLong(PickScheduleFragment.TAG_TARGET_ID, targetId ?: -1)
+			putLong(PickScheduleFragment.TAG_PACK_ID, packId)
 		}
 		loadFragment(fragment, PickScheduleFragment.TAG)
 	}

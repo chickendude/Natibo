@@ -14,6 +14,8 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.math.min
 
+private const val MAX_REPETITIONS = 99
+
 class PickScheduleViewModel @Inject constructor(
 	private val screenNavigator: ScreenNavigator,
 	private val languageRepository: LanguageRepository,
@@ -25,26 +27,26 @@ class PickScheduleViewModel @Inject constructor(
 		fun setCourseTitle(title: String)
 	}
 
-	val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
+	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
 
-	private val languages = ArrayList<LanguageRoom>()
+	private lateinit var nativeLanguage: LanguageRoom
+	private var targetLanguage: LanguageRoom? = null
 
-	companion object {
-		const val MAX_REPETITIONS = 99
-	}
-
-	fun fetchLanguages(languageIds: LongArray?) {
-		// TODO: throw error if null or empty
-		if (languageIds == null || languageIds.isEmpty())
+	fun fetchData(nativeId: Long, targetId: Long, packId: Long) {
+		// TODO: Throw error if nativeLanguage comes back null
+		if (nativeId < 0 || packId < 0)
 			return
 		coroutineScope.launch {
-			languages.clear()
-			languageIds.forEach {
-				languageRepository.fetchLanguage(it)?.run {
-					languages.add(this)
-				}
-			}
-			val title = languages.joinToString(" → ") { it.name }
+			nativeLanguage = languageRepository.fetchLanguage(nativeId)!!
+			targetLanguage = languageRepository.fetchLanguage(targetId)
+
+			val pack = packRepository.fetchPack(packId)
+			val languageTitle =
+				if (targetLanguage == null)
+					nativeLanguage.name
+				else
+					"${nativeLanguage.name} → ${targetLanguage!!.name}"
+			val title = "$languageTitle : ${pack?.name}"
 			withContext(dispatcherProvider.main()) {
 				listeners.forEach { it.setCourseTitle(title) }
 			}
@@ -74,15 +76,15 @@ class PickScheduleViewModel @Inject constructor(
 
 		// "base-target-target" if chorus enabled, otherwise "base-target"
 		// TODO: handle Course.Chorus.NEW, perhaps create "order_review" and "order_new"
-		val order = languages.mapIndexed { index, _ ->
-			if (chorus == Course.Chorus.ALL && (index > 0 || languages.size == 1))
+		val order = listOf(nativeLanguage, targetLanguage).mapIndexed { index, _ ->
+			if (chorus == Course.Chorus.ALL && (index > 0 || targetLanguage == null))
 				"$index$index"
 			else
 				"$index"
 		}.joinToString("")
 
-		val baseLanguageId = languages.first().id
-		val targetLanguageId = languages.last().id
+		val nativeId = nativeLanguage.id
+		val targetId = targetLanguage?.id
 
 		coroutineScope.launch(dispatcherProvider.main()) {
 			val courseId = withContext(dispatcherProvider.io()) {
@@ -92,8 +94,8 @@ class PickScheduleViewModel @Inject constructor(
 					startingSentence,
 					dailyReviews,
 					title,
-					baseLanguageId,
-					targetLanguageId,
+					nativeId,
+					targetId,
 					"" // TODO: Fix
 				)
 			}
