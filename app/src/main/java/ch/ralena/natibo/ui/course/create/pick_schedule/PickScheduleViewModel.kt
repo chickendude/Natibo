@@ -7,6 +7,7 @@ import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.PackRepository
 import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
+import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.ScreenNavigator
@@ -31,6 +32,7 @@ class PickScheduleViewModel @Inject constructor(
 
 	private lateinit var nativeLanguage: LanguageRoom
 	private var targetLanguage: LanguageRoom? = null
+	private lateinit var pack: PackRoom
 
 	fun fetchData(nativeId: Long, targetId: Long, packId: Long) {
 		// TODO: Throw error if nativeLanguage comes back null
@@ -40,13 +42,13 @@ class PickScheduleViewModel @Inject constructor(
 			nativeLanguage = languageRepository.fetchLanguage(nativeId)!!
 			targetLanguage = languageRepository.fetchLanguage(targetId)
 
-			val pack = packRepository.fetchPack(packId)
+			pack = packRepository.fetchPack(packId)!!
 			val languageTitle =
 				if (targetLanguage == null)
 					nativeLanguage.name
 				else
 					"${nativeLanguage.name} → ${targetLanguage!!.name}"
-			val title = "$languageTitle : ${pack?.name}"
+			val title = "$languageTitle : ${pack.name}"
 			withContext(dispatcherProvider.main()) {
 				listeners.forEach { it.setCourseTitle(title) }
 			}
@@ -96,7 +98,7 @@ class PickScheduleViewModel @Inject constructor(
 					title,
 					nativeId,
 					targetId,
-					"" // TODO: Fix
+					pack.id
 				)
 			}
 			// TODO: perhaps wait for response from courseRepository and send signal back to fragment

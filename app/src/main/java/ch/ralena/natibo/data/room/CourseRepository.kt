@@ -32,7 +32,7 @@ class CourseRepository @Inject constructor(
 		title: String,
 		baseLanguageId: Long,
 		targetLanguageId: Long?,
-		packName: String
+		packId: Long
 	): Long {
 		val scheduleRoom = ScheduleRoom(
 			numSentencesPerDay,
@@ -41,7 +41,7 @@ class CourseRepository @Inject constructor(
 			dailyReviews.joinToString(" ")
 		)
 		val courseRoom =
-			CourseRoom(title, baseLanguageId, targetLanguageId, packName, scheduleRoom, 0)
+			CourseRoom(title, baseLanguageId, targetLanguageId, packId, scheduleRoom, 0)
 		val courseId = courseDao.insert(courseRoom)
 
 //		// --- begin transaction

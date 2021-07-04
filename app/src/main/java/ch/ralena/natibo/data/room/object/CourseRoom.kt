@@ -17,11 +17,11 @@ data class CourseRoom(
 	val targetLanguageId: Long?,
 
 	/**
-	 * The name of the pack to pull sentences from.
+	 * The pack to pull sentences from.
 	 *
-	 * The pack name must be the same for both the base and target language.
+	 * Must be available in native and target language.
 	 */
-	val packName: String,
+	val packId: Long,
 
 	/** Contains information on the scheduling of the course. */
 	@Embedded
