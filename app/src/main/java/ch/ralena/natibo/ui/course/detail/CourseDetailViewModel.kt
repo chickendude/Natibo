@@ -40,7 +40,9 @@ class CourseDetailViewModel @Inject constructor(
 			val result = courseRepository.fetchCourse(id)
 			if (result is Result.Success<CourseRoom>) {
 				val course = result.data
+				// Notify that the course was found
 				fetchCourseSuccess(course)
+				// Fetch the pack from the database
 				fetchPack(course.packId)
 			} else
 				withContext(dispatcherProvider.main()) {
@@ -49,18 +51,6 @@ class CourseDetailViewModel @Inject constructor(
 		}
 		coroutineScope.launch {
 		}
-	}
-
-	private suspend fun fetchPack(packId: Long) {
-		val pack = packRepository.fetchPack(packId)
-		pack?.let {
-			listeners.forEach { it.onPackFetched(pack) }
-		} ?: run {
-			withContext(dispatcherProvider.main()) {
-				listeners.forEach { it.onPackNotFound() }
-			}
-		}
-
 	}
 
 	fun fetchLanguage(id: Long) {
@@ -95,6 +85,20 @@ class CourseDetailViewModel @Inject constructor(
 		val msgId =
 			if (course.sessionId == 0L) R.string.start_session else R.string.continue_session
 		listeners.forEach { it.updateSessionStatusText(msgId) }
+	}
+
+	private suspend fun fetchPack(packId: Long) {
+		val pack = packRepository.fetchPack(packId)
+
+		// If the pack was found, notify listeners. If it wasn't found, notify of error on the main
+		// thread.
+		pack?.let {
+			listeners.forEach { it.onPackFetched(pack) }
+		} ?: run {
+			withContext(dispatcherProvider.main()) {
+				listeners.forEach { it.onPackNotFound() }
+			}
+		}
 	}
 // endregion Helper functions-------------------------------------------------------------------
 }
