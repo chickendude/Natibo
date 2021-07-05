@@ -14,7 +14,7 @@
         android:background="@color/colorBackgroundDark">
 
         <ImageView
-            android:id="@+id/flagImageView"
+            android:id="@+id/flag_image"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_alignParentTop="true"
@@ -27,7 +27,7 @@
             android:id="@+id/languageLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/flagImageView"
+            android:layout_below="@id/flag_image"
             android:padding="4dp"
             android:textAlignment="center"
             android:textColor="@color/colorTextDark"

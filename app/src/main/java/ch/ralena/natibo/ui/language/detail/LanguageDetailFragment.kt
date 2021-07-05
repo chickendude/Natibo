@@ -62,7 +62,7 @@ class LanguageDetailFragment :
 		val language = languageWithPacks.language
 		val packs = languageWithPacks.packs
 		binding.languageLabel.text = language.name
-		binding.flagImageView.setImageResource(language.flagDrawable)
+		binding.flagImage.setImageResource(language.flagDrawable)
 		rvAdapter.loadLanguagePacks(packs)
 	}
 

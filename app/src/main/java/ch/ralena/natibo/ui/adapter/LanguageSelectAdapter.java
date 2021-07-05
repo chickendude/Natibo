@@ -52,7 +52,7 @@ public class LanguageSelectAdapter extends RecyclerView.Adapter<LanguageSelectAd
 
 		LanguageViewHolder(View itemView) {
 			super(itemView);
-			flag = itemView.findViewById(R.id.flagImageView);
+			flag = itemView.findViewById(R.id.flag_image);
 			languageName = itemView.findViewById(R.id.languageLabel);
 		}
 

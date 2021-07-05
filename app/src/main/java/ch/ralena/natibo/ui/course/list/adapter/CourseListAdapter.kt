@@ -44,7 +44,7 @@ class CourseListAdapter(
 		private val languageName = view.findViewById<TextView>(R.id.languageLabel)
 		private val courseTitle = view.findViewById<TextView>(R.id.courseTitleLabel)
 		private val numReps = view.findViewById<TextView>(R.id.numRepsLabel)
-		private val flagImage = view.findViewById<ImageView>(R.id.flagImageView)
+		private val flagImage = view.findViewById<ImageView>(R.id.flag_image)
 
 		private lateinit var course: CourseRoom
 

@@ -45,7 +45,7 @@ class TargetLanguagesAdapter(
 
 	inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 		private val languageName: TextView = view.findViewById(R.id.languageLabel)
-		private val flagImage: ImageView = view.findViewById(R.id.flagImageView)
+		private val flagImage: ImageView = view.findViewById(R.id.flag_image)
 		private val checkedImage: ImageView = view.findViewById(R.id.checkedImage)
 
 		private lateinit var language: LanguageRoom

@@ -14,7 +14,7 @@
     <string name="packs">Packs:</string>
     <string name="sentenceGroups">Sentences:</string>
     <string name="language_flag">Language Flag</string>
-    <string name="flag_image">Flag Image</string>
+    <string name="flag_image">Country Flag</string>
     <string name="ipa">IPA</string>
     <string name="rom">ROM</string>
     <string name="alt">ALT</string>
@@ -93,4 +93,8 @@
     <string name="delete_course">Delete course</string>
     <!-- Progress bar starting value for how many reps you've done (should be zero) -->
     <string name="zero">0</string>
+    <!-- Content description for clock icon -->
+    <string name="time_studied_clock">Time studied clock</string>
+
+    <!-- ======================================================================================= -->
 </resources>

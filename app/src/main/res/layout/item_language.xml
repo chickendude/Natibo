@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			  xmlns:tools="http://schemas.android.com/tools"
-			  android:layout_width="match_parent"
-			  android:layout_height="wrap_content"
-			  android:background="?attr/selectableItemBackground"
-			  android:clickable="true"
-			  android:orientation="horizontal"
-			  android:padding="3dp">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="horizontal"
+    android:padding="3dp">
 
-	<ImageView
-		android:id="@+id/flagImageView"
-		android:layout_width="60dp"
-		android:layout_height="30dp"
-		android:layout_gravity="center"
-		android:layout_marginRight="5dp"
-		android:scaleType="fitXY"
-		tools:src="@drawable/flag_arabic_egypt"/>
+    <ImageView
+        android:id="@+id/flag_image"
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/spacing_small"
+        android:contentDescription="@string/flag_image"
+        android:scaleType="fitXY"
+        tools:src="@drawable/flag_arabic_egypt" />
 
-	<TextView
-		android:id="@+id/languageLabel"
-		android:layout_width="0dp"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center"
-		android:textAlignment="center"
-		android:layout_weight="3"
-		android:textSize="26sp"
-		tools:text="Arabic (Egyptian)"/>
+    <TextView
+        android:id="@+id/languageLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="3"
+        android:textAlignment="center"
+        android:textSize="26sp"
+        tools:text="Arabic (Egyptian)" />
 
 </LinearLayout>

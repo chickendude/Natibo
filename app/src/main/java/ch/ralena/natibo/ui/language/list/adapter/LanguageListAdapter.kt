@@ -43,7 +43,7 @@ class LanguageListAdapter @Inject constructor(
 		private val languageName: TextView = view.findViewById(R.id.languageLabel)
 		private val numPacks: TextView = view.findViewById(R.id.numPacksLabel)
 		private val numSentences: TextView = view.findViewById(R.id.numSentencesLabel)
-		private val flagImage: ImageView = view.findViewById(R.id.flagImageView)
+		private val flagImage: ImageView = view.findViewById(R.id.flag_image)
 
 		private lateinit var languageWithPacks: LanguageWithPacks
 

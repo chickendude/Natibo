@@ -21,7 +21,6 @@ class CourseDetailViewModel @Inject constructor(
 		fun onCourseFetched(course: CourseRoom)
 		fun onLanguageFetched(language: LanguageRoom)
 		fun onCourseNotFound()
-		fun noPacksSelected()
 		fun onSessionStarted()
 		fun onSessionNotStarted()
 	}
@@ -52,18 +51,8 @@ class CourseDetailViewModel @Inject constructor(
 		}
 	}
 
-	suspend fun addRemovePack(packId: String) {
-		course?.let { courseRepository.togglePackInCourse(packId, it.id) }
-	}
-
 	fun startSession() {
-		// todo alert no packs selected
-//			if (course?.packs.size == 0)
-//				for (l in listeners)
-//					l.noPacksSelected()
-//			else
 		course?.let { screenNavigator.toStudySessionFragment(it.id) }
-
 	}
 
 	fun deleteCourse() {
