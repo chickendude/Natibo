@@ -33,7 +33,7 @@
     <string name="missing_gsp">The pack is incomplete, it\'s missing the sentence text file!</string>
     <string name="language_not_supported">This language is not yet supported!</string>
     <string name="error_opening_file">There was an error opening the file!</string>
-    <string name="puase_course">Pause course when you open the individual course settings screen.</string>
+    <string name="pause_course">Pause course when you open the individual course settings screen.</string>
     <string name="pause_on_opening_settings">Pause on opening settings</string>
     <string name="confirm_delete">Are you sure you want to delete? This cannot be undone.</string>
     <string name="delete">DELETE</string>
@@ -71,16 +71,26 @@
     <string name="strings_none">None</string>
     <string name="chorus_description">If enabled, you will hear the target language twice instead of once. \"All\" sets it for all sentences, \"New sentences\" only sets it the first session a sentence is shown. This can be changed later, however sentenceGroups that have already been studied one way will remain like that for all reviews.</string>
     <string name="no_language_found">No language found</string>
-    <string name="selected_languages">Selected Languages</string>
-    <!-- Heading for available packs based on selected native/target language  -->
-    <string name="available_packs">Available Packs</string>
+
+    <!-- Pick Languages Fragment : This is where you select the language and pack for the course -->
+
     <!-- Heading asking you to select your native language -->
     <string name="native_language">Native Language</string>
     <!-- Heading asking you to select your target language -->
     <string name="target_language">Target Language</string>
+    <!-- Heading for available packs based on selected native/target language -->
+    <string name="available_packs">Available Packs</string>
     <!-- Text that shows when no native language has been selected -->
     <string name="select_your_native_language">Select your native language</string>
-    <!-- Content descriptioni string for checkbox that appears when clicking a language in course
-     creation screen -->
+    <!-- Content description string for checkbox that appears when clicking a language in course creation screen -->
     <string name="image_checked">Image checked</string>
+
+    <!--  Course Detail Fragment : Page before starting a course =============================== -->
+
+    <!-- Opens the settings page from the course detail page. -->
+    <string name="open_course_settings">Open course settings</string>
+    <!-- Deletes the course from the database -->
+    <string name="delete_course">Delete course</string>
+    <!-- Progress bar starting value for how many reps you've done (should be zero) -->
+    <string name="zero">0</string>
 </resources>

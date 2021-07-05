@@ -8,6 +8,6 @@
 			android:defaultValue="false"
 			android:key="pref_pause_course"
 			android:title="@string/pause_on_opening_settings"
-			android:summary="@string/puase_course"/>
+			android:summary="@string/pause_course"/>
 	</PreferenceCategory>
 </PreferenceScreen>
