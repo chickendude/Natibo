@@ -3,6 +3,7 @@ package ch.ralena.natibo.ui.course.detail
 import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
+import ch.ralena.natibo.data.room.PackRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.testutils.*
 import ch.ralena.natibo.ui.course.detail.CourseDetailViewModel.*
@@ -24,6 +25,7 @@ internal class CourseDetailViewModelTest {
 	private val listener1 = mockk<Listener>(relaxed = true)
 	private val listener2 = mockk<Listener>(relaxed = true)
 	private val courseRepository = mockk<CourseRepository>(relaxed = true)
+	private val packRepository = mockk<PackRepository>(relaxed = true)
 	private val languageRepository = mockk<LanguageRepository>(relaxed = true)
 	private val screenNavigator = mockk<ScreenNavigator>(relaxed = true)
 	private val testDispatcher = TestCoroutineDispatcher()
@@ -35,7 +37,7 @@ internal class CourseDetailViewModelTest {
 	@BeforeEach
 	fun setUp() {
 		Dispatchers.setMain(testDispatcher)
-		SUT = CourseDetailViewModel(courseRepository, languageRepository, screenNavigator, testDispatcherProvider)
+		SUT = CourseDetailViewModel(courseRepository, packRepository, languageRepository, screenNavigator, testDispatcherProvider)
 		listenersRegistered()
 	}
 
@@ -51,7 +53,7 @@ internal class CourseDetailViewModelTest {
 		fetchCourseFailure()
 
 		// When
-		SUT.fetchCourse(COURSE_ID)
+		SUT.fetchData(COURSE_ID)
 
 		// Then
 		verify { listener1.onCourseNotFound() }
@@ -64,7 +66,7 @@ internal class CourseDetailViewModelTest {
 		fetchCourseSuccess()
 
 		// When
-		SUT.fetchCourse(COURSE_ID)
+		SUT.fetchData(COURSE_ID)
 
 		// Then
 		verify { listener1.onCourseFetched(COURSE) }
@@ -78,7 +80,7 @@ internal class CourseDetailViewModelTest {
 	fun `startSession success navigates to study session fragment`() {
 		// Given
 		fetchCourseSuccess()
-		SUT.fetchCourse(COURSE_ID)
+		SUT.fetchData(COURSE_ID)
 
 		// When
 		SUT.startSession()
@@ -93,7 +95,7 @@ internal class CourseDetailViewModelTest {
 	fun `deleteCourse with course loaded deletes course and navigates to course list fragment`() {
 		// Given
 		fetchCourseSuccess()
-		SUT.fetchCourse(COURSE_ID)
+		SUT.fetchData(COURSE_ID)
 
 		// When
 		SUT.deleteCourse()
@@ -108,7 +110,7 @@ internal class CourseDetailViewModelTest {
 	fun `openSettings with course loaded navigates to course settings fragment`() {
 		// Given
 		fetchCourseSuccess()
-		SUT.fetchCourse(COURSE_ID)
+		SUT.fetchData(COURSE_ID)
 
 		// When
 		SUT.openSettings()

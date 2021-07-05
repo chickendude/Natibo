@@ -2,9 +2,11 @@ package ch.ralena.natibo.ui.course.detail
 
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.StringRes
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
+import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.databinding.FragmentCourseDetailBinding
 import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
@@ -22,7 +24,7 @@ class CourseDetailFragment
 
 	companion object {
 		val TAG: String = CourseDetailFragment::class.java.simpleName
-		const val TAG_COURSE_ID = "language_id"
+		const val TAG_COURSE_ID = "course_id"
 	}
 
 	@Inject
@@ -52,7 +54,7 @@ class CourseDetailFragment
 		}
 
 		requireArguments().getLong(TAG_COURSE_ID).let {
-			viewModel.fetchCourse(it)
+			viewModel.fetchData(it)
 		}
 	}
 
@@ -60,28 +62,32 @@ class CourseDetailFragment
 		injector.inject(this)
 	}
 
+	// region ViewModel listeners ------------------------------------------------------------------
 	override fun onCourseFetched(course: CourseRoom) {
 		activity.title = course.title
-		// TODO: Change function to show pack as well
-		binding.packNameText.text = course.packId.toString()
 		loadCourseInfo(course)
+	}
+
+	override fun onPackFetched(pack: PackRoom) {
+		binding.packNameText.text = pack.name
+	}
+
+	override fun onPackNotFound() {
+		Toast.makeText(context, getString(R.string.pack_not_found), Toast.LENGTH_LONG).show()
 	}
 
 	override fun onCourseNotFound() {
 		Toast.makeText(context, R.string.course_not_found, Toast.LENGTH_SHORT).show()
 	}
 
-	override fun onSessionStarted() {
-		binding.startSessionButton.text = getString(R.string.continue_session)
-	}
-
-	override fun onSessionNotStarted() {
-		binding.startSessionButton.text = getString(R.string.start_session)
+	override fun updateSessionStatusText(@StringRes msgId: Int) {
+		binding.startSessionButton.text = getString(msgId)
 	}
 
 	override fun onLanguageFetched(language: LanguageRoom) {
 		binding.flagImage.setImageResource(language.flagDrawable)
 	}
+	// endregion ViewModel listeners ---------------------------------------------------------------
 
 	// region Helper functions----------------------------------------------------------------------
 	private fun loadCourseInfo(course: CourseRoom) {

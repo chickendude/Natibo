@@ -1,10 +1,14 @@
 package ch.ralena.natibo.ui.course.detail
 
+import androidx.annotation.StringRes
+import ch.ralena.natibo.R
 import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
+import ch.ralena.natibo.data.room.PackRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
+import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.ScreenNavigator
@@ -13,32 +17,50 @@ import javax.inject.Inject
 
 class CourseDetailViewModel @Inject constructor(
 	private val courseRepository: CourseRepository,
+	private val packRepository: PackRepository,
 	private val languageRepository: LanguageRepository,
 	private val screenNavigator: ScreenNavigator,
 	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<CourseDetailViewModel.Listener>() {
 	interface Listener {
 		fun onCourseFetched(course: CourseRoom)
-		fun onLanguageFetched(language: LanguageRoom)
 		fun onCourseNotFound()
-		fun onSessionStarted()
-		fun onSessionNotStarted()
+		fun onLanguageFetched(language: LanguageRoom)
+		fun onPackFetched(pack: PackRoom)
+		fun onPackNotFound()
+		fun updateSessionStatusText(@StringRes msgId: Int)
 	}
 
 	val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
 
 	private var course: CourseRoom? = null
 
-	fun fetchCourse(id: Long) {
+	fun fetchData(id: Long) {
 		coroutineScope.launch {
 			val result = courseRepository.fetchCourse(id)
-			if (result is Result.Success)
-				fetchCourseSuccess(result.data)
-			else
+			if (result is Result.Success<CourseRoom>) {
+				val course = result.data
+				fetchCourseSuccess(course)
+				fetchPack(course.packId)
+			} else
 				withContext(dispatcherProvider.main()) {
 					listeners.forEach { it.onCourseNotFound() }
 				}
 		}
+		coroutineScope.launch {
+		}
+	}
+
+	private suspend fun fetchPack(packId: Long) {
+		val pack = packRepository.fetchPack(packId)
+		pack?.let {
+			listeners.forEach { it.onPackFetched(pack) }
+		} ?: run {
+			withContext(dispatcherProvider.main()) {
+				listeners.forEach { it.onPackNotFound() }
+			}
+		}
+
 	}
 
 	fun fetchLanguage(id: Long) {
@@ -69,11 +91,10 @@ class CourseDetailViewModel @Inject constructor(
 	// region Helper functions----------------------------------------------------------------------
 	private fun fetchCourseSuccess(course: CourseRoom) {
 		this.course = course
-		for (l in listeners) l.onCourseFetched(course)
-		if (course.sessionId == 0L)
-			for (l in listeners) l.onSessionNotStarted()
-		else
-			for (l in listeners) l.onSessionStarted()
+		listeners.forEach { it.onCourseFetched(course) }
+		val msgId =
+			if (course.sessionId == 0L) R.string.start_session else R.string.continue_session
+		listeners.forEach { it.updateSessionStatusText(msgId) }
 	}
 // endregion Helper functions-------------------------------------------------------------------
 }

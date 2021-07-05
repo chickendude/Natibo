@@ -1,9 +1,6 @@
 package ch.ralena.natibo.data.room.`object`
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Relation
+import androidx.room.*
 
 @Entity
 data class CourseRoom(
@@ -67,13 +64,4 @@ data class ScheduleRoom(
 	 *   - Day 3: Day 1's sentences 30 times + Day 2's sentences 40 times + 60 new sentences, etc.
 	 */
 	val reviewPattern: String
-)
-
-data class CourseWithPacks(
-	@Embedded val course: CourseRoom,
-	@Relation(
-		parentColumn = "id",
-		entityColumn = "courseId"
-	)
-	val packs: List<PackRoom>
 )

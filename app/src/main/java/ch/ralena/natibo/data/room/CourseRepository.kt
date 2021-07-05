@@ -105,26 +105,6 @@ class CourseRepository @Inject constructor(
 
 	// region Old Realm stuff
 	/**
-	 * Toggles a pack in a course.
-	 *
-	 * If the pack is in the course it will be removed, otherwise it will be added.
-	 *
-	 * @param packId The ID of the pack to toggle.
-	 * @param courseId The course ID of the pack which should be toggled.
-	 */
-	suspend fun togglePackInCourse(packId: String, courseId: Long) {
-		val r = Realm.getDefaultInstance()
-		r.executeTransactionAwait {
-			val course = it.where(Course::class.java).equalTo("id", courseId).findFirst()!!
-			val pack = it.where(Pack::class.java).equalTo("id", packId).findFirst()!!
-			if (course.packs.contains(pack))
-				course.packs.remove(pack)
-			else
-				course.packs.add(pack)
-		}
-	}
-
-	/**
 	 * Prepares the sentences for the next day of study.
 	 *
 	 * @param course The course to prepare

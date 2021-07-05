@@ -95,6 +95,8 @@
     <string name="zero">0</string>
     <!-- Content description for clock icon -->
     <string name="time_studied_clock">Time studied clock</string>
-
+    <!-- Error message when the language pack the course needs wasn't found -->
+    <string name="pack_not_found">The language pack for this course was not found</string>
     <!-- ======================================================================================= -->
+
 </resources>
