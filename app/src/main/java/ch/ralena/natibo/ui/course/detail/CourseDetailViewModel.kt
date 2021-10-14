@@ -79,12 +79,14 @@ class CourseDetailViewModel @Inject constructor(
 	}
 
 	// region Helper functions----------------------------------------------------------------------
-	private fun fetchCourseSuccess(course: CourseRoom) {
+	private suspend fun fetchCourseSuccess(course: CourseRoom) {
 		this.course = course
-		listeners.forEach { it.onCourseFetched(course) }
-		val msgId =
-			if (course.sessionId == 0L) R.string.start_session else R.string.continue_session
-		listeners.forEach { it.updateSessionStatusText(msgId) }
+		withContext(dispatcherProvider.main()) {
+			listeners.forEach { it.onCourseFetched(course) }
+			val msgId =
+				if (course.sessionId == 0L) R.string.start_session else R.string.continue_session
+			listeners.forEach { it.updateSessionStatusText(msgId) }
+		}
 	}
 
 	private suspend fun fetchPack(packId: Long) {
@@ -92,10 +94,10 @@ class CourseDetailViewModel @Inject constructor(
 
 		// If the pack was found, notify listeners. If it wasn't found, notify of error on the main
 		// thread.
-		pack?.let {
-			listeners.forEach { it.onPackFetched(pack) }
-		} ?: run {
-			withContext(dispatcherProvider.main()) {
+		withContext(dispatcherProvider.main()) {
+			pack?.let {
+				listeners.forEach { it.onPackFetched(pack) }
+			} ?: run {
 				listeners.forEach { it.onPackNotFound() }
 			}
 		}
