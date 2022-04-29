@@ -2,8 +2,8 @@
 
 buildscript {
 	ext {
-		kotlin_version = '1.5.10'
-		room_version = "2.3.0"
+		kotlin_version = '1.6.21'
+		room_version = "2.4.2"
 		dagger_version = "2.35.1"
 	}
 	repositories {

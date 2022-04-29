@@ -16,7 +16,7 @@ import ch.ralena.natibo.data.room.`object`.Day
 import ch.ralena.natibo.data.room.`object`.SentenceGroup
 import ch.ralena.natibo.databinding.FragmentStudySessionBinding
 import ch.ralena.natibo.di.component.PresentationComponent
-import ch.ralena.natibo.service.StudySessionService
+import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.adapter.SentenceGroupAdapter
 import ch.ralena.natibo.ui.base.BaseFragment
@@ -46,14 +46,15 @@ class StudySessionFragment :
 
 	// fields
 	private val prefs: SharedPreferences? = null
-	private lateinit var studySessionService: StudySessionService
+	private lateinit var studySessionService: StudySessionServiceKt
 	private var millisLeft: Long = 0
 	private var countDownTimer: CountDownTimer? = null
 	private var isPaused = false
 	var adapter: SentenceGroupAdapter? = null
 
 	var serviceDisposable: Disposable? = null
-//	var sentenceDisposable: Disposable? = null
+
+	//	var sentenceDisposable: Disposable? = null
 	var finishDisposable: Disposable? = null
 
 	override fun setupViews(view: View) {
@@ -96,12 +97,13 @@ class StudySessionFragment :
 		savedInstanceState: Bundle?
 	): View? {
 		isPaused = savedInstanceState?.getBoolean(KEY_IS_PAUSED, true) ?: true
+		viewModel.registerListener(this)
 		return super.onCreateView(inflater, container, savedInstanceState)
 	}
 
 	private fun connectToService() {
 		serviceDisposable =
-			activity.sessionPublish.subscribe { service: StudySessionService ->
+			activity.sessionPublish.subscribe { service: StudySessionServiceKt ->
 				studySessionService = service
 //				if (course.getCurrentDay().getCurrentSentenceGroup() != null) nextSentence(
 //					course.getCurrentDay().getCurrentSentenceGroup()
@@ -112,7 +114,7 @@ class StudySessionFragment :
 //					})
 //				finishDisposable = studySessionService.finishObservable()
 //					.subscribe(Consumer<Day> { day: Day -> sessionFinished(day) })
-				setPaused(studySessionService.getPlaybackStatus() == null || studySessionService.getPlaybackStatus() == StudySessionService.PlaybackStatus.PAUSED)
+				setPaused(studySessionService.playbackStatus == null || studySessionService.playbackStatus == StudySessionServiceKt.PlaybackStatus.PAUSED)
 				if (!isPaused) {
 					startTimer()
 				}
@@ -123,7 +125,7 @@ class StudySessionFragment :
 
 	private fun playPause(view: View) {
 		if (studySessionService != null) {
-			if (studySessionService.getPlaybackStatus() == StudySessionService.PlaybackStatus.PLAYING) {
+			if (studySessionService.playbackStatus == StudySessionServiceKt.PlaybackStatus.PLAYING) {
 				studySessionService.pause()
 				setPaused(true)
 				countDownTimer?.cancel()
@@ -136,7 +138,7 @@ class StudySessionFragment :
 	}
 
 	private fun updatePlayPauseImage() {
-		if (studySessionService.playbackStatus == StudySessionService.PlaybackStatus.PLAYING) {
+		if (studySessionService.playbackStatus == StudySessionServiceKt.PlaybackStatus.PLAYING) {
 			binding.playPauseImage.setImageResource(R.drawable.ic_pause)
 		} else {
 			binding.playPauseImage.setImageResource(R.drawable.ic_play)

@@ -3,6 +3,7 @@ package ch.ralena.natibo.ui
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.MenuItem
@@ -13,8 +14,7 @@ import ch.ralena.natibo.MainApplication
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.di.module.ActivityModule
-import ch.ralena.natibo.service.StudySessionService
-import ch.ralena.natibo.service.StudySessionService.StudyBinder
+import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
 import ch.ralena.natibo.ui.study.insession.StudySessionFragment
 import ch.ralena.natibo.utils.ScreenNavigator
@@ -44,14 +44,14 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 
 	// fields
 	private lateinit var bottomNavigationView: BottomNavigationView
-	private var studySessionService: StudySessionService? = null
+	private var studySessionService: StudySessionServiceKt? = null
 	private var isServiceBound = false
-	val sessionPublish = PublishSubject.create<StudySessionService?>()
+	val sessionPublish = PublishSubject.create<StudySessionServiceKt?>()
 
 	private val serviceConnection: ServiceConnection = object : ServiceConnection {
 		override fun onServiceConnected(name: ComponentName, service: IBinder) {
-			val binder = service as StudyBinder
-			studySessionService = service.service
+			val binder = service as StudySessionServiceKt.StudyBinder
+			studySessionService = binder.service
 			isServiceBound = true
 			// publish the service object
 			sessionPublish.onNext(studySessionService!!)
@@ -147,15 +147,15 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 				bundle.putParcelable(LanguageImportFragment.EXTRA_URI, data!!.data)
 				fragment.arguments = bundle
 				supportFragmentManager.beginTransaction()
-						.replace(R.id.fragmentPlaceHolder, fragment)
-						.commit()
+					.replace(R.id.fragmentPlaceHolder, fragment)
+					.commit()
 			} else if (requestCode == REQUEST_LOAD_SESSION) {
 				val fragment =
 					StudySessionFragment()
 				supportFragmentManager
-						.beginTransaction()
-						.replace(R.id.fragmentPlaceHolder, fragment)
-						.commit()
+					.beginTransaction()
+					.replace(R.id.fragmentPlaceHolder, fragment)
+					.commit()
 			}
 		}
 	}
@@ -197,7 +197,11 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 	}
 
 	fun snackBar(message: String?) {
-		val snackbar = Snackbar.make(findViewById(R.id.fragmentPlaceHolder), message!!, Snackbar.LENGTH_INDEFINITE)
+		val snackbar = Snackbar.make(
+			findViewById(R.id.fragmentPlaceHolder),
+			message!!,
+			Snackbar.LENGTH_INDEFINITE
+		)
 		snackbar.setAction(R.string.ok) { v: View? -> snackbar.dismiss() }
 		snackbar.show()
 	}
@@ -212,11 +216,14 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 		// if we aren't bound to the service, start it if necessary and bind to it so that we can interact with it.
 		// if we are bound to it, we need to tell it to start a new session
 		if (!isServiceBound) {
-			val intent = Intent(this, StudySessionService::class.java)
-			startService(intent)
+			val intent = Intent(this, StudySessionServiceKt::class.java)
+			if (Build.VERSION.SDK_INT >= 26)
+				startForegroundService(intent)
+			else
+				startService(intent)
 			bindService(intent, serviceConnection, BIND_AUTO_CREATE)
 		} else {
-			val intent = Intent(StudySessionService.BROADCAST_START_SESSION)
+			val intent = Intent(StudySessionServiceKt.BROADCAST_START_SESSION)
 			sendBroadcast(intent)
 			sessionPublish.onNext(studySessionService!!)
 		}

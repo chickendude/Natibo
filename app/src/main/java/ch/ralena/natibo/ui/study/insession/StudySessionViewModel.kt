@@ -47,24 +47,22 @@ class StudySessionViewModel @Inject constructor(
 	}
 
 	// region Helper functions ---------------------------------------------------------------------
-	private fun loadCourse(course: CourseRoom) {
+	private suspend fun loadCourse(course: CourseRoom) {
 		if (course.sessionId == 0L)
 			createSession(course)
 		listeners.forEach { it.onCourseLoaded(course) }
 	}
 
-	private fun createSession(course: CourseRoom) {
-		coroutineScope.launch {
-			val numSessions = courseRepository.countSessions(course.id)
-			val session = SessionRoom(
-				index = numSessions + 1,
-				progress = 0,
-				courseId = course.id
-			)
-			val sessionId = sessionRepository.createSession(session)
-			addSentencesToSession(course, sessionId)
-//			courseRepository.updateCourse(course.copy(sessionId = sessionId))
-		}
+	private suspend fun createSession(course: CourseRoom) {
+		val numSessions = courseRepository.countSessions(course.id)
+		val session = SessionRoom(
+			index = numSessions + 1,
+			progress = 0,
+			courseId = course.id
+		)
+		val sessionId = sessionRepository.createSession(session)
+		addSentencesToSession(course, sessionId)
+//		courseRepository.updateCourse(course.copy(sessionId = sessionId))
 	}
 
 	private suspend fun addSentencesToSession(course: CourseRoom, sessionId: Long) {

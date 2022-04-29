@@ -15,7 +15,6 @@ import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.ScheduleText
 import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.SentencesPerDayTextWatcher
 import javax.inject.Inject
 
-// TODO: 13/04/18 move to course detail page
 class PickScheduleFragment :
 	BaseFragment<FragmentCoursePickScheduleBinding,
 			PickScheduleViewModel.Listener,
