@@ -41,7 +41,9 @@ class CourseDetailViewModel @Inject constructor(
 			if (result is Result.Success<CourseRoom>) {
 				val course = result.data
 				// Notify that the course was found
-				fetchCourseSuccess(course)
+				withContext(dispatcherProvider.main()) {
+					fetchCourseSuccess(course)
+				}
 				// Fetch the pack from the database
 				fetchPack(course.packId)
 			} else
