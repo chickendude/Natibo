@@ -52,8 +52,6 @@ dependencies {
 	// 3rd party
 	implementation 'com.takisoft.fix:preference-v7:27.1.1.1'
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-	debugImplementation 'com.facebook.stetho:stetho:1.5.0'
-	debugImplementation 'com.uphyca:stetho_realm:2.2.2'
 }
 repositories {
 	mavenCentral()
