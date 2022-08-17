@@ -397,7 +397,11 @@ public class StudySessionService extends Service implements MediaPlayer.OnComple
 			default:
 				return null;
 		}
-		return PendingIntent.getService(this, actionId, iconIntent, 0);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			return PendingIntent.getService(this, actionId, iconIntent, PendingIntent.FLAG_IMMUTABLE);
+		} else {
+			return PendingIntent.getService(this, actionId, iconIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		}
 	}
 
 	private void handleIncomingActions(Intent playbackAction) {
