@@ -7,12 +7,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.*
 import ch.ralena.natibo.databinding.FragmentLanguageDetailBinding
-import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.sentences.SentenceListFragment
 import ch.ralena.natibo.ui.language.detail.adapter.LanguageDetailAdapter
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class LanguageDetailFragment :
 		BaseFragment<FragmentLanguageDetailBinding,
 				LanguageDetailViewModel.Listener,
@@ -38,10 +39,6 @@ class LanguageDetailFragment :
 			adapter = rvAdapter
 			layoutManager = LinearLayoutManager(context)
 		}
-	}
-
-	override fun injectDependencies(injector: PresentationComponent) {
-		injector.inject(this)
 	}
 
 	override fun onStart() {

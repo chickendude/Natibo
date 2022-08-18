@@ -8,13 +8,14 @@ import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.PackWithSentences
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.databinding.FragmentSentenceListBinding
-import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.sentences.adapter.SentenceListAdapter
 import ch.ralena.natibo.ui.sentences.listener.SentenceSeekBarChangeListener
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class SentenceListFragment :
 	BaseFragment<FragmentSentenceListBinding, SentenceListViewModel.Listener, SentenceListViewModel>(
 		FragmentSentenceListBinding::inflate
@@ -69,11 +70,6 @@ class SentenceListFragment :
 			})
 		}
 	}
-
-	override fun injectDependencies(injector: PresentationComponent) {
-		injector.inject(this)
-	}
-
 
 	// region Listener overrides -------------------------------------------------------------------
 	override fun onProgressChanged(progress: Int) {

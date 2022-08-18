@@ -7,12 +7,12 @@ import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.databinding.FragmentCoursePickLanguagesBinding
-import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.NativeLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailablePacksAdapter
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.TargetLanguagesAdapter
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 /**
@@ -21,6 +21,7 @@ import javax.inject.Inject
  * You will be given a list of languages to select for your native and target language. Once you
  * have selected your native and (optionally) target language, select the pack you want to study.
  */
+@AndroidEntryPoint
 class PickLanguagesFragment :
 	BaseFragment<FragmentCoursePickLanguagesBinding,
 			PickLanguagesViewModel.Listener,
@@ -72,10 +73,6 @@ class PickLanguagesFragment :
 				layoutManager = GridLayoutManager(context, 3)
 			}
 		}
-	}
-
-	override fun injectDependencies(injector: PresentationComponent) {
-		injector.inject(this)
 	}
 
 	override fun onStart() {

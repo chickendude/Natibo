@@ -1,8 +1,7 @@
-package ch.ralena.natibo.di.module
+package ch.ralena.natibo.di
 
 import android.media.MediaPlayer
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
-import ch.ralena.natibo.di.PresentationScope
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.NativeLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailablePacksAdapter
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.TargetLanguagesAdapter
@@ -12,44 +11,48 @@ import ch.ralena.natibo.ui.language.detail.adapter.LanguageDetailAdapter
 import ch.ralena.natibo.ui.language.list.adapter.LanguageListAdapter
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.FragmentComponent
+import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Qualifier
 
 @Module
+@InstallIn(FragmentComponent::class)
 class PresentationModule {
-	@PresentationScope
+	@FragmentScoped
 	@Provides
 	fun nativeLanguagesAdapter() = NativeLanguagesAdapter(arrayListOf())
 
-	@PresentationScope
+	@FragmentScoped
 	@Provides
 	fun targetLanguagesAdapter() = TargetLanguagesAdapter(arrayListOf())
 
-	@PresentationScope
+	@FragmentScoped
 	@Provides
 	fun selectedLanguagesAdapter() = AvailablePacksAdapter(arrayListOf())
 
-	@PresentationScope
+	@FragmentScoped
 	@Provides
 	fun languageDetailAdapter() = LanguageDetailAdapter(arrayListOf())
 
-	@PresentationScope
+	@FragmentScoped
 	@Provides
 	fun languageListAdapter() = LanguageListAdapter(arrayListOf())
 
-	@PresentationScope
+	@FragmentScoped
 	@Provides
 	fun bookAdapter() = PackAdapter(arrayListOf(), arrayListOf())
 
-	@PresentationScope
+	@FragmentScoped
 	@Provides
 	fun courseListAdapter() = CourseListAdapter(arrayListOf(), arrayListOf())
 
-	@PresentationScope
+	@FragmentScoped
 	@Provides
 	@LanguageList
 	fun selectedLanguages() = arrayListOf<LanguageRoom>()
 
-	@PresentationScope
+	@FragmentScoped
 	@Provides
 	fun mediaPlayer() = MediaPlayer()
 }

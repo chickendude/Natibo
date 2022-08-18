@@ -12,12 +12,13 @@ import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
 import ch.ralena.natibo.databinding.FragmentLanguageListBinding
-import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.ArrayList
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class LanguageListFragment :
 		BaseFragment<FragmentLanguageListBinding,
 				LanguageListViewModel.Listener,
@@ -47,10 +48,6 @@ class LanguageListFragment :
 		binding.fab.setOnClickListener {
 			mainActivity.importLanguagePack()
 		}
-	}
-
-	override fun injectDependencies(injector: PresentationComponent) {
-		injector.inject(this)
 	}
 
 	override fun onStart() {

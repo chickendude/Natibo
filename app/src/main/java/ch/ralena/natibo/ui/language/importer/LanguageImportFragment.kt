@@ -1,14 +1,13 @@
 package ch.ralena.natibo.ui.language.importer
 
 import android.net.Uri
-import android.util.Log
 import android.view.View
 import androidx.work.*
 import androidx.work.WorkManager
 import ch.ralena.natibo.databinding.FragmentLanguageImportBinding
-import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker
+import dagger.hilt.android.AndroidEntryPoint
 
 enum class ImportProgress {
 	ACTION_TEXT,
@@ -16,6 +15,7 @@ enum class ImportProgress {
 	ACTION_COMPLETED
 }
 
+@AndroidEntryPoint
 class LanguageImportFragment :
 	BaseFragment<
 			FragmentLanguageImportBinding,
@@ -41,10 +41,6 @@ class LanguageImportFragment :
 
 	override fun setupViews(view: View) {
 		launchWorker()
-	}
-
-	override fun injectDependencies(injector: PresentationComponent) {
-		injector.inject(this)
 	}
 
 	// region Helper functions----------------------------------------------------------------------

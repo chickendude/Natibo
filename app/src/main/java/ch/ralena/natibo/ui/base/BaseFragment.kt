@@ -4,11 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
-import ch.ralena.natibo.di.component.PresentationComponent
-import ch.ralena.natibo.ui.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 /**
@@ -17,9 +15,8 @@ import javax.inject.Inject
  * This provides some convenience methods to inject your ViewModel, simplify view binding and
  * dependency injection, and handles [onCreate] and [onCreateView] for you.
  *
- * You should override [setupViews] and [injectDependencies] in your Fragment. [setupViews] is where
- * you can do any work with your layout's views. In [injectDependencies] you should simply run the
- * `injector`'s `inject` function.
+ * You should override [setupViews] in your Fragment. [setupViews] is where you can do any work
+ * with your layout's views.
  *
  * @param inflate this should be your viewbinding's inflate method, e.g.
  * `MyFragmentBinding::inflate`
@@ -31,15 +28,6 @@ abstract class BaseFragment<VB : ViewBinding, LISTENER, VM : BaseViewModel<LISTE
 	lateinit var viewModel: VM
 
 	lateinit var binding: VB
-
-	val injector: PresentationComponent by lazy {
-		(requireActivity() as MainActivity).activityComponent.newPresentationComponent()
-	}
-
-	override fun onCreate(savedInstanceState: Bundle?) {
-		injectDependencies(injector)
-		super.onCreate(savedInstanceState)
-	}
 
 	override fun onCreateView(
 			inflater: LayoutInflater,
@@ -53,5 +41,4 @@ abstract class BaseFragment<VB : ViewBinding, LISTENER, VM : BaseViewModel<LISTE
 	}
 
 	abstract fun setupViews(view: View)
-	abstract fun injectDependencies(injector: PresentationComponent)
 }

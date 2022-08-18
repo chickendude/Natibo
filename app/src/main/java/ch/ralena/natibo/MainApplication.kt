@@ -1,17 +1,23 @@
 package ch.ralena.natibo
 
 import android.app.Application
-import ch.ralena.natibo.di.component.DaggerAppComponent
-import ch.ralena.natibo.di.module.AppModule
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
+import ch.ralena.natibo.di.AppModule
+import dagger.hilt.android.HiltAndroidApp
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import javax.inject.Inject
 
-open class MainApplication : Application() {
-	val appComponent by lazy {
-		DaggerAppComponent.builder()
-			.appModule(AppModule(this))
+@HiltAndroidApp
+open class MainApplication : Application(), Configuration.Provider {
+	@Inject
+	lateinit var workerFactory: HiltWorkerFactory
+
+	override fun getWorkManagerConfiguration() =
+		Configuration.Builder()
+			.setWorkerFactory(workerFactory)
 			.build()
-	}
 
 	override fun onCreate() {
 		super.onCreate()

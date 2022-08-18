@@ -3,17 +3,9 @@ package ch.ralena.natibo.di
 import javax.inject.Scope
 
 @Scope
-@Retention(AnnotationRetention.SOURCE)
+@Retention(AnnotationRetention.BINARY)
 annotation class AppScope
 
 @Scope
-@Retention(AnnotationRetention.SOURCE)
+@Retention(AnnotationRetention.BINARY)
 annotation class WorkerScope
-
-@Scope
-@Retention(AnnotationRetention.SOURCE)
-annotation class ActivityScope
-
-@Scope
-@Retention(AnnotationRetention.SOURCE)
-annotation class PresentationScope

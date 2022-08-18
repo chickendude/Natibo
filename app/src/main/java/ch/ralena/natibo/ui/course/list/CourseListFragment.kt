@@ -6,12 +6,13 @@ import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.databinding.FragmentCourseListBinding
-import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.course.list.adapter.CourseListAdapter
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class CourseListFragment :
 	BaseFragment<FragmentCourseListBinding,
 			CourseListViewModel.Listener,
@@ -52,11 +53,6 @@ class CourseListFragment :
 			adapter = courseListAdapter
 			layoutManager = LinearLayoutManager(context)
 		}
-	}
-
-	override fun injectDependencies(injector: PresentationComponent) {
-		injector.inject(this)
-		viewModel.registerListener(this)
 	}
 
 	override fun onStart() {

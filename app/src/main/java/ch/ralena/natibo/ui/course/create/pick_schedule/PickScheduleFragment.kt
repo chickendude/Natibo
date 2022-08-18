@@ -7,14 +7,15 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
 import ch.ralena.natibo.databinding.FragmentCoursePickScheduleBinding
-import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.course.create.pick_schedule.adapter.PackAdapter
 import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.ScheduleTextWatcher
 import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.SentencesPerDayTextWatcher
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class PickScheduleFragment :
 	BaseFragment<FragmentCoursePickScheduleBinding,
 			PickScheduleViewModel.Listener,
@@ -95,10 +96,6 @@ class PickScheduleFragment :
 				}
 			}
 		}
-	}
-
-	override fun injectDependencies(injector: PresentationComponent) {
-		injector.inject(this)
 	}
 
 	override fun onStart() {

@@ -8,13 +8,14 @@ import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.databinding.FragmentCourseDetailBinding
-import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class CourseDetailFragment
 	: BaseFragment<
 		FragmentCourseDetailBinding,
@@ -56,10 +57,6 @@ class CourseDetailFragment
 		requireArguments().getLong(TAG_COURSE_ID).let {
 			viewModel.fetchData(it)
 		}
-	}
-
-	override fun injectDependencies(injector: PresentationComponent) {
-		injector.inject(this)
 	}
 
 	// region ViewModel listeners ------------------------------------------------------------------

@@ -19,7 +19,6 @@ import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.Day
 import ch.ralena.natibo.data.room.`object`.SentenceGroup
 import ch.ralena.natibo.databinding.FragmentStudySessionBinding
-import ch.ralena.natibo.di.component.PresentationComponent
 import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.adapter.SentenceGroupAdapter
@@ -29,11 +28,13 @@ import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
 import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker
 import ch.ralena.natibo.ui.study.insession.worker.StudySessionWorker
 import ch.ralena.natibo.ui.study.overview.StudySessionOverviewFragment
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import io.realm.Realm
 import java.util.*
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class StudySessionFragment :
 	BaseFragment<
 			FragmentStudySessionBinding,
@@ -94,10 +95,6 @@ class StudySessionFragment :
 			// handle playing/pausing
 			playPauseImage.setOnClickListener { v: View -> playPause(v) }
 		}
-	}
-
-	override fun injectDependencies(injector: PresentationComponent) {
-		injector.inject(this)
 	}
 
 	override fun onCreateView(

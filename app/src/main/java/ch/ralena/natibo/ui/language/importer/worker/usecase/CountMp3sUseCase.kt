@@ -6,6 +6,7 @@ import android.util.Log
 import ch.ralena.natibo.data.room.SentenceRepository
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.Utils.readZip
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -20,7 +21,7 @@ class CountMp3sUseCase @Inject constructor(
 	private val metadataRetriever: MediaMetadataRetriever,
 	private val sentenceRepository: SentenceRepository,
 	dispatcherProvider: DispatcherProvider,
-	private val context: Context
+	@ApplicationContext private val context: Context
 ) {
 	companion object {
 		private val TAG = CountMp3sUseCase::class.java.simpleName

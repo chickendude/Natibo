@@ -8,13 +8,16 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import ch.ralena.natibo.MainApplication
 import ch.ralena.natibo.R
-import ch.ralena.natibo.di.module.WorkerModule
+import ch.ralena.natibo.di.WorkerModule
 import ch.ralena.natibo.ui.language.importer.ImportProgress
 import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
 import ch.ralena.natibo.ui.language.importer.worker.listener.PackImporterListener
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
@@ -28,8 +31,12 @@ enum class Status {
 /**
  * A worker that imports a pack into the database in the background.
  */
-class PackImporterWorker(context: Context, parameters: WorkerParameters) :
-	CoroutineWorker(context, parameters),
+@HiltWorker
+class PackImporterWorker @AssistedInject constructor(
+	@Assisted context: Context,
+	@Assisted parameters: WorkerParameters,
+	private val viewModel: PackImporterViewModel
+) : CoroutineWorker(context, parameters),
 	PackImporterListener {
 	companion object {
 		val TAG: String = PackImporterWorker::class.java.simpleName
@@ -38,13 +45,6 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 		const val BUFFER_SIZE = 1024
 	}
 
-	private val workerComponent by lazy {
-		(applicationContext as MainApplication).appComponent.newWorkerComponent(WorkerModule(this))
-	}
-
-	@Inject
-	lateinit var viewModel: PackImporterViewModel
-
 	private var status = Status.IN_PROGRESS
 	private val notificationManager =
 		context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -52,8 +52,6 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 	private lateinit var notificationBuilder: NotificationCompat.Builder
 
 	override suspend fun doWork(): Result {
-		injectDependencies()
-
 		val uriString = inputData.getString("uri")!!
 		val foregroundInfo = createForegroundInfo(uriString)
 		setForeground(foregroundInfo)
@@ -70,10 +68,6 @@ class PackImporterWorker(context: Context, parameters: WorkerParameters) :
 			Status.SUCCESS -> Result.success()
 			else -> Result.failure()
 		}
-	}
-
-	private fun injectDependencies() {
-		workerComponent.inject(this)
 	}
 
 	// region Notification Setup--------------------------------------------------------------------

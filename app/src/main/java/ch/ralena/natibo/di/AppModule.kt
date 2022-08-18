@@ -1,56 +1,60 @@
-package ch.ralena.natibo.di.module
+package ch.ralena.natibo.di
 
-import android.app.Application
 import android.content.ContentResolver
+import android.content.Context
 import androidx.room.Room
 import ch.ralena.natibo.data.room.AppDatabase
-import ch.ralena.natibo.di.ActivityScope
-import ch.ralena.natibo.di.AppScope
 import ch.ralena.natibo.utils.DefaultDispatcherProvider
 import ch.ralena.natibo.utils.DispatcherProvider
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import io.realm.Realm
+import javax.inject.Singleton
 
 @Module
-class AppModule(private val application: Application) {
+@InstallIn(SingletonComponent::class)
+object AppModule {
 	@Provides
-	@AppScope
-	fun contentResolver(): ContentResolver = application.contentResolver
+	@Singleton
+	fun contentResolver(@ApplicationContext appContext: Context): ContentResolver =
+		appContext.contentResolver
 
 	@Provides
-	@AppScope
+	@Singleton
 	fun dispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider()
 
 	@Provides
 	fun realm(): Realm = Realm.getDefaultInstance()
 
 	@Provides
-	@AppScope
-	fun database(): AppDatabase = Room.databaseBuilder(
-		application,
+	@Singleton
+	fun database(@ApplicationContext appContext: Context): AppDatabase = Room.databaseBuilder(
+		appContext,
 		AppDatabase::class.java,
 		"natibo_db"
 	).fallbackToDestructiveMigration()
 		.build()
 
 	@Provides
-	@AppScope
+	@Singleton
 	fun courseDao(database: AppDatabase) = database.courseDao()
 
 	@Provides
-	@AppScope
+	@Singleton
 	fun languageDao(database: AppDatabase) = database.languageDao()
 
 	@Provides
-	@AppScope
+	@Singleton
 	fun packDao(database: AppDatabase) = database.packDao()
 
 	@Provides
-	@AppScope
+	@Singleton
 	fun sentenceDao(database: AppDatabase) = database.sentenceDao()
 
 	@Provides
-	@AppScope
+	@Singleton
 	fun sesseionDao(database: AppDatabase) = database.sessionDao()
 }

@@ -10,10 +10,8 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import ch.ralena.natibo.MainApplication
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.CourseRoom
-import ch.ralena.natibo.di.module.ActivityModule
 import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
 import ch.ralena.natibo.ui.study.insession.StudySessionFragment
@@ -21,14 +19,12 @@ import ch.ralena.natibo.utils.ScreenNavigator
 import ch.ralena.natibo.utils.Utils
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), MainViewModel.Listener {
-	val activityComponent by lazy {
-		(application as MainApplication).appComponent.newActivityComponent(ActivityModule(this))
-	}
-
 	companion object {
 		private val TAG = MainActivity::class.java.simpleName
 		private const val KEY_SERVICE_BOUND = "key_service_bound"
@@ -64,7 +60,6 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		activityComponent.inject(this)
 
 		setContentView(R.layout.activity_main)
 
@@ -137,6 +132,7 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 		screenNavigator.toCourseListFragment(courseId)
 	}
 
+	@Deprecated("Deprecated in Java")
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 		super.onActivityResult(requestCode, resultCode, data)
 		// TODO: Move to ScreenNavigator
