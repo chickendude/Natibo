@@ -7,7 +7,6 @@ import ch.ralena.natibo.ui.language.importer.worker.listener.PackImporterListene
 import ch.ralena.natibo.ui.language.importer.worker.usecase.*
 import ch.ralena.natibo.utils.DispatcherProvider
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -84,7 +83,7 @@ class PackImporterViewModel @Inject constructor(
 			updateProgress(20)
 
 			u("Extracting mp3s")
-			countMp3sUseCase.copyMp3s(packId, getInputStream(uri))
+			countMp3sUseCase.copyMp3s(packId, languageId, getInputStream(uri))
 			u("Copy complete")
 			updateProgress(100)
 		} catch (e: ImportException) {

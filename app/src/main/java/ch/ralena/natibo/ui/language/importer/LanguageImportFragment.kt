@@ -45,12 +45,8 @@ class LanguageImportFragment :
 
 	// region Helper functions----------------------------------------------------------------------
 	private fun launchWorker() {
-		val uri = requireArguments().getParcelable<Uri>(EXTRA_URI)
-//		if (uri == null) {
-//			requireActivity().supportFragmentManager.popBackStack()
-//			return
-//		}
-//		requireArguments().remove(EXTRA_URI)
+		val uri = requireArguments().getParcelable<Uri>(EXTRA_URI) ?: return
+		requireArguments().remove(EXTRA_URI)
 
 		val data = Data.Builder()
 			.putString("uri", uri.toString())
@@ -62,23 +58,21 @@ class LanguageImportFragment :
 		val workManager = WorkManager.getInstance(requireContext())
 		workManager
 			.getWorkInfoByIdLiveData(workRequest.id)
-			.observe(viewLifecycleOwner, { workInfo ->
+			.observe(viewLifecycleOwner) { workInfo ->
 				if (workInfo != null) {
 					val progress = workInfo.progress
 					val updateType = progress.getInt(WORKER_ACTION, -1)
 					when (updateType) {
-						ImportProgress.ACTION_TEXT.ordinal -> {
+						ImportProgress.ACTION_TEXT.ordinal ->
 							binding.actionText.text = progress.getString(WORKER_MESSAGE)
-						}
-						ImportProgress.ACTION_PROGRESS.ordinal -> {
+						ImportProgress.ACTION_PROGRESS.ordinal ->
 							binding.progressBar.progress = progress.getInt(WORKER_PROGRESS, 0)
-						}
 						ImportProgress.ACTION_COMPLETED.ordinal -> {
 							viewModel.workComplete()
 						}
 					}
 				}
-			})
+			}
 		workManager.enqueue(workRequest)
 	}
 	// endregion Helper functions-------------------------------------------------------------------

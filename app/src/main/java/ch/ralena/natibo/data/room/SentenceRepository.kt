@@ -45,6 +45,6 @@ class SentenceRepository @Inject constructor(
 	suspend fun updateSentence(sentence: SentenceRoom) =
 		sentenceDao.update(sentence)
 
-	suspend fun updateSentenceMp3(packId: Long, index: Int, mp3Uri: String, mp3Length: Int) =
-		sentenceDao.updateMp3(packId, index, mp3Uri, mp3Length)
+	suspend fun updateSentenceMp3(packId: Long, languageId: Long, index: Int, mp3Uri: String, mp3Length: Int) =
+		sentenceDao.updateMp3(packId, languageId, index, mp3Uri, mp3Length)
 }

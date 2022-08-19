@@ -36,8 +36,14 @@ interface SentenceDao {
 	@Update(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun update(sentence: SentenceRoom)
 
-	@Query("UPDATE sentenceroom SET mp3 = :mp3Uri, mp3Length = :mp3Length WHERE packId = :packId AND `index` = :index")
-	suspend fun updateMp3(packId: Long, index: Int, mp3Uri: String, mp3Length: Int)
+	@Query("UPDATE sentenceroom SET mp3 = :mp3Uri, mp3Length = :mp3Length WHERE packId = :packId AND languageId = :languageId AND `index` = :index")
+	suspend fun updateMp3(
+		packId: Long,
+		languageId: Long,
+		index: Int,
+		mp3Uri: String,
+		mp3Length: Int
+	)
 
 	@Delete
 	suspend fun delete(sentence: SentenceRoom)

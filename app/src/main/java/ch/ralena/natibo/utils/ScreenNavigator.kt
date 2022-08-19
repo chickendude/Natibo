@@ -60,7 +60,7 @@ class ScreenNavigator @Inject constructor(
 				putLong(CourseListFragment.TAG_COURSE_ID, courseId)
 			}
 		}
-		loadFragment(fragment, CourseListFragment.TAG)
+		loadFragment(fragment, CourseListFragment.TAG, addToBackStack = false)
 	}
 
 	fun toCoursePreparationFragment(nativeId: Long, targetId: Long?, packId: Long) {
@@ -84,8 +84,8 @@ class ScreenNavigator @Inject constructor(
 		loadFragment(fragment, CourseSettingsFragment.TAG)
 	}
 
-	fun toLanguageListFragment() {
-		loadFragment(LanguageListFragment(), LanguageListFragment.TAG)
+	fun toLanguageListFragment(addToBackStack: Boolean = true) {
+		loadFragment(LanguageListFragment(), LanguageListFragment.TAG, addToBackStack)
 	}
 
 	fun toLanguageDetailsFragment(languageId: Long) {
@@ -118,19 +118,20 @@ class ScreenNavigator @Inject constructor(
 	}
 
 	// region Helper functions----------------------------------------------------------------------
-	private fun loadFragment(fragment: Fragment, name: String) {
+	private fun loadFragment(fragment: Fragment, name: String, addToBackStack: Boolean = true) {
 		val transaction = fragmentManager
 			.beginTransaction()
 			.replace(R.id.fragmentPlaceHolder, fragment)
 
-		// make sure fragment isn't added to back stack twice
-		val backStackCount = fragmentManager.backStackEntryCount
-		if (backStackCount > 0) {
-			val entry = fragmentManager.getBackStackEntryAt(backStackCount - 1)
-			if (entry.name != name)
-				transaction.addToBackStack(name)
-		} else if (name != CourseListFragment.TAG)
-			transaction.addToBackStack(name)
+		if (addToBackStack) {
+			// make sure fragment isn't added to back stack twice
+			val backStackCount = fragmentManager.backStackEntryCount
+			if (backStackCount > 0) {
+				val entry = fragmentManager.getBackStackEntryAt(backStackCount - 1)
+				if (entry.name != name)
+					transaction.addToBackStack(name)
+			} else transaction.addToBackStack(name)
+		}
 
 		transaction.commit()
 	}

@@ -10,6 +10,6 @@ class LanguageImportViewModel @Inject constructor(
 	interface Listener
 
 	fun workComplete() {
-		screenNavigator.toLanguageListFragment()
+		screenNavigator.toLanguageListFragment(addToBackStack = false)
 	}
 }

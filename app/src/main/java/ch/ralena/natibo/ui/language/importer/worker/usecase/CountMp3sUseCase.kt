@@ -54,7 +54,7 @@ class CountMp3sUseCase @Inject constructor(
 		return numFiles
 	}
 
-	fun copyMp3s(packId: Long, inputStream: InputStream) {
+	fun copyMp3s(packId: Long, languageId: Long, inputStream: InputStream) {
 		readZip(inputStream) { zis ->
 			var zipEntry = zis.nextEntry
 
@@ -87,7 +87,7 @@ class CountMp3sUseCase @Inject constructor(
 							?.toInt() ?: 0
 
 					coroutineScope.launch {
-						sentenceRepository.updateSentenceMp3(packId, index, mp3Uri, mp3LengthMs)
+						sentenceRepository.updateSentenceMp3(packId, languageId, index, mp3Uri, mp3LengthMs)
 					}
 					currentFile++
 				} else {

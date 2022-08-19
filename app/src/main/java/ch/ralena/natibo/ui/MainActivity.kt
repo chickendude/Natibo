@@ -123,15 +123,6 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 		startActivityForResult(mediaIntent, REQUEST_PICK_GLS)
 	}
 
-	/**
-	 * Loads the CourseListFragment fragment.
-	 */
-	// TODO: Delete when everything is using ScreenNavigator
-	@JvmOverloads
-	fun loadCourseListFragment(courseId: Long? = null) {
-		screenNavigator.toCourseListFragment(courseId)
-	}
-
 	@Deprecated("Deprecated in Java")
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 		super.onActivityResult(requestCode, resultCode, data)
@@ -144,6 +135,7 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 				fragment.arguments = bundle
 				supportFragmentManager.beginTransaction()
 					.replace(R.id.fragmentPlaceHolder, fragment)
+					.addToBackStack(null)
 					.commit()
 			} else if (requestCode == REQUEST_LOAD_SESSION) {
 				val fragment =

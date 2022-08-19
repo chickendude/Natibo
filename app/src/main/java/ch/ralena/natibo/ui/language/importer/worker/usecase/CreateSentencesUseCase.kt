@@ -1,18 +1,10 @@
 package ch.ralena.natibo.ui.language.importer.worker.usecase
 
-import android.util.Log
 import ch.ralena.natibo.data.room.SentenceRepository
-import ch.ralena.natibo.data.room.`object`.LanguageRoom
-import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
-import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker
-import ch.ralena.natibo.utils.Utils.readZip
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
-import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
 class CreateSentencesUseCase @Inject constructor(
@@ -32,7 +24,7 @@ class CreateSentencesUseCase @Inject constructor(
 
 	suspend fun createSentences(languageId: Long, packId: Long, sentences: List<String>) {
 		totalSentences = sentences.size - 1
-		val packSentences = sentenceRepository.fetchSentencesInPack(packId)
+		val packSentences = sentenceRepository.fetchSentencesInPack(packId, languageId)
 
 		val sections = sentences[0].split("\t")
 
@@ -68,8 +60,7 @@ class CreateSentencesUseCase @Inject constructor(
 			}
 		}
 		// Create/update sentence
-		val sentence = packSentences
-			.firstOrNull { it.index == index && it.languageId == languageId }
+		val sentence = packSentences.firstOrNull { it.index == index }
 		if (sentence != null) {
 			sentenceRepository.updateSentence(
 				sentence.copy(
