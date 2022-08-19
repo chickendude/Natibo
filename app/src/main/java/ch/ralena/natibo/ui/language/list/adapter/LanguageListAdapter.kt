@@ -7,6 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
+import ch.ralena.natibo.data.room.LanguageRepository
+import ch.ralena.natibo.data.room.SentenceRepository
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
@@ -14,7 +16,8 @@ import java.util.*
 import javax.inject.Inject
 
 class LanguageListAdapter @Inject constructor(
-		private val languages: ArrayList<LanguageWithPacks>
+		private val languages: ArrayList<LanguageWithPacks>,
+		private val sentenceCounts: ArrayList<Int>
 ) : BaseRecyclerAdapter<LanguageListAdapter.ViewHolder, LanguageListAdapter.Listener>() {
 	interface Listener {
 		fun onLanguageClicked(language: LanguageRoom)
@@ -26,16 +29,18 @@ class LanguageListAdapter @Inject constructor(
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-		if (position < itemCount) holder.bindView(languages[position])
+		if (position < itemCount) holder.bindView(languages[position], sentenceCounts[position])
 	}
 
 	override fun getItemCount(): Int {
 		return languages.size
 	}
 
-	fun loadLanguages(languages: List<LanguageWithPacks>) {
+	fun loadLanguages(languages: List<LanguageWithPacks>, sentenceCounts: List<Int>) {
 		this.languages.clear()
 		this.languages.addAll(languages)
+		this.sentenceCounts.clear()
+		this.sentenceCounts.addAll(sentenceCounts)
 		notifyDataSetChanged()
 	}
 
@@ -51,13 +56,13 @@ class LanguageListAdapter @Inject constructor(
 			view.setOnClickListener { for (l in listeners) l.onLanguageClicked(languageWithPacks.language) }
 		}
 
-		fun bindView(languageWithPacks: LanguageWithPacks) {
+		fun bindView(languageWithPacks: LanguageWithPacks, sentenceCount: Int) {
 			this.languageWithPacks = languageWithPacks
 			val language = languageWithPacks.language
 			val packs = languageWithPacks.packs
 			languageName.text = language.name
 			numPacks.text = "${packs.size}"
-//			numSentences.text = "${language.sentenceCount}"
+			numSentences.text = "$sentenceCount"
 			flagImage.setImageResource(language.flagDrawable)
 		}
 	}

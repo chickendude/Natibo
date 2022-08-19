@@ -7,11 +7,22 @@ import ch.ralena.natibo.data.room.`object`.SentenceRoom
 
 @Dao
 interface SentenceDao {
-	@Query("SELECT * FROM sentenceroom")
-	suspend fun getAll(): List<SentenceRoom>
+	@Query("SELECT * FROM sentenceroom WHERE languageId = :languageId")
+	suspend fun getAllInLanguage(languageId: Long): List<SentenceRoom>
 
-	@Query("SELECT * FROM sentenceroom WHERE packId = :packId")
-	suspend fun getAllInPack(packId: Long): List<SentenceRoom>
+	@Query("SELECT COUNT(ID) FROM sentenceroom WHERE languageId = :languageId")
+	suspend fun getCountInLanguage(languageId: Long): Int
+
+	@Query("SELECT * FROM sentenceroom WHERE packId = :packId AND languageId = :languageId")
+	suspend fun getAllInPack(packId: Long, languageId: Long): List<SentenceRoom>
+
+	@Query("SELECT * FROM sentenceroom WHERE packId = :packId AND languageId = :languageId AND `index` >= :start AND `index` < :end")
+	suspend fun getPackSentencesInRange(
+		packId: Long,
+		languageId: Long,
+		start: Int,
+		end: Int
+	): List<SentenceRoom>
 
 	@Query("SELECT * FROM sentenceroom WHERE id = :id LIMIT 1")
 	suspend fun getById(id: Long): SentenceRoom

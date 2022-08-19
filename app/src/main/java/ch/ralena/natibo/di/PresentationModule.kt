@@ -37,7 +37,7 @@ class PresentationModule {
 
 	@FragmentScoped
 	@Provides
-	fun languageListAdapter() = LanguageListAdapter(arrayListOf())
+	fun languageListAdapter() = LanguageListAdapter(arrayListOf(), arrayListOf())
 
 	@FragmentScoped
 	@Provides

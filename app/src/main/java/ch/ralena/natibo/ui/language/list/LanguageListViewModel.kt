@@ -2,6 +2,7 @@ package ch.ralena.natibo.ui.language.list
 
 import android.view.View
 import ch.ralena.natibo.data.room.LanguageRepository
+import ch.ralena.natibo.data.room.SentenceRepository
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
 import ch.ralena.natibo.ui.base.BaseViewModel
@@ -14,22 +15,28 @@ import javax.inject.Inject
 class LanguageListViewModel @Inject constructor(
 	private val screenNavigator: ScreenNavigator,
 	private val languageRepository: LanguageRepository,
+	private val sentenceRepository: SentenceRepository,
 	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<LanguageListViewModel.Listener>() {
 	interface Listener {
-		fun onLanguagesLoaded(languagesWithPacks: List<LanguageWithPacks>)
+		fun onLanguagesLoaded(languagesWithPacks: List<LanguageWithPacks>, sentenceCounts: List<Int>)
 	}
 
-	val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
+	private val coroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.default())
 
-	lateinit var languagesWithPacks: List<LanguageWithPacks>
+	private var languagesWithPacks: List<LanguageWithPacks> = mutableListOf()
 
 	fun fetchLanguages() {
 		coroutineScope.launch(dispatcherProvider.main()) {
+			val sentenceCounts = mutableListOf<Int>()
 			withContext(dispatcherProvider.io()) {
 				languagesWithPacks = languageRepository.fetchLanguagesWithPacks()
+				languagesWithPacks.forEach {
+					val count = sentenceRepository.fetchSentenceCount(it.language.id)
+					sentenceCounts.add(count)
+				}
 			}
-			listeners.forEach { it.onLanguagesLoaded(languagesWithPacks) }
+			listeners.forEach { it.onLanguagesLoaded(languagesWithPacks, sentenceCounts) }
 		}
 	}
 
@@ -38,8 +45,8 @@ class LanguageListViewModel @Inject constructor(
 	}
 
 	fun getRecyclerViewVisibility(): Int =
-		if (languagesWithPacks.isNullOrEmpty()) View.GONE else View.VISIBLE
+		if (languagesWithPacks.isEmpty()) View.GONE else View.VISIBLE
 
 	fun getNoCourseTextVisibility(): Int =
-		if (languagesWithPacks.isNullOrEmpty()) View.VISIBLE else View.GONE
+		if (languagesWithPacks.isEmpty()) View.VISIBLE else View.GONE
 }
