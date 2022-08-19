@@ -2,10 +2,10 @@ package ch.ralena.natibo.ui.course.create.pick_schedule
 
 import androidx.annotation.IdRes
 import ch.ralena.natibo.R
+import ch.ralena.natibo.data.Chorus
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.PackRepository
-import ch.ralena.natibo.data.room.`object`.Course
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
@@ -66,9 +66,9 @@ class PickScheduleViewModel @Inject constructor(
 			return
 
 		val chorus = when (chorusId) {
-			R.id.chorus_all_radio -> Course.Chorus.ALL
-			R.id.chorus_new_radio -> Course.Chorus.NEW
-			else -> Course.Chorus.NONE
+			R.id.chorus_all_radio -> Chorus.ALL
+			R.id.chorus_new_radio -> Chorus.NEW
+			else -> Chorus.NONE
 		}
 
 		// Split up reviews and check if there are any invalid inputs
@@ -79,7 +79,7 @@ class PickScheduleViewModel @Inject constructor(
 		// "base-target-target" if chorus enabled, otherwise "base-target"
 		// TODO: handle Course.Chorus.NEW, perhaps create "order_review" and "order_new"
 		val order = listOf(nativeLanguage, targetLanguage).mapIndexed { index, _ ->
-			if (chorus == Course.Chorus.ALL && (index > 0 || targetLanguage == null))
+			if (chorus == Chorus.ALL && (index > 0 || targetLanguage == null))
 				"$index$index"
 			else
 				"$index"

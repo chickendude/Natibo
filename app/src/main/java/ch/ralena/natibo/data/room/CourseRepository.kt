@@ -11,7 +11,7 @@ import java.util.*
 import javax.inject.Inject
 
 /**
- * Repository for obtaining [Course] data.
+ * Repository for obtaining [CourseRoom] data.
  */
 class CourseRepository @Inject constructor(
 	private val realm: Realm,
@@ -104,64 +104,64 @@ class CourseRepository @Inject constructor(
 	suspend fun countSessions(courseId: Long): Int = courseDao.getSessionCount(courseId)
 
 	// region Old Realm stuff
-	/**
-	 * Prepares the sentences for the next day of study.
-	 *
-	 * @param course The course to prepare
-	 */
-	fun prepareNextDay(course: Course) {
-		// add current day to past days
-
-		// add current day to past days
-		if (course.currentDay?.isCompleted == true)
-			realm.executeTransaction { course.pastDays.add(course.currentDay) }
-
-		// create a new day
-		realm.executeTransaction { r: Realm ->
-			val day = r.createObject(Day::class.java, UUID.randomUUID().toString())
-
-			// add the sentence sets from the current day to the next day
-			if (course.currentDay != null && course.currentDay.isCompleted) {
-				day.sentenceSets.addAll(course.currentDay.sentenceSets)
-
-				// move yesterday's new words to the front of the reviews
-				val lastSet = day.sentenceSets.last()
-				day.sentenceSets.remove(lastSet)
-				day.sentenceSets.add(0, lastSet)
-			}
-			val reviewPattern: RealmList<Int> = course.schedule.getReviewPattern()
-			val numSentences: Int = course.schedule.numSentences
-			val sentenceIndex: Int = course.schedule.sentenceIndex
-			course.schedule.sentenceIndex = sentenceIndex + numSentences
-
-			// create new set of sentences based off the schedule
-			val sentenceSet = SentenceSet()
-			sentenceSet.sentenceSet =
-				getSentenceGroups(sentenceIndex, numSentences, course.languages, course.packs)
-			sentenceSet.reviews = reviewPattern
-			sentenceSet.isFirstDay = true
-			sentenceSet.order = course.schedule.order
-
-			// add sentence set to list of sentencesets for the next day's studies
-			day.sentenceSets.add(sentenceSet)
-			day.isCompleted = false
-			day.pauseMillis = course.pauseMillis
-			day.setPlaybackSpeed(course.playbackSpeed)
-			course.currentDay = day
-		}
-		val emptySentenceSets: MutableList<SentenceSet> = ArrayList()
-		for (set in course.currentDay.sentenceSets) {
-			// create sentence set and mark it to be deleted if it is empty
-			if (!set.buildSentences(realm)) {
-				emptySentenceSets.add(set)
-			}
-		}
-
-		// delete the sentence sets with no reviews left
-		realm.executeTransaction {
-			course.currentDay.sentenceSets.removeAll(emptySentenceSets)
-		}
-	}
+//	/**
+//	 * Prepares the sentences for the next day of study.
+//	 *
+//	 * @param course The course to prepare
+//	 */
+//	fun prepareNextDay(course: Course) {
+//		// add current day to past days
+//
+//		// add current day to past days
+//		if (course.currentDay?.isCompleted == true)
+//			realm.executeTransaction { course.pastDays.add(course.currentDay) }
+//
+//		// create a new day
+//		realm.executeTransaction { r: Realm ->
+//			val day = r.createObject(Day::class.java, UUID.randomUUID().toString())
+//
+//			// add the sentence sets from the current day to the next day
+//			if (course.currentDay != null && course.currentDay.isCompleted) {
+//				day.sentenceSets.addAll(course.currentDay.sentenceSets)
+//
+//				// move yesterday's new words to the front of the reviews
+//				val lastSet = day.sentenceSets.last()
+//				day.sentenceSets.remove(lastSet)
+//				day.sentenceSets.add(0, lastSet)
+//			}
+//			val reviewPattern: RealmList<Int> = course.schedule.getReviewPattern()
+//			val numSentences: Int = course.schedule.numSentences
+//			val sentenceIndex: Int = course.schedule.sentenceIndex
+//			course.schedule.sentenceIndex = sentenceIndex + numSentences
+//
+//			// create new set of sentences based off the schedule
+//			val sentenceSet = SentenceSet()
+//			sentenceSet.sentenceSet =
+//				getSentenceGroups(sentenceIndex, numSentences, course.languages, course.packs)
+//			sentenceSet.reviews = reviewPattern
+//			sentenceSet.isFirstDay = true
+//			sentenceSet.order = course.schedule.order
+//
+//			// add sentence set to list of sentencesets for the next day's studies
+//			day.sentenceSets.add(sentenceSet)
+//			day.isCompleted = false
+//			day.pauseMillis = course.pauseMillis
+//			day.setPlaybackSpeed(course.playbackSpeed)
+//			course.currentDay = day
+//		}
+//		val emptySentenceSets: MutableList<SentenceSet> = ArrayList()
+//		for (set in course.currentDay.sentenceSets) {
+//			// create sentence set and mark it to be deleted if it is empty
+//			if (!set.buildSentences(realm)) {
+//				emptySentenceSets.add(set)
+//			}
+//		}
+//
+//		// delete the sentence sets with no reviews left
+//		realm.executeTransaction {
+//			course.currentDay.sentenceSets.removeAll(emptySentenceSets)
+//		}
+//	}
 	// endregion
 
 	// region Helper function ----------------------------------------------------------------------
