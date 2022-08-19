@@ -1,12 +1,10 @@
 package ch.ralena.natibo.ui.sentences
 
 import android.media.MediaPlayer
-import android.util.Log
-import android.widget.Toast
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.PackRepository
+import ch.ralena.natibo.data.room.SentenceRepository
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
-import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.data.room.`object`.PackWithSentences
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
@@ -18,11 +16,12 @@ import javax.inject.Inject
 class SentenceListViewModel @Inject constructor(
 	private val languageRepository: LanguageRepository,
 	private val packRepository: PackRepository,
+	private val sentenceRepository: SentenceRepository,
 	private val mediaPlayer: MediaPlayer,
 	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<SentenceListViewModel.Listener>() {
 	interface Listener {
-		fun onInfoFetched(language: LanguageRoom, packWithSentences: PackWithSentences)
+		fun onInfoFetched(language: LanguageRoom, sentences: List<SentenceRoom>)
 		fun onError()
 	}
 
@@ -31,13 +30,13 @@ class SentenceListViewModel @Inject constructor(
 	fun fetchInfo(languageId: Long, packId: Long) {
 		coroutineScope.launch {
 			val language = languageRepository.fetchLanguage(languageId)
-			val packWithSentences = packRepository.fetchPackWithSentences(packId)
-			if (language == null || packWithSentences == null) {
+			val sentences = sentenceRepository.fetchSentencesInPack(languageId, packId)
+			if (language == null) {
 				listeners.forEach { it.onError() }
 				return@launch
 			}
 			withContext(dispatcherProvider.main()) {
-				listeners.forEach { it.onInfoFetched(language, packWithSentences) }
+				listeners.forEach { it.onInfoFetched(language, sentences) }
 			}
 		}
 	}

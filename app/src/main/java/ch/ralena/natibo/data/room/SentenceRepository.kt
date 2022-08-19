@@ -15,6 +15,9 @@ class SentenceRepository @Inject constructor(
 	suspend fun fetchSentences(languageId: Long): List<SentenceRoom> =
 		sentenceDao.getAllInLanguage(languageId)
 
+	suspend fun fetchSentencesInPack(languageId: Long, packId: Long): List<SentenceRoom> =
+		sentenceDao.getAllInLanguagePack(languageId, packId)
+
 	suspend fun fetchSentenceCount(languageId: Long): Int =
 		sentenceDao.getCountInLanguage(languageId)
 

@@ -76,11 +76,11 @@ class SentenceListFragment :
 		binding.recyclerView.scrollToPosition(progress)
 	}
 
-	override fun onInfoFetched(language: LanguageRoom, packWithSentences: PackWithSentences) {
+	override fun onInfoFetched(language: LanguageRoom, sentences: List<SentenceRoom>) {
 		// load language name
 		mainActivity.title = language.name
-		binding.seekbar.max = packWithSentences.sentences.size
-		sentenceListAdapter.loadSentences(packWithSentences.sentences, language)
+		binding.seekbar.max = sentences.size
+		sentenceListAdapter.loadSentences(sentences, language)
 	}
 
 	override fun onError() {

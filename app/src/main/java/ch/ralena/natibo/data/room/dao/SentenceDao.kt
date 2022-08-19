@@ -10,6 +10,9 @@ interface SentenceDao {
 	@Query("SELECT * FROM sentenceroom WHERE languageId = :languageId")
 	suspend fun getAllInLanguage(languageId: Long): List<SentenceRoom>
 
+	@Query("SELECT * FROM sentenceroom WHERE languageId = :languageId AND packId = :packId")
+	suspend fun getAllInLanguagePack(languageId: Long, packId: Long): List<SentenceRoom>
+
 	@Query("SELECT COUNT(ID) FROM sentenceroom WHERE languageId = :languageId")
 	suspend fun getCountInLanguage(languageId: Long): Int
 
