@@ -68,7 +68,8 @@ class CreateSentencesUseCase @Inject constructor(
 			}
 		}
 		// Create/update sentence
-		val sentence = packSentences.firstOrNull { it.index == index }
+		val sentence = packSentences
+			.firstOrNull { it.index == index && it.languageId == languageId }
 		if (sentence != null) {
 			sentenceRepository.updateSentence(
 				sentence.copy(
@@ -81,7 +82,17 @@ class CreateSentencesUseCase @Inject constructor(
 			)
 		} else {
 			sentenceRepository.createSentence(
-				SentenceRoom(index, original, alternate, romanization, ipa, "", 0, packId, languageId)
+				SentenceRoom(
+					index,
+					original,
+					alternate,
+					romanization,
+					ipa,
+					"",
+					0,
+					packId,
+					languageId
+				)
 			)
 		}
 	}
