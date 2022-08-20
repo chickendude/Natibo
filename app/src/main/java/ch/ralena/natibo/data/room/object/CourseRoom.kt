@@ -46,7 +46,13 @@ data class ScheduleRoom(
 	/** The index of the first new sentence. */
 	val curSentenceIndex: Int,
 
-	/** The order to play sentences in. E.g. "Base Target Target" or "Target Base Target" */
+	/**
+	 * The order to play sentences in. E.g. "Base Target Target" or "Target Base Target".
+	 *
+	 * '0' refers to the native language and '1' refers to the target language, with no spaces.
+	 *
+	 * `"011"` will play the native language once and then the target language twice.
+	 */
 	val order: String,
 
 	/**
@@ -60,8 +66,8 @@ data class ScheduleRoom(
 	 *
 	 *  Remember that previous sentences will be added, so if you have 10 new sentences a day:
 	 *   - Day 1: 60 sentences.
-	 *   - Day 2: Day 1's sentences 40 times + a new set of sentences 60 times.
-	 *   - Day 3: Day 1's sentences 30 times + Day 2's sentences 40 times + 60 new sentences, etc.
+	 *   - Day 2: 100 (Day 1's sentences 40 times + a new set of sentences 60 times)
+	 *   - Day 3: 130 (Day 1's sentences 30 times + Day 2's 40 times + 60 new sentences)
 	 */
 	val reviewPattern: String
 )
