@@ -24,7 +24,7 @@ class CreateSentencesUseCase @Inject constructor(
 
 	suspend fun createSentences(languageId: Long, packId: Long, sentences: List<String>) {
 		totalSentences = sentences.size - 1
-		val packSentences = sentenceRepository.fetchSentencesInPack(packId, languageId)
+		val packSentences = sentenceRepository.fetchSentencesInPack(languageId, packId)
 
 		val sections = sentences[0].split("\t")
 

@@ -28,16 +28,7 @@ class LanguageImportFragment :
 		const val WORKER_ACTION = "worker_action"
 		const val WORKER_MESSAGE = "worker_message"
 		const val WORKER_PROGRESS = "worker_progress"
-		const val ACTION_OPENING_FILE = 0
-		const val ACTION_COUNTING_SENTENCES = 1
-		const val ACTION_READING_SENTENCES = 2
-		const val ACTION_EXTRACTING_TEXT = 3
-		const val ACTION_EXTRACTING_AUDIO = 4
-		const val ACTION_EXIT = 5
 	}
-
-	var curAction = 0
-
 
 	override fun setupViews(view: View) {
 		launchWorker()
