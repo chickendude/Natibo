@@ -1,7 +1,6 @@
 package ch.ralena.natibo.ui.study.insession
 
 import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -11,9 +10,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.Day
@@ -23,14 +19,9 @@ import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.adapter.SentenceGroupAdapter
 import ch.ralena.natibo.ui.base.BaseFragment
-import ch.ralena.natibo.ui.language.importer.ImportProgress
-import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
-import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker
-import ch.ralena.natibo.ui.study.insession.worker.StudySessionWorker
 import ch.ralena.natibo.ui.study.overview.StudySessionOverviewFragment
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
-import io.realm.Realm
 import java.util.*
 import javax.inject.Inject
 
@@ -39,11 +30,10 @@ class StudySessionFragment :
 	BaseFragment<
 			FragmentStudySessionBinding,
 			StudySessionViewModel.Listener,
-			StudySessionViewModel>(
-		FragmentStudySessionBinding::inflate
-	), StudySessionViewModel.Listener {
+			StudySessionViewModel>(FragmentStudySessionBinding::inflate),
+	StudySessionViewModel.Listener {
 	companion object {
-		val TAG = StudySessionFragment::class.java.simpleName
+		val TAG: String = StudySessionFragment::class.java.simpleName
 		const val KEY_COURSE_ID = "language_id"
 		private const val KEY_IS_PAUSED = "key_is_paused"
 	}
@@ -55,19 +45,18 @@ class StudySessionFragment :
 
 	// fields
 	private val prefs: SharedPreferences? = null
-	private lateinit var studySessionService: StudySessionServiceKt
+	private var studySessionService: StudySessionServiceKt? = null
 	private var millisLeft: Long = 0
 	private var countDownTimer: CountDownTimer? = null
 	private var isPaused = false
-	var adapter: SentenceGroupAdapter? = null
+	private var adapter: SentenceGroupAdapter? = null
 
-	var serviceDisposable: Disposable? = null
+	private var serviceDisposable: Disposable? = null
 
 	//	var sentenceDisposable: Disposable? = null
-	var finishDisposable: Disposable? = null
+	private var finishDisposable: Disposable? = null
 
 	override fun setupViews(view: View) {
-		launchWorker()
 		// load schedules from database
 		val id = requireArguments().getLong(KEY_COURSE_ID)
 		viewModel.fetchCourse(id)
@@ -120,7 +109,10 @@ class StudySessionFragment :
 //					})
 //				finishDisposable = studySessionService.finishObservable()
 //					.subscribe(Consumer<Day> { day: Day -> sessionFinished(day) })
-				setPaused(studySessionService.playbackStatus == null || studySessionService.playbackStatus == StudySessionServiceKt.PlaybackStatus.PAUSED)
+				setPaused(
+					service.playbackStatus == null ||
+							service.playbackStatus == StudySessionServiceKt.PlaybackStatus.PAUSED
+				)
 				if (!isPaused) {
 					startTimer()
 				}
@@ -130,13 +122,13 @@ class StudySessionFragment :
 	}
 
 	private fun playPause(view: View) {
-		if (studySessionService != null) {
-			if (studySessionService.playbackStatus == StudySessionServiceKt.PlaybackStatus.PLAYING) {
-				studySessionService.pause()
+		studySessionService?.let { service ->
+			if (service.playbackStatus == StudySessionServiceKt.PlaybackStatus.PLAYING) {
+				service.pause()
 				setPaused(true)
 				countDownTimer?.cancel()
 			} else {
-				studySessionService.resume()
+				service.resume()
 				startTimer()
 			}
 			updatePlayPauseImage()
@@ -144,7 +136,7 @@ class StudySessionFragment :
 	}
 
 	private fun updatePlayPauseImage() {
-		if (studySessionService.playbackStatus == StudySessionServiceKt.PlaybackStatus.PLAYING) {
+		if (studySessionService?.playbackStatus == StudySessionServiceKt.PlaybackStatus.PLAYING) {
 			binding.playPauseImage.setImageResource(R.drawable.ic_pause)
 		} else {
 			binding.playPauseImage.setImageResource(R.drawable.ic_play)
@@ -252,46 +244,6 @@ class StudySessionFragment :
 	// endregion ViewModel Listener-----------------------------------------------------------------
 
 	// region Helper functions----------------------------------------------------------------------
-	private fun launchWorker() {
-		val uri = requireArguments().getParcelable<Uri>(LanguageImportFragment.EXTRA_URI)
-//		if (uri == null) {
-//			requireActivity().supportFragmentManager.popBackStack()
-//			return
-//		}
-//		requireArguments().remove(EXTRA_URI)
-
-		val data = Data.Builder()
-			.putString("uri", uri.toString())
-			.build()
-
-		val workRequest = OneTimeWorkRequestBuilder<StudySessionWorker>()
-			.setInputData(data)
-			.build()
-		val workManager = WorkManager.getInstance(requireContext())
-		workManager
-			.getWorkInfoByIdLiveData(workRequest.id)
-			.observe(viewLifecycleOwner, { workInfo ->
-				if (workInfo != null) {
-					val progress = workInfo.progress
-					val updateType = progress.getInt(LanguageImportFragment.WORKER_ACTION, -1)
-					when (updateType) {
-//						ImportProgress.ACTION_TEXT.ordinal -> {
-//							binding.actionText.text =
-//								progress.getString(LanguageImportFragment.WORKER_MESSAGE)
-//						}
-//						ImportProgress.ACTION_PROGRESS.ordinal -> {
-//							binding.progressBar.progress =
-//								progress.getInt(LanguageImportFragment.WORKER_PROGRESS, 0)
-//						}
-//						ImportProgress.ACTION_COMPLETED.ordinal -> {
-//							viewModel.workComplete()
-//						}
-					}
-				}
-			})
-		workManager.enqueue(workRequest)
-	}
-
 	private fun setPaused(isPaused: Boolean) {
 		this.isPaused = isPaused
 	}

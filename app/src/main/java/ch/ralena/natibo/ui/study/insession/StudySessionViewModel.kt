@@ -48,7 +48,11 @@ class StudySessionViewModel @Inject constructor(
 
 	// region Helper functions ---------------------------------------------------------------------
 	private suspend fun loadCourse(course: CourseRoom) {
-		if (course.sessionId == 0L)
+		// TODO: Remove
+		if (courseRepository.countSessions(course.id) > 0)
+			sessionRepository.deleteAll()
+
+		if (courseRepository.countSessions(course.id) == 0)
 			createSession(course)
 		listeners.forEach { it.onCourseLoaded(course) }
 	}
@@ -58,29 +62,45 @@ class StudySessionViewModel @Inject constructor(
 		val session = SessionRoom(
 			index = numSessions + 1,
 			progress = 0,
-			courseId = course.id
+			courseId = course.id,
+			sentenceIndices = getSentenceIndices(course)
 		)
 		val sessionId = sessionRepository.createSession(session)
-		addSentencesToSession(course, sessionId)
 //		courseRepository.updateCourse(course.copy(sessionId = sessionId))
 	}
 
-	private suspend fun addSentencesToSession(course: CourseRoom, sessionId: Long) {
-		var curSentenceIndex = course.schedule.curSentenceIndex
-		val order = course.schedule.order
-		val reviewPattern = course.schedule.reviewPattern
-		val numSentences = course.schedule.numSentences
+	private suspend fun getSentenceIndices(course: CourseRoom): String {
+		val schedule = course.schedule
+		val startingIndex = schedule.curSentenceIndex
 
-		val sentenceSets = ArrayList<List<SentenceRoom>>()
-//		val packSentences = sentenceRepository.fetchSentencesInPack(course.packName)
-//		val packs = packRepository.fetchPackWithSentencesByNameAndLanguages(course.packName, listOf(course.baseLanguageId, course.targetLanguageId))
-		val newSentences = ArrayList<SentenceRoom>()
-		reviewPattern.forEach { numTimesStr: Char ->
-			val numTimes = Character.getNumericValue(numTimesStr)
-
+		// First time sentences are seen they should be in order
+		val initialSentences = mutableListOf<Int>()
+		for (i in 0..schedule.numSentences) {
+			initialSentences.add(startingIndex + i)
 		}
 
-//		sessionRepository.addSentencesToSession(sessionId, )
+		// Review of new sentences should be randomized
+		val sentences = mutableListOf<Int>()
+		val numTimes = schedule.reviewPattern.split(' ').first().toInt()
+		for (i in 0..schedule.numSentences) {
+			repeat(numTimes - 1) { sentences.add(startingIndex + i) }
+		}
+		sentences.shuffle()
+
+		// make sure no sentences are repeated twice in a row
+		sentences.forEachIndexed { i, sentence ->
+			if (i > 0) {
+				if (sentences[i - 1] == sentence) {
+					sentences.removeAt(i)
+					for (index in 1..sentences.size) {
+						if (sentences[index] != sentence &&	sentences[index -1] != sentence)
+							sentences.add(index, sentence)
+					}
+				}
+			}
+		}
+
+		return initialSentences.joinToString { "," } + sentences.joinToString { "," }
 	}
-	// endregion Helper functions ------------------------------------------------------------------
+// endregion Helper functions ------------------------------------------------------------------
 }

@@ -20,11 +20,20 @@ interface SessionDao {
 	suspend fun insertSessionSentenceCrossRef(sessionSentenceCrossRef: SessionSentenceCrossRef)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	suspend fun insert(course: SessionRoom): Long
+	suspend fun insert(session: SessionRoom): Long
 
 	@Update
-	suspend fun update(course: SessionRoom)
+	suspend fun update(session: SessionRoom)
+
+	@Query("DELETE FROM sessionroom WHERE id > 0")
+	suspend fun deleteAll()
+
+	@Query("DELETE FROM sessionroom WHERE id = :id")
+	suspend fun delete(id: Long)
 
 	@Delete
-	suspend fun delete(course: SessionRoom)
+	suspend fun delete(session: SessionRoom)
+
+	@Query("DELETE FROM sessionsentencecrossref WHERE sessionId = :id")
+	suspend fun deleteSessionSentenceCrossRefs(id: Long)
 }

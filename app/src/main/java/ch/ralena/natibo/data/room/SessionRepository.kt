@@ -23,4 +23,21 @@ class SessionRepository @Inject constructor(
 			sessionDao.insertSessionSentenceCrossRef(sessionSentenceCrossRef)
 		}
 	}
+
+	// region Delete -------------------------------------------------------------------------------
+	suspend fun deleteSession(session: SessionRoom) {
+		sessionDao.deleteSessionSentenceCrossRefs(session.id)
+		sessionDao.delete(session)
+	}
+
+	suspend fun deleteSession(id: Long) {
+		sessionDao.deleteSessionSentenceCrossRefs(id)
+		sessionDao.delete(id)
+	}
+
+	suspend fun deleteAll() {
+		// TODO: Delete sentence crossrefs
+		sessionDao.deleteAll()
+	}
+	// endregion Delete ----------------------------------------------------------------------------
 }

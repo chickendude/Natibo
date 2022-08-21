@@ -13,6 +13,9 @@ data class SessionRoom(
 	/** ID of the course the session belongs to. */
 	val courseId: Long,
 
+	/** Indices of the sentences to be studied, comma-separated. */
+	val sentenceIndices: String,
+
 	@PrimaryKey(autoGenerate = true) val id: Long = 0
 )
 

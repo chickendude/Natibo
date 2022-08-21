@@ -1,5 +1,6 @@
 package ch.ralena.natibo.service
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,6 +9,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.media.MediaPlayer.OnCompletionListener
 import android.media.AudioManager.OnAudioFocusChangeListener
@@ -20,20 +22,22 @@ import android.os.Build
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
 import android.telephony.PhoneStateListener
+import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.Course
-import ch.ralena.natibo.data.room.`object`.Day
-import ch.ralena.natibo.data.room.`object`.Sentence
-import ch.ralena.natibo.data.room.`object`.SentenceGroup
+import ch.ralena.natibo.data.room.`object`.*
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.utils.Utils
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.subjects.PublishSubject
 import io.realm.Realm
 import java.io.IOException
 import java.lang.IllegalStateException
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChangeListener {
 	// Media Session
 	private var mediaSessionManager: MediaSessionManager? = null
@@ -44,8 +48,11 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 		PLAYING, PAUSED
 	}
 
+	@Inject
+	lateinit var viewModel: StudySessionViewModel
+
 	private var mediaPlayer: MediaPlayer? = null
-	private var course: Course? = null
+	private var course: CourseRoom? = null
 	private var day: Day? = null
 	private var audioManager: AudioManager? = null
 	private var isPlaying = false
@@ -72,6 +79,8 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 		// check if we have attached our bundle or not
 		if (intent.extras == null) stopSelf()
 
+//		val sessionId = Utils.Storage(applicationContext).sessionId
+		viewModel.start(1L)
 		realm = Realm.getDefaultInstance()
 		val dayId = Utils.Storage(applicationContext).dayId
 		if (day == null) {
@@ -331,7 +340,11 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 				iconAction(ACTION_ID_PREVIOUS)
 			)
 			.addAction(playPauseDrawable, "pause", playPauseAction)
-			.addAction(android.R.drawable.ic_media_next, "next sentence", iconAction(ACTION_ID_NEXT))
+			.addAction(
+				android.R.drawable.ic_media_next,
+				"next sentence",
+				iconAction(ACTION_ID_NEXT)
+			)
 		val notification = notificationBuilder!!.build()
 		notificationManager.notify(NOTIFICATION_ID, notification)
 		startForeground(NOTIFICATION_ID, notification)
@@ -348,10 +361,10 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 	private fun iconAction(actionId: Int): PendingIntent? {
 		val iconIntent = Intent(this, StudySessionServiceKt::class.java)
 		when (actionId) {
-			ACTION_ID_PLAY -> iconIntent.setAction(ACTION_PLAY)
-			ACTION_ID_PAUSE -> iconIntent.setAction(ACTION_PAUSE)
-			ACTION_ID_NEXT -> iconIntent.setAction(ACTION_NEXT)
-			ACTION_ID_PREVIOUS -> iconIntent.setAction(ACTION_PREVIOUS)
+			ACTION_ID_PLAY -> iconIntent.action = ACTION_PLAY
+			ACTION_ID_PAUSE -> iconIntent.action = ACTION_PAUSE
+			ACTION_ID_NEXT -> iconIntent.action = ACTION_NEXT
+			ACTION_ID_PREVIOUS -> iconIntent.action = ACTION_PREVIOUS
 			else -> return null
 		}
 		return PendingIntent.getService(this, actionId, iconIntent, 0)
@@ -372,21 +385,38 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 
 	// --- call state listener
 	private fun callStateListener() {
+		if (!isReadPhoneStateGranted()) return
+
 		telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
-		phoneStateListener = object : PhoneStateListener() {
-			override fun onCallStateChanged(state: Int, incomingNumber: String) {
-				when (state) {
-					TelephonyManager.CALL_STATE_OFFHOOK, TelephonyManager.CALL_STATE_RINGING -> {
-						// phone ringing or in phone call
-						isPlaying = playbackStatus == PlaybackStatus.PLAYING
-						pause()
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+			telephonyManager.registerTelephonyCallback(
+				mainExecutor,
+				object : TelephonyCallback(), TelephonyCallback.CallStateListener {
+					override fun onCallStateChanged(state: Int) {
+						callStateChanged(state)
 					}
-					TelephonyManager.CALL_STATE_IDLE ->                        // back from phone call
-						if (isPlaying) resume()
+				})
+		} else {
+			telephonyManager.listen(object : PhoneStateListener() {
+				@Deprecated("Deprecated in Java")
+				override fun onCallStateChanged(state: Int, phoneNumber: String?) {
+					callStateChanged(state)
 				}
-			}
+			}, PhoneStateListener.LISTEN_CALL_STATE)
 		}
-		telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
+	}
+
+	private fun callStateChanged(state: Int) {
+		when (state) {
+			TelephonyManager.CALL_STATE_OFFHOOK, TelephonyManager.CALL_STATE_RINGING -> {
+				// phone ringing or in phone call
+				isPlaying = playbackStatus == PlaybackStatus.PLAYING
+				pause()
+			}
+			TelephonyManager.CALL_STATE_IDLE ->
+				// back from phone call
+				if (isPlaying) resume()
+		}
 	}
 
 	override fun onBind(intent: Intent): IBinder? {
@@ -450,6 +480,12 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 		// restore full volume levels
 		setVolume(1.0f)
 	}
+
+	private fun isReadPhoneStateGranted() = ActivityCompat.checkSelfPermission(
+		applicationContext,
+		Manifest.permission.READ_PHONE_STATE
+	) == PackageManager.PERMISSION_GRANTED
+
 
 	// get a copy of the service so we can run its methods from fragment
 	inner class StudyBinder : Binder() {
