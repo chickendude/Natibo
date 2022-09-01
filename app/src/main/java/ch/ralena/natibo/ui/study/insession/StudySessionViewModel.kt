@@ -13,6 +13,7 @@ import ch.ralena.natibo.data.room.`object`.SessionRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.DispatcherProvider
 import kotlinx.coroutines.*
+import java.io.File.separator
 import javax.inject.Inject
 
 class StudySessionViewModel @Inject constructor(
@@ -66,16 +67,16 @@ class StudySessionViewModel @Inject constructor(
 			sentenceIndices = getSentenceIndices(course)
 		)
 		val sessionId = sessionRepository.createSession(session)
-//		courseRepository.updateCourse(course.copy(sessionId = sessionId))
+		courseRepository.updateCourse(course.copy(sessionId = sessionId))
 	}
 
-	private suspend fun getSentenceIndices(course: CourseRoom): String {
+	private fun getSentenceIndices(course: CourseRoom): String {
 		val schedule = course.schedule
 		val startingIndex = schedule.curSentenceIndex
 
 		// First time sentences are seen they should be in order
 		val initialSentences = mutableListOf<Int>()
-		for (i in 0..schedule.numSentences) {
+		for (i in 0 until schedule.numSentences) {
 			initialSentences.add(startingIndex + i)
 		}
 
@@ -88,19 +89,30 @@ class StudySessionViewModel @Inject constructor(
 		sentences.shuffle()
 
 		// make sure no sentences are repeated twice in a row
+		val repeatedSentences = mutableListOf<Int>()
 		sentences.forEachIndexed { i, sentence ->
 			if (i > 0) {
 				if (sentences[i - 1] == sentence) {
-					sentences.removeAt(i)
-					for (index in 1..sentences.size) {
-						if (sentences[index] != sentence &&	sentences[index -1] != sentence)
-							sentences.add(index, sentence)
-					}
+					repeatedSentences.add(sentence)
+					sentences[i] = -1
+				}
+			} else {
+				if (sentence == initialSentences.last()) sentences[i] = 0
+			}
+		}
+		sentences.removeAll { it == -1 }
+
+		// Insert sentences back into list where they won't be repeated
+		repeatedSentences.forEach { sentence ->
+			for (index in 1..sentences.size) {
+				if (sentences[index] != sentence &&	sentences[index -1] != sentence) {
+					sentences.add(index, sentence)
+					break
 				}
 			}
 		}
 
-		return initialSentences.joinToString { "," } + sentences.joinToString { "," }
+		return (initialSentences + sentences).joinToString(separator = ",")
 	}
 // endregion Helper functions ------------------------------------------------------------------
 }
