@@ -58,7 +58,6 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 	private var isPlaying = false
 	private var phoneStateListener: PhoneStateListener? = null
 	private lateinit var telephonyManager: TelephonyManager
-	private var realm: Realm? = null
 	private var sentenceGroup: SentenceGroup? = null
 	private var sentence: Sentence? = null
 
@@ -79,15 +78,12 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 		// check if we have attached our bundle or not
 		if (intent.extras == null) stopSelf()
 
-//		val sessionId = Utils.Storage(applicationContext).sessionId
-		viewModel.start(1L)
-		realm = Realm.getDefaultInstance()
-		val dayId = Utils.Storage(applicationContext).dayId
+		val courseId = Utils.Storage(applicationContext).courseId
+		viewModel.start(courseId)
 		if (day == null) {
 //			day = realm.where<Day>(Day::class.java).equalTo("id", dayId).findFirst()
 			if (day == null) stopSelf()
 		}
-		val courseId = Utils.Storage(applicationContext).courseId
 		if (course == null) {
 //			course = realm.where<Course>(Course::class.java).equalTo("id", courseId).findFirst()
 			if (course == null) stopSelf()
