@@ -6,4 +6,7 @@
 	<string name="custom_schedule_hint" translatable="false">5 4 3 2 1</string>
 	<string name="schedule_five_day_radio" translatable="false">7 / 5 / 4 / 3 / 2</string>
 	<string name="schedule_four_day_radio" translatable="false">6 / 4 / 3 / 2</string>
+    <string name="estimated_time">Estimated Time</string>
+	<string name="course_settings_content_description">Course Settings</string>
+	<string name="play_and_pause_button">Play and pause button</string>
 </resources>

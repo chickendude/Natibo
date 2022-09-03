@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.Day
@@ -19,8 +18,8 @@ import ch.ralena.natibo.databinding.FragmentStudySessionBinding
 import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.ui.MainActivity
-import ch.ralena.natibo.ui.adapter.SentenceGroupAdapter
 import ch.ralena.natibo.ui.base.BaseFragment
+import ch.ralena.natibo.ui.study.insession.views.Sentences
 import ch.ralena.natibo.ui.study.overview.StudySessionOverviewFragment
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
@@ -53,7 +52,6 @@ class StudySessionFragment :
 	private var millisLeft: Long = 0
 	private var countDownTimer: CountDownTimer? = null
 	private var isPaused = false
-	private var adapter: SentenceGroupAdapter? = null
 
 	private var serviceDisposable: Disposable? = null
 
@@ -80,11 +78,6 @@ class StudySessionFragment :
 				viewModel.settingsIconClicked()
 			}
 
-			recyclerView.apply {
-				adapter = SentenceGroupAdapter()
-				layoutManager = LinearLayoutManager(context)
-			}
-
 			// handle playing/pausing
 			playPauseImage.setOnClickListener { v: View -> playPause(v) }
 		}
@@ -104,6 +97,7 @@ class StudySessionFragment :
 		serviceDisposable =
 			activity.sessionPublish.subscribe { service: StudySessionServiceKt ->
 				studySessionService = service
+				binding.sentences.setContent { Sentences(service.currentSentence()) }
 //				if (course.getCurrentDay().getCurrentSentenceGroup() != null) nextSentence(
 //					course.getCurrentDay().getCurrentSentenceGroup()
 //				) else sessionFinished(course.getCurrentDay())
@@ -113,9 +107,6 @@ class StudySessionFragment :
 							loadSentence(sentence)
 						}
 					}.launchIn(lifecycleScope)
-//					.subscribe({ sentenceGroup: SentenceGroup ->
-//						nextSentence(sentenceGroup)
-//					})
 //				finishDisposable = studySessionService.finishObservable()
 //					.subscribe(Consumer<Day> { day: Day -> sessionFinished(day) })
 				setPaused(
@@ -170,7 +161,6 @@ class StudySessionFragment :
 	private fun loadSentence(sentence: NatiboSentence) {
 		updatePlayPauseImage()
 		binding.sentencesLayout.visibility = View.VISIBLE
-//		adapter?.updateSentenceGroup(sentencePair)
 
 		// update number of reps remaining
 //		binding.remainingRepsText.setText(
