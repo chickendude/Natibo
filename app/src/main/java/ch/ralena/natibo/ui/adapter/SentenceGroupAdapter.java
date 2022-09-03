@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.List;
+
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.data.room.object.Language;
 import ch.ralena.natibo.data.room.object.Sentence;
@@ -24,8 +26,8 @@ public class SentenceGroupAdapter extends RecyclerView.Adapter<SentenceGroupAdap
 		return languageSubject;
 	}
 
-	private RealmList<Sentence> sentences;
-	private RealmList<Language> languages;
+	private List<Sentence> sentences;
+	private List<Language> languages;
 
 	public SentenceGroupAdapter() {
 		sentences = new RealmList<>();

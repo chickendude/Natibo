@@ -9,12 +9,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.Day
-import ch.ralena.natibo.data.room.`object`.SentenceGroup
 import ch.ralena.natibo.databinding.FragmentStudySessionBinding
+import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.adapter.SentenceGroupAdapter
@@ -22,6 +24,8 @@ import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.study.overview.StudySessionOverviewFragment
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.util.*
 import javax.inject.Inject
 
@@ -103,7 +107,12 @@ class StudySessionFragment :
 //				if (course.getCurrentDay().getCurrentSentenceGroup() != null) nextSentence(
 //					course.getCurrentDay().getCurrentSentenceGroup()
 //				) else sessionFinished(course.getCurrentDay())
-//				sentenceDisposable = studySessionService.sentenceObservable()
+				service.currentSentence().flowWithLifecycle(lifecycle)
+					.onEach { sentence ->
+						if (sentence != null) {
+							loadSentence(sentence)
+						}
+					}.launchIn(lifecycleScope)
 //					.subscribe({ sentenceGroup: SentenceGroup ->
 //						nextSentence(sentenceGroup)
 //					})
@@ -158,10 +167,10 @@ class StudySessionFragment :
 			.commit()
 	}
 
-	private fun nextSentence(sentenceGroup: SentenceGroup) {
+	private fun loadSentence(sentence: NatiboSentence) {
 		updatePlayPauseImage()
 		binding.sentencesLayout.visibility = View.VISIBLE
-		adapter?.updateSentenceGroup(sentenceGroup)
+//		adapter?.updateSentenceGroup(sentencePair)
 
 		// update number of reps remaining
 //		binding.remainingRepsText.setText(

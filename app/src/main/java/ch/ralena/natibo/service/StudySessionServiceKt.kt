@@ -4,9 +4,9 @@ import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Context.MEDIA_SESSION_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -26,19 +26,29 @@ import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.media.AudioManagerCompat.requestAudioFocus
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.*
+import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.ui.MainActivity
+import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker.Companion.NOTIFICATION_ID
 import ch.ralena.natibo.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.subjects.PublishSubject
-import io.realm.Realm
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.io.IOException
 import java.lang.IllegalStateException
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChangeListener {
+class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioFocusChangeListener {
 	// Media Session
 	private var mediaSessionManager: MediaSessionManager? = null
 	private var mediaSession: MediaSession? = null
@@ -58,14 +68,16 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 	private var isPlaying = false
 	private var phoneStateListener: PhoneStateListener? = null
 	private lateinit var telephonyManager: TelephonyManager
-	private var sentenceGroup: SentenceGroup? = null
-	private var sentence: Sentence? = null
 
 	// --- getters/setters ---
 	var playbackStatus: PlaybackStatus? = null
 		private set
 	private var notificationBuilder: NotificationCompat.Builder? = null
-	var sentencePublish: PublishSubject<SentenceGroup> = PublishSubject.create<SentenceGroup>()
+	private var currentSentence: MutableStateFlow<NatiboSentence?> =
+		MutableStateFlow(null)
+
+	fun currentSentence() = currentSentence.asStateFlow()
+
 	var finishPublish: PublishSubject<Day> = PublishSubject.create<Day>()
 
 	// given to clients that connect to the service
@@ -74,9 +86,9 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 	// Broadcast Receivers
 	private val becomingNoisyReceiver: BroadcastReceiver = BecomingNoisyReceiver()
 	private val startSessionReceiver: BroadcastReceiver = StartSessionReceiver()
-	override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 		// check if we have attached our bundle or not
-		if (intent.extras == null) stopSelf()
+		if (intent?.extras == null) stopSelf()
 
 		val courseId = Utils.Storage(applicationContext).courseId
 		viewModel.start(courseId)
@@ -89,10 +101,15 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 			if (course == null) stopSelf()
 		}
 		if (!requestAudioFocus()) stopSelf()
-		if (mediaPlayer == null) {
-			loadSentence()
-			play()
-		}
+
+		viewModel.readyToStart().flowWithLifecycle(lifecycle)
+			.onEach { isReady ->
+				if (isReady && mediaPlayer == null) {
+					loadSentence()
+					play()
+				}
+
+			}.launchIn(lifecycleScope)
 		if (mediaSessionManager == null) {
 			initMediaSession()
 		}
@@ -130,48 +147,50 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 
 	// --- setup ---
 	private fun loadSentence() {
-		sentenceGroup = day?.getCurrentSentenceGroup()
-
-		// if sentenceGroup is null, we're done studying for the day!
-		if (sentenceGroup == null) {
+		val sentence = viewModel.nextSentence()
+		if (sentence == null) {
 			removeNotification()
 //			finishPublish.onNext(day)
 			stop()
 			stopSelf()
-		} else {
-//			sentencePublish.onNext(sentenceGroup)
-//			sentence = day.getCurrentSentence()
-			if (mediaPlayer == null) {
-				mediaPlayer = MediaPlayer()
-				mediaPlayer!!.setOnCompletionListener(this)
-				mediaPlayer!!.setAudioStreamType(AudioManager.STREAM_MUSIC)
-			}
-			try {
-				mediaPlayer!!.stop()
-				mediaPlayer!!.reset()
-				// load sentence path into mediaplayer to be played
-//				mediaPlayer.setDataSource(sentence.getUri())
+			return
+		}
 
-				// Set playback speed for the target language according to preferences
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					// Only change playback speed for the target language
+		if (mediaPlayer == null) {
+			mediaPlayer = MediaPlayer().apply {
+				setOnCompletionListener(this@StudySessionServiceKt)
+				setAudioStreamType(AudioManager.STREAM_MUSIC)
+			}
+		}
+		mediaPlayer!!.apply {
+			stop()
+			reset()
+			setDataSource(sentence.native.mp3)
+			prepare()
+			play()
+		}
+		// if sentenceGroup is null, we're done studying for the day!
+		currentSentence.value = sentence
+		try {
+			// Set playback speed for the target language according to preferences
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				// Only change playback speed for the target language
 //					if (sentence.getId() == sentenceGroup.getSentences().get(1).getId()) {
 //						mediaPlayer!!.playbackParams =
 //							mediaPlayer!!.playbackParams.setSpeed(course.getPlaybackSpeed())
 //					} else {
 //						mediaPlayer!!.playbackParams = mediaPlayer!!.playbackParams.setSpeed(1f)
 //					}
-				}
-				mediaPlayer!!.prepare()
-			} catch (e: IOException) {
-				e.printStackTrace()
-				stopSelf()
-			} catch (e: IllegalStateException) {
-				e.printStackTrace()
-				stopSelf()
 			}
-			updateNotificationText()
+			mediaPlayer!!.prepare()
+		} catch (e: IOException) {
+			e.printStackTrace()
+			stopSelf()
+		} catch (e: IllegalStateException) {
+			e.printStackTrace()
+			stopSelf()
 		}
+		updateNotificationText()
 	}
 
 	// --- managing media ---
@@ -283,10 +302,10 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 
 	// --- notification ---
 	fun buildNotification() {
-		if (sentenceGroup == null) {
+//		if (sentenceGroup == null) {
 //			finishPublish.onNext(day)
-			return
-		}
+//			return
+//		}
 		var playPauseDrawable = android.R.drawable.ic_media_pause
 		var playPauseAction: PendingIntent? = null
 		if (playbackStatus == PlaybackStatus.PLAYING) {
@@ -524,14 +543,10 @@ class StudySessionServiceKt : Service(), OnCompletionListener, OnAudioFocusChang
 //			}
 
 			// when returning to the screen, make sure the sentences are updated
-			if (sentenceGroup != null) {
+//			if (sentenceGroup != null) {
 //				sentencePublish.onNext(sentenceGroup)
-			}
+//			}
 		}
-	}
-
-	fun sentenceObservable(): PublishSubject<SentenceGroup> {
-		return sentencePublish
 	}
 
 	fun finishObservable(): PublishSubject<Day> {
