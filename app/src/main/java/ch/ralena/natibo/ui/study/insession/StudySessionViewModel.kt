@@ -104,7 +104,7 @@ class StudySessionViewModel @Inject constructor(
 
 		// Insert sentences back into list where they won't be repeated
 		repeatedSentences.forEach { sentence ->
-			for (index in 1..sentences.size) {
+			for (index in 1 until sentences.size) {
 				if (sentences[index] != sentence &&	sentences[index -1] != sentence) {
 					sentences.add(index, sentence)
 					break
