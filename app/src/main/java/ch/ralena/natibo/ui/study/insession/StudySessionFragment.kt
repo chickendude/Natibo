@@ -17,6 +17,7 @@ import ch.ralena.natibo.data.room.`object`.Day
 import ch.ralena.natibo.databinding.FragmentStudySessionBinding
 import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.service.StudySessionServiceKt
+import ch.ralena.natibo.service.StudyState
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.study.insession.views.Sentences
@@ -110,8 +111,8 @@ class StudySessionFragment :
 //				finishDisposable = studySessionService.finishObservable()
 //					.subscribe(Consumer<Day> { day: Day -> sessionFinished(day) })
 				setPaused(
-					service.playbackStatus == null ||
-							service.playbackStatus == StudySessionServiceKt.PlaybackStatus.PAUSED
+					service.studyState().value == StudyState.UNINITIALIZED ||
+							service.studyState().value == StudyState.PAUSED
 				)
 				if (!isPaused) {
 					startTimer()
@@ -123,7 +124,7 @@ class StudySessionFragment :
 
 	private fun playPause(view: View) {
 		studySessionService?.let { service ->
-			if (service.playbackStatus == StudySessionServiceKt.PlaybackStatus.PLAYING) {
+			if (service.studyState().value == StudyState.PLAYING) {
 				service.pause()
 				setPaused(true)
 				countDownTimer?.cancel()
@@ -136,7 +137,7 @@ class StudySessionFragment :
 	}
 
 	private fun updatePlayPauseImage() {
-		if (studySessionService?.playbackStatus == StudySessionServiceKt.PlaybackStatus.PLAYING) {
+		if (studySessionService?.studyState()?.value == StudyState.PLAYING) {
 			binding.playPauseImage.setImageResource(R.drawable.ic_pause)
 		} else {
 			binding.playPauseImage.setImageResource(R.drawable.ic_play)

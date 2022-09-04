@@ -8,6 +8,8 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 fun Sentences(currentSentence: StateFlow<NatiboSentence?>) {
 	val sentence = currentSentence.collectAsState().value ?: return
 	Column(modifier = Modifier.padding(5.dp)) {
+		Text(text = sentence.native.index.toString())
 		Text(text = sentence.native.original, modifier = Modifier.padding(5.dp))
 		Text(text = sentence.native.ipa, modifier = Modifier.padding(5.dp))
 		Text(text = sentence.native.romanization, modifier = Modifier.padding(5.dp))

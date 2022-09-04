@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 	private lateinit var bottomNavigationView: BottomNavigationView
 	private var studySessionService: StudySessionServiceKt? = null
 	private var isServiceBound = false
-	val sessionPublish = PublishSubject.create<StudySessionServiceKt?>()
+	internal val sessionPublish = PublishSubject.create<StudySessionServiceKt?>()
 
 	private val serviceConnection: ServiceConnection = object : ServiceConnection {
 		override fun onServiceConnected(name: ComponentName, service: IBinder) {

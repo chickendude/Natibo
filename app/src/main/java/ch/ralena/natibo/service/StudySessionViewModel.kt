@@ -5,20 +5,21 @@ import ch.ralena.natibo.data.Result
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.SessionRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
+import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.model.NatiboSession
 import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.usecases.data.FetchSessionWithSentencesUseCase
 import ch.ralena.natibo.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private val TAG = StudySessionViewModel::class.simpleName
 
-class StudySessionViewModel @Inject constructor(
+internal class StudySessionViewModel @Inject constructor(
 	private val fetchSessionWithSentencesUseCase: FetchSessionWithSentencesUseCase,
 	private val courseRepository: CourseRepository,
 	private val sessionRepository: SessionRepository,
@@ -27,8 +28,11 @@ class StudySessionViewModel @Inject constructor(
 	private val job = Job()
 	val coroutineScope = CoroutineScope(job + dispatcherProvider.default())
 
-	private val readyToStart = MutableStateFlow(false)
-	fun readyToStart() = readyToStart.asStateFlow()
+	private val events = MutableSharedFlow<Event>()
+	fun events() = events.asSharedFlow()
+
+	private var _currentSentence: NatiboSentence? = null
+	val currentSentence get() = _currentSentence
 
 	private lateinit var session: NatiboSession
 
@@ -42,16 +46,24 @@ class StudySessionViewModel @Inject constructor(
 		}
 	}
 
-	fun nextSentence(): NatiboSentence? {
-		session.currentSentenceIndex += 1
-		val sentence = session.sentences.getOrNull(session.currentSentenceIndex)
-		return sentence
+	fun nextSentence() {
+		coroutineScope.launch {
+			session.nextSentence()
+			_currentSentence = session.currentSentencePair
+			val sentence = session.currentSentence
+			if (sentence == null) events.emit(Event.SessionFinished)
+			else events.emit(Event.SentenceLoaded(sentence))
+		}
 	}
 
 	private suspend fun loadSession(course: CourseRoom) {
 		session =
 			fetchSessionWithSentencesUseCase.fetchSessionWithSentences(course.sessionId) ?: return
-		Log.d("----", session.toString())
-		readyToStart.value = true
+		nextSentence()
+	}
+
+	internal sealed class Event {
+		data class SentenceLoaded(val sentence: SentenceRoom) : Event()
+		object SessionFinished : Event()
 	}
 }

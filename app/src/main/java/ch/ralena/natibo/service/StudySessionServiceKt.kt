@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Context.MEDIA_SESSION_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -26,19 +25,16 @@ import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.media.AudioManagerCompat.requestAudioFocus
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.*
 import ch.ralena.natibo.model.NatiboSentence
+import ch.ralena.natibo.service.StudySessionViewModel.Event
 import ch.ralena.natibo.ui.MainActivity
-import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker.Companion.NOTIFICATION_ID
 import ch.ralena.natibo.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -48,21 +44,17 @@ import java.lang.IllegalStateException
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioFocusChangeListener {
+internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
+	OnAudioFocusChangeListener {
 	// Media Session
 	private var mediaSessionManager: MediaSessionManager? = null
 	private var mediaSession: MediaSession? = null
 	private var transportControls: MediaController.TransportControls? = null
 
-	enum class PlaybackStatus {
-		PLAYING, PAUSED
-	}
-
 	@Inject
 	lateinit var viewModel: StudySessionViewModel
 
 	private var mediaPlayer: MediaPlayer? = null
-	private var course: CourseRoom? = null
 	private var day: Day? = null
 	private var audioManager: AudioManager? = null
 	private var isPlaying = false
@@ -70,15 +62,13 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 	private lateinit var telephonyManager: TelephonyManager
 
 	// --- getters/setters ---
-	var playbackStatus: PlaybackStatus? = null
-		private set
 	private var notificationBuilder: NotificationCompat.Builder? = null
-	private var currentSentence: MutableStateFlow<NatiboSentence?> =
-		MutableStateFlow(null)
 
+	private var currentSentence = MutableStateFlow<NatiboSentence?>(null)
 	fun currentSentence() = currentSentence.asStateFlow()
 
-	var finishPublish: PublishSubject<Day> = PublishSubject.create<Day>()
+	private var studyState = MutableStateFlow(StudyState.UNINITIALIZED)
+	fun studyState() = studyState.asStateFlow()
 
 	// given to clients that connect to the service
 	var binder: StudyBinder = StudyBinder()
@@ -92,27 +82,22 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 
 		val courseId = Utils.Storage(applicationContext).courseId
 		viewModel.start(courseId)
-		if (day == null) {
-//			day = realm.where<Day>(Day::class.java).equalTo("id", dayId).findFirst()
-			if (day == null) stopSelf()
-		}
-		if (course == null) {
-//			course = realm.where<Course>(Course::class.java).equalTo("id", courseId).findFirst()
-			if (course == null) stopSelf()
-		}
 		if (!requestAudioFocus()) stopSelf()
 
-		viewModel.readyToStart().flowWithLifecycle(lifecycle)
-			.onEach { isReady ->
-				if (isReady && mediaPlayer == null) {
-					loadSentence()
-					play()
+		viewModel.events()
+			.flowWithLifecycle(lifecycle)
+			.onEach { event ->
+				when (event) {
+					is Event.SessionFinished -> studyState.value = StudyState.COMPLETE
+					is Event.SentenceLoaded -> loadSentence(event.sentence)
 				}
 
 			}.launchIn(lifecycleScope)
+
 		if (mediaSessionManager == null) {
 			initMediaSession()
 		}
+		setUpMediaPlayer()
 		handleIncomingActions(intent)
 		return super.onStartCommand(intent, flags, startId)
 	}
@@ -145,32 +130,57 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 		unregisterReceiver(startSessionReceiver)
 	}
 
-	// --- setup ---
-	private fun loadSentence() {
-		val sentence = viewModel.nextSentence()
-		if (sentence == null) {
-			removeNotification()
-//			finishPublish.onNext(day)
-			stop()
-			stopSelf()
-			return
-		}
+	override fun onCompletion(mp: MediaPlayer) {
+		// when file has completed playing
+		viewModel.nextSentence()
+//		if (day.nextSentence(realm)) {
+//			val handler = Handler()
+//			val runnable = Runnable {
+//				loadSentence()
+//				if (studyState.value == PlaybackStatus.PLAYING) play()
+//			}
+//			handler.postDelayed(runnable, course.getPauseMillis().toLong())
+//		}
+	}
 
+	override fun onAudioFocusChange(focusChange: Int) {
+		// when another app makes focus request
+		when (focusChange) {
+			AudioManager.AUDIOFOCUS_GAIN -> if (isPlaying) restartPlaying()
+			AudioManager.AUDIOFOCUS_LOSS -> {
+				isPlaying = false
+				pauseAndRelease()
+				buildNotification()
+			}
+			AudioManager.AUDIOFOCUS_LOSS_TRANSIENT, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+				isPlaying = studyState.value == StudyState.PLAYING
+				pause()
+			}
+		}
+	}
+
+	private fun setUpMediaPlayer() {
 		if (mediaPlayer == null) {
 			mediaPlayer = MediaPlayer().apply {
 				setOnCompletionListener(this@StudySessionServiceKt)
 				setAudioStreamType(AudioManager.STREAM_MUSIC)
 			}
 		}
-		mediaPlayer!!.apply {
+	}
+
+	// --- setup ---
+	private fun loadSentence(sentence: SentenceRoom) {
+		currentSentence.value = viewModel.currentSentence
+
+		// TODO: Check if all of this is necessary
+		mediaPlayer?.apply {
 			stop()
 			reset()
-			setDataSource(sentence.native.mp3)
+			setDataSource(sentence.mp3)
 			prepare()
 			play()
 		}
 		// if sentenceGroup is null, we're done studying for the day!
-		currentSentence.value = sentence
 		try {
 			// Set playback speed for the target language according to preferences
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -198,39 +208,36 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 		if (mediaSessionManager != null) return
 
 		mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
-		mediaSession = MediaSession(applicationContext, "Natibo")
-		transportControls = mediaSession!!.controller.transportControls
-		mediaSession!!.isActive = true
-		mediaSession!!.setFlags(MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS)
-		mediaSession!!.setCallback(object : MediaSession.Callback() {
-			override fun onPlay() {
-				super.onPlay()
-				resume()
-				buildNotification()
-			}
+		mediaSession = MediaSession(applicationContext, "Natibo").apply {
+			transportControls = controller.transportControls
+			isActive = true
+			setFlags(MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS)
+			setCallback(object : MediaSession.Callback() {
+				override fun onPlay() {
+					super.onPlay()
+					resume()
+					buildNotification()
+				}
 
-			override fun onPause() {
-				super.onPause()
-				pause()
-				buildNotification()
-			}
+				override fun onPause() {
+					super.onPause()
+					pause()
+					buildNotification()
+				}
 
-			override fun onSkipToNext() {
-				super.onSkipToNext()
-				nextSentence()
-				buildNotification()
-			}
+				override fun onSkipToNext() {
+					super.onSkipToNext()
+					nextSentence()
+					buildNotification()
+				}
 
-			override fun onSkipToPrevious() {
-				super.onSkipToPrevious()
-				previousSentence()
-				buildNotification()
-			}
-
-			override fun onSeekTo(pos: Long) {
-				super.onSeekTo(pos)
-			}
-		})
+				override fun onSkipToPrevious() {
+					super.onSkipToPrevious()
+					previousSentence()
+					buildNotification()
+				}
+			})
+		}
 	}
 
 	private fun updateNotificationText() {
@@ -238,7 +245,7 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 //			notificationBuilder!!
 //				.setContentText(sentenceGroup.getSentences().first().getText())
 //				.setContentTitle(sentenceGroup.getSentences().last().getText())
-//				.setOngoing(playbackStatus == PlaybackStatus.PLAYING)
+//				.setOngoing(studyState.value == PlaybackStatus.PLAYING)
 			val notificationManager: NotificationManager =
 				getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 			notificationManager.notify(NOTIFICATION_ID, notificationBuilder!!.build())
@@ -246,21 +253,21 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 	}
 
 	private fun play() {
-		playbackStatus = PlaybackStatus.PLAYING
+		studyState.value = StudyState.PLAYING
 		if (mediaPlayer != null && !mediaPlayer!!.isPlaying) {
 			mediaPlayer!!.start()
 		}
 	}
 
 	private fun stop() {
-		playbackStatus = PlaybackStatus.PAUSED
+		studyState.value = StudyState.PAUSED
 		if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
 			mediaPlayer!!.stop()
 		}
 	}
 
 	fun pause() {
-		playbackStatus = PlaybackStatus.PAUSED
+		studyState.value = StudyState.PAUSED
 		if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
 			mediaPlayer!!.pause()
 		}
@@ -268,11 +275,11 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 
 	fun resume() {
 		if (requestAudioFocus()) {
-			playbackStatus = PlaybackStatus.PLAYING
+			studyState.value = StudyState.PLAYING
 			if (mediaPlayer != null && !mediaPlayer!!.isPlaying) {
 				mediaPlayer!!.start()
 			} else {
-				loadSentence()
+				viewModel.nextSentence()
 				play()
 			}
 		}
@@ -280,16 +287,17 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 
 	private fun nextSentence() {
 //		day.goToNextSentencePair(realm)
-		loadSentence()
-		if (playbackStatus == PlaybackStatus.PLAYING) {
+		viewModel.nextSentence()
+		if (studyState.value == StudyState.PLAYING) {
 			play()
 		}
 	}
 
 	private fun previousSentence() {
 //		day.goToPreviousSentencePair(realm)
-		loadSentence()
-		if (playbackStatus == PlaybackStatus.PLAYING) {
+		// TODO: Switch to previous sentence
+		viewModel.nextSentence()
+		if (studyState.value == StudyState.PLAYING) {
 			play()
 		}
 	}
@@ -308,10 +316,10 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 //		}
 		var playPauseDrawable = android.R.drawable.ic_media_pause
 		var playPauseAction: PendingIntent? = null
-		if (playbackStatus == PlaybackStatus.PLAYING) {
+		if (studyState.value == StudyState.PLAYING) {
 			playPauseDrawable = android.R.drawable.ic_media_pause
 			playPauseAction = iconAction(ACTION_ID_PAUSE)
-		} else if (playbackStatus == PlaybackStatus.PAUSED) {
+		} else if (studyState.value == StudyState.PAUSED) {
 			playPauseDrawable = android.R.drawable.ic_media_play
 			playPauseAction = iconAction(ACTION_ID_PLAY)
 		}
@@ -338,7 +346,7 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 		notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
 			.setVisibility(NotificationCompat.VISIBILITY_PUBLIC) //				.setContentIntent(contentIntent)
 			.setShowWhen(false)
-			.setOngoing(playbackStatus == PlaybackStatus.PLAYING)
+			.setOngoing(studyState.value == StudyState.PLAYING)
 			.setOnlyAlertOnce(true)
 			.setSmallIcon(R.drawable.ic_logo)
 			.setColorized(false)
@@ -425,7 +433,7 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 		when (state) {
 			TelephonyManager.CALL_STATE_OFFHOOK, TelephonyManager.CALL_STATE_RINGING -> {
 				// phone ringing or in phone call
-				isPlaying = playbackStatus == PlaybackStatus.PLAYING
+				isPlaying = studyState.value == StudyState.PLAYING
 				pause()
 			}
 			TelephonyManager.CALL_STATE_IDLE ->
@@ -436,34 +444,6 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 
 	override fun onBind(intent: Intent): IBinder? {
 		return binder
-	}
-
-	override fun onCompletion(mp: MediaPlayer) {
-		// when file has completed playing
-//		if (day.nextSentence(realm)) {
-//			val handler = Handler()
-//			val runnable = Runnable {
-//				loadSentence()
-//				if (playbackStatus == PlaybackStatus.PLAYING) play()
-//			}
-//			handler.postDelayed(runnable, course.getPauseMillis().toLong())
-//		}
-	}
-
-	override fun onAudioFocusChange(focusChange: Int) {
-		// when another app makes focus request
-		when (focusChange) {
-			AudioManager.AUDIOFOCUS_GAIN -> if (isPlaying) restartPlaying()
-			AudioManager.AUDIOFOCUS_LOSS -> {
-				isPlaying = false
-				pauseAndRelease()
-				buildNotification()
-			}
-			AudioManager.AUDIOFOCUS_LOSS_TRANSIENT, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
-				isPlaying = playbackStatus == PlaybackStatus.PLAYING
-				pause()
-			}
-		}
 	}
 
 	private fun requestAudioFocus(): Boolean {
@@ -488,7 +468,8 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 
 	private fun restartPlaying() {
 		if (mediaPlayer == null) {
-			loadSentence()
+			// TODO: Maybe incorrect
+			viewModel.nextSentence()
 		}
 		play()
 
@@ -537,7 +518,7 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 
 			// if the app is playing, we don't need to reload the sentence.
 			// if nothing is playing, we'll need to load the sentence and start it.
-//			if (playbackStatus != PlaybackStatus.PLAYING && !day.isCompleted()) {
+//			if (studyState.value != PlaybackStatus.PLAYING && !day.isCompleted()) {
 //				loadSentence()
 //				play()
 //			}
@@ -547,10 +528,6 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 //				sentencePublish.onNext(sentenceGroup)
 //			}
 		}
-	}
-
-	fun finishObservable(): PublishSubject<Day> {
-		return finishPublish
 	}
 
 	companion object {
@@ -567,3 +544,5 @@ class StudySessionServiceKt : LifecycleService(), OnCompletionListener, OnAudioF
 		private const val CHANNEL_ID = "Natibo Study Notification"
 	}
 }
+
+internal enum class StudyState { UNINITIALIZED, PAUSED, PLAYING, COMPLETE }

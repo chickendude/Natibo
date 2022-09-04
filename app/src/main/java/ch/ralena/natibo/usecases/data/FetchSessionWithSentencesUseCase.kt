@@ -21,6 +21,7 @@ class FetchSessionWithSentencesUseCase @Inject constructor(
 		val course = result.data
 		val startingIndex = course.schedule.curSentenceIndex
 		val endingIndex = course.schedule.curSentenceIndex + course.schedule.numSentences
+		val languageOrder = course.schedule.order.toCharArray().map { it.digitToInt() }
 		val targetSentences = if (course.targetLanguageId != null) {
 			sentenceRepository.fetchSentencesInPack(
 				packId = course.packId,
@@ -46,6 +47,6 @@ class FetchSessionWithSentencesUseCase @Inject constructor(
 			if (course.targetLanguageId != null && target == null) continue
 			sentences.add(NatiboSentence(native, target))
 		}
-		return NatiboSession(sentences, sentenceIndices = indices)
+		return NatiboSession(sentences, sentenceIndices = indices, languageOrder = languageOrder)
 	}
 }
