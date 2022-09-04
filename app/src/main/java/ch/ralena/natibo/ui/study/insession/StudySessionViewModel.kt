@@ -82,9 +82,9 @@ class StudySessionViewModel @Inject constructor(
 
 		// Review of new sentences should be randomized
 		val sentences = mutableListOf<Int>()
-		val numTimes = schedule.reviewPattern.split(' ').first().toInt()
-		for (i in 0..schedule.numSentences) {
-			repeat(numTimes - 1) { sentences.add(startingIndex + i) }
+		val numTimes = schedule.reviewPattern.split(' ').first().toInt() - 1
+		for (i in 0 until schedule.numSentences) {
+			repeat(numTimes) { sentences.add(startingIndex + i) }
 		}
 		sentences.shuffle()
 
