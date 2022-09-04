@@ -163,47 +163,4 @@ class CourseRepository @Inject constructor(
 //		}
 //	}
 	// endregion
-
-	// region Helper function ----------------------------------------------------------------------
-	private fun getSentenceGroups(
-		index: Int,
-		numSentences: Int,
-		languages: List<Language>,
-		packs: List<Pack>
-	): RealmList<SentenceGroup> {
-		val sentenceGroups = RealmList<SentenceGroup>()
-
-		// go through each pack
-		for (language in languages) {
-			var i = 0
-			var sentenceIndex = index
-			var sentencesToAdd = numSentences
-			for (pack in getPacksPerLanguage(language, packs)) {
-				val packSentences = pack.sentences
-				if (sentenceIndex >= pack.sentences.size) sentenceIndex -= packSentences.size else {
-					while (sentencesToAdd > 0) {
-						if (sentenceIndex >= pack.sentences.size) break
-						sentencesToAdd--
-						val sentence = packSentences[sentenceIndex++]
-						if (sentenceGroups.size <= i) {
-							sentenceGroups.add(SentenceGroup())
-						}
-						sentenceGroups[i]!!.sentences.add(sentence)
-						sentenceGroups[i++]!!.languages.add(language)
-					}
-				}
-			}
-		}
-		return sentenceGroups
-	}
-
-	private fun getPacksPerLanguage(language: Language, packs: List<Pack>): RealmList<Pack> {
-		val results = RealmList<Pack>()
-		for (pack in packs) {
-			if (language.hasBook(pack.book)) results.add(language.getPack(pack.book))
-		}
-		return results
-	}
-// endregion Helper functions ----------------------------------------------------------------------
-
 }
