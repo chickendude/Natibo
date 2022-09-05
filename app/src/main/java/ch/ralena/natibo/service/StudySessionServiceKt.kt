@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Context.MEDIA_SESSION_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -25,14 +26,17 @@ import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.media.AudioManagerCompat.requestAudioFocus
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.*
 import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.service.StudySessionViewModel.Event
 import ch.ralena.natibo.ui.MainActivity
+import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker.Companion.NOTIFICATION_ID
 import ch.ralena.natibo.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -172,33 +176,13 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 	private fun loadSentence(sentence: SentenceRoom) {
 		currentSentence.value = viewModel.currentSentence
 
-		// TODO: Check if all of this is necessary
 		mediaPlayer?.apply {
-			stop()
 			reset()
 			setDataSource(sentence.mp3)
 			prepare()
 			play()
-		}
-		// if sentenceGroup is null, we're done studying for the day!
-		try {
-			// Set playback speed for the target language according to preferences
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-				// Only change playback speed for the target language
-//					if (sentence.getId() == sentenceGroup.getSentences().get(1).getId()) {
-//						mediaPlayer!!.playbackParams =
-//							mediaPlayer!!.playbackParams.setSpeed(course.getPlaybackSpeed())
-//					} else {
-//						mediaPlayer!!.playbackParams = mediaPlayer!!.playbackParams.setSpeed(1f)
-//					}
-			}
-			mediaPlayer!!.prepare()
-		} catch (e: IOException) {
-			e.printStackTrace()
-			stopSelf()
-		} catch (e: IllegalStateException) {
-			e.printStackTrace()
-			stopSelf()
+			// TODO: Handle speed from settings
+			playbackParams = playbackParams.setSpeed(1f)
 		}
 		updateNotificationText()
 	}
