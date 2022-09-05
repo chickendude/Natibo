@@ -104,9 +104,7 @@ class StudySessionFragment :
 //				) else sessionFinished(course.getCurrentDay())
 				service.currentSentence().flowWithLifecycle(lifecycle)
 					.onEach { sentence ->
-						if (sentence != null) {
-							loadSentence(sentence)
-						}
+						if (sentence != null) loadSentence(sentence)
 					}.launchIn(lifecycleScope)
 //				finishDisposable = studySessionService.finishObservable()
 //					.subscribe(Consumer<Day> { day: Day -> sessionFinished(day) })

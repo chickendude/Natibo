@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Context.MEDIA_SESSION_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -22,29 +21,25 @@ import android.os.Build
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
 import android.telephony.PhoneStateListener
+import android.telephony.ServiceState
 import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.media.AudioManagerCompat.requestAudioFocus
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.*
 import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.service.StudySessionViewModel.Event
 import ch.ralena.natibo.ui.MainActivity
-import ch.ralena.natibo.ui.language.importer.worker.PackImporterWorker.Companion.NOTIFICATION_ID
 import ch.ralena.natibo.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import java.io.IOException
-import java.lang.IllegalStateException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -59,7 +54,6 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 	lateinit var viewModel: StudySessionViewModel
 
 	private var mediaPlayer: MediaPlayer? = null
-	private var day: Day? = null
 	private var audioManager: AudioManager? = null
 	private var isPlaying = false
 	private var phoneStateListener: PhoneStateListener? = null
@@ -238,22 +232,22 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 
 	private fun play() {
 		studyState.value = StudyState.PLAYING
-		if (mediaPlayer != null && !mediaPlayer!!.isPlaying) {
-			mediaPlayer!!.start()
+		if (mediaPlayer?.isPlaying == false) {
+			mediaPlayer?.start()
 		}
 	}
 
 	private fun stop() {
 		studyState.value = StudyState.PAUSED
-		if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
-			mediaPlayer!!.stop()
+		if (mediaPlayer?.isPlaying == true) {
+			mediaPlayer?.stop()
 		}
 	}
 
 	fun pause() {
 		studyState.value = StudyState.PAUSED
-		if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
-			mediaPlayer!!.pause()
+		if (mediaPlayer?.isPlaying == true) {
+			mediaPlayer?.pause()
 		}
 	}
 
@@ -270,7 +264,6 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 	}
 
 	private fun nextSentence() {
-//		day.goToNextSentencePair(realm)
 		viewModel.nextSentence()
 		if (studyState.value == StudyState.PLAYING) {
 			play()
@@ -278,7 +271,6 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 	}
 
 	private fun previousSentence() {
-//		day.goToPreviousSentencePair(realm)
 		// TODO: Switch to previous sentence
 		viewModel.nextSentence()
 		if (studyState.value == StudyState.PLAYING) {
@@ -287,8 +279,8 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 	}
 
 	private fun setVolume(volume: Float) {
-		if (mediaPlayer!!.isPlaying) {
-			mediaPlayer!!.setVolume(volume, volume)
+		if (mediaPlayer?.isPlaying == true) {
+			mediaPlayer?.setVolume(volume, volume)
 		}
 	}
 
@@ -495,22 +487,7 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 
 	private inner class StartSessionReceiver : BroadcastReceiver() {
 		override fun onReceive(context: Context, intent: Intent) {
-			val id = Utils.Storage(applicationContext).dayId
-//			day = realm.where<Day>(Day::class.java).equalTo("id", id).findFirst()
-			if (day == null) stopSelf()
 			if (!requestAudioFocus()) stopSelf()
-
-			// if the app is playing, we don't need to reload the sentence.
-			// if nothing is playing, we'll need to load the sentence and start it.
-//			if (studyState.value != PlaybackStatus.PLAYING && !day.isCompleted()) {
-//				loadSentence()
-//				play()
-//			}
-
-			// when returning to the screen, make sure the sentences are updated
-//			if (sentenceGroup != null) {
-//				sentencePublish.onNext(sentenceGroup)
-//			}
 		}
 	}
 
