@@ -59,11 +59,13 @@ internal class StudySessionViewModel @Inject constructor(
 	private suspend fun loadSession(course: CourseRoom) {
 		session =
 			fetchSessionWithSentencesUseCase.fetchSessionWithSentences(course.sessionId) ?: return
+		events.emit(Event.SessionLoaded)
 		nextSentence()
 	}
 
 	internal sealed class Event {
 		data class SentenceLoaded(val sentence: SentenceRoom) : Event()
+		object SessionLoaded : Event()
 		object SessionFinished : Event()
 	}
 }

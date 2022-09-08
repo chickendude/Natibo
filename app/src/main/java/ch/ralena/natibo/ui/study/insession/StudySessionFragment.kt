@@ -20,13 +20,17 @@ import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.service.StudyState
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
+import ch.ralena.natibo.ui.study.insession.views.PlayPause
 import ch.ralena.natibo.ui.study.insession.views.Sentences
 import ch.ralena.natibo.ui.study.overview.StudySessionOverviewFragment
 import ch.ralena.natibo.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
@@ -73,9 +77,6 @@ class StudySessionFragment :
 //			course.prepareNextDay(realm)
 
 		binding.apply {
-			// hide sentences layout until a sentence has been loaded
-			sentencesLayout.visibility = View.VISIBLE
-
 			settingsIcon.setOnClickListener {
 				viewModel.settingsIconClicked()
 			}
@@ -99,8 +100,13 @@ class StudySessionFragment :
 		serviceDisposable =
 			activity.sessionPublish.subscribe { service: StudySessionServiceKt ->
 				studySessionService = service
-				binding.sentences.setContent { Sentences(service.currentSentence(), service.viewModel.session) }
-				binding.sentencesLayout.show()
+				lifecycleScope.launch {
+					service.studyState().first { it != StudyState.UNINITIALIZED }
+					binding.sentences.setContent {
+						Sentences(service.currentSentence(), service.viewModel.session)
+					}
+					binding.playPauseImage.setContent { PlayPause(service) }
+				}
 //				if (course.getCurrentDay().getCurrentSentenceGroup() != null) nextSentence(
 //					course.getCurrentDay().getCurrentSentenceGroup()
 //				) else sessionFinished(course.getCurrentDay())
@@ -114,7 +120,7 @@ class StudySessionFragment :
 					startTimer()
 				}
 				updateTime()
-				updatePlayPauseImage()
+//				updatePlayPauseImage()
 			}
 	}
 
@@ -128,17 +134,17 @@ class StudySessionFragment :
 				service.resume()
 				startTimer()
 			}
-			updatePlayPauseImage()
+//			updatePlayPauseImage()
 		}
 	}
 
-	private fun updatePlayPauseImage() {
-		if (studySessionService?.studyState()?.value == StudyState.PLAYING) {
-			binding.playPauseImage.setImageResource(R.drawable.ic_pause)
-		} else {
-			binding.playPauseImage.setImageResource(R.drawable.ic_play)
-		}
-	}
+//	private fun updatePlayPauseImage() {
+//		if (studySessionService?.studyState()?.value == StudyState.PLAYING) {
+//			binding.playPauseImage.setImageResource(R.drawable.ic_pause)
+//		} else {
+//			binding.playPauseImage.setImageResource(R.drawable.ic_play)
+//		}
+//	}
 
 	private fun sessionFinished(day: Day) {
 		// mark day as completed

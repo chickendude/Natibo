@@ -24,10 +24,10 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.*
@@ -37,8 +37,7 @@ import ch.ralena.natibo.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -82,15 +81,17 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 		viewModel.start(courseId)
 		if (!requestAudioFocus()) stopSelf()
 
-		viewModel.events()
-			.flowWithLifecycle(lifecycle)
-			.onEach { event ->
-				when (event) {
-					is Event.SessionFinished -> studyState.value = StudyState.COMPLETE
-					is Event.SentenceLoaded -> loadSentence(event.sentence)
+		lifecycleScope.launch {
+			viewModel.events()
+				.collect { event ->
+					when (event) {
+						is Event.SessionFinished -> studyState.value = StudyState.COMPLETE
+						is Event.SessionLoaded -> {studyState.value = StudyState.READY ; Log.d("----", "READY2")}
+						is Event.SentenceLoaded -> {loadSentence(event.sentence) ; Log.d("----", "LOADED2") }
+					}
 				}
+		}
 
-			}.launchIn(lifecycleScope)
 
 		if (mediaSessionManager == null) {
 			initMediaSession()
@@ -262,9 +263,7 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 
 	fun pause() {
 		studyState.value = StudyState.PAUSED
-		if (mediaPlayer?.isPlaying == true) {
-			mediaPlayer?.pause()
-		}
+		mediaPlayer?.pause()
 	}
 
 	fun resume() {
@@ -277,6 +276,11 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 				play()
 			}
 		}
+	}
+
+	fun togglePausePlay() {
+		if (studyState.value == StudyState.PLAYING) pause()
+		else resume()
 	}
 
 	private fun nextSentence() {
@@ -517,4 +521,19 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 	}
 }
 
-internal enum class StudyState { UNINITIALIZED, PAUSED, PLAYING, COMPLETE }
+internal enum class StudyState {
+	/** Session has not been initialized. */
+	UNINITIALIZED,
+
+	/** Playback is currently paused. */
+	PAUSED,
+
+	/** Audio is currently playing. */
+	PLAYING,
+
+	/** Session has been initialized and is ready to use. */
+	READY,
+
+	/** Session has completed. */
+	COMPLETE
+}

@@ -21,7 +21,7 @@ data class NatiboSession(
 
 	fun nextSentence() {
 		currentLanguageIndex += 1
-		if (currentLanguageIndex >= languageOrder.size) {
+		if (currentLanguageIndex >= languageOrder.size || currentSentenceIndex < 0) {
 			currentLanguageIndex = 0
 			currentSentenceIndex++
 		}

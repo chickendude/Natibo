@@ -64,9 +64,9 @@
                 android:id="@+id/settings_icon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:contentDescription="@string/course_settings_content_description"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_settings"
-                android:contentDescription="@string/course_settings_content_description" />
+                android:src="@drawable/ic_settings" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -83,27 +83,19 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/sentencesLayout"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/sentences"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:background="@drawable/sentence_list_border"
-        android:orientation="vertical">
+        android:background="@drawable/sentence_list_border" />
 
-        <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/sentences"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
-
-    <ImageView
+    <androidx.compose.ui.platform.ComposeView
         android:id="@+id/playPauseImage"
         android:layout_width="180dp"
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:layout_weight="1"
-        android:src="@drawable/ic_play"
-        android:contentDescription="@string/play_and_pause_button" />
+        android:contentDescription="@string/play_and_pause_button"
+        android:src="@drawable/ic_play" />
 </LinearLayout>
