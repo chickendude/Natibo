@@ -1,6 +1,7 @@
 package ch.ralena.natibo.utils
 
 import android.content.Context
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import java.io.BufferedInputStream
 import java.io.InputStream
@@ -63,4 +64,12 @@ object Utils {
 			}
 		}
 	}
+}
+
+fun View.show() {
+	visibility = View.VISIBLE
+}
+
+fun View.hide() {
+	visibility = View.GONE
 }

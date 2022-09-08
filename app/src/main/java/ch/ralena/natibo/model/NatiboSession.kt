@@ -23,7 +23,7 @@ data class NatiboSession(
 		currentLanguageIndex += 1
 		if (currentLanguageIndex >= languageOrder.size) {
 			currentLanguageIndex = 0
-			currentSentenceIndex += 1
+			currentSentenceIndex++
 		}
 	}
 }

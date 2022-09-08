@@ -34,7 +34,7 @@ internal class StudySessionViewModel @Inject constructor(
 	private var _currentSentence: NatiboSentence? = null
 	val currentSentence get() = _currentSentence
 
-	private lateinit var session: NatiboSession
+	lateinit var session: NatiboSession
 
 	fun start(courseId: Long) {
 		coroutineScope.launch {

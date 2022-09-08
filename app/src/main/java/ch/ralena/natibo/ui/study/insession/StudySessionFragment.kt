@@ -22,6 +22,7 @@ import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.study.insession.views.Sentences
 import ch.ralena.natibo.ui.study.overview.StudySessionOverviewFragment
+import ch.ralena.natibo.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.flow.launchIn
@@ -98,14 +99,11 @@ class StudySessionFragment :
 		serviceDisposable =
 			activity.sessionPublish.subscribe { service: StudySessionServiceKt ->
 				studySessionService = service
-				binding.sentences.setContent { Sentences(service.currentSentence()) }
+				binding.sentences.setContent { Sentences(service.currentSentence(), service.viewModel.session) }
+				binding.sentencesLayout.show()
 //				if (course.getCurrentDay().getCurrentSentenceGroup() != null) nextSentence(
 //					course.getCurrentDay().getCurrentSentenceGroup()
 //				) else sessionFinished(course.getCurrentDay())
-				service.currentSentence().flowWithLifecycle(lifecycle)
-					.onEach { sentence ->
-						if (sentence != null) loadSentence(sentence)
-					}.launchIn(lifecycleScope)
 //				finishDisposable = studySessionService.finishObservable()
 //					.subscribe(Consumer<Day> { day: Day -> sessionFinished(day) })
 				setPaused(
@@ -155,30 +153,6 @@ class StudySessionFragment :
 		parentFragmentManager.beginTransaction()
 			.replace(R.id.fragmentPlaceHolder, fragment)
 			.commit()
-	}
-
-	private fun loadSentence(sentence: NatiboSentence) {
-		updatePlayPauseImage()
-		binding.sentencesLayout.visibility = View.VISIBLE
-
-		// update number of reps remaining
-//		binding.remainingRepsText.setText(
-//			String.format(
-//				Locale.getDefault(),
-//				"%d",
-//				course.getCurrentDay().getNumReviewsLeft()
-//			)
-//		)
-//		binding.totalRepsText.setText(
-//			String.format(
-//				Locale.getDefault(),
-//				"%d",
-//				course.getTotalReps()
-//			)
-//		)
-
-		// update time left
-//		millisLeft = course.currentDay.timeLeft.toLong()
 	}
 
 	private fun startTimer() {

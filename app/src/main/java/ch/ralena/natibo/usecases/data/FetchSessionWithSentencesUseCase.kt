@@ -42,8 +42,8 @@ class FetchSessionWithSentencesUseCase @Inject constructor(
 		// to be null
 		val sentences = mutableListOf<NatiboSentence>()
 		for (i in nativeSentences.indices) {
-			val target = targetSentences.getOrNull(i)
 			val native = nativeSentences.getOrNull(i) ?: continue
+			val target = targetSentences.getOrNull(i)
 			if (course.targetLanguageId != null && target == null) continue
 			sentences.add(NatiboSentence(native, target))
 		}
