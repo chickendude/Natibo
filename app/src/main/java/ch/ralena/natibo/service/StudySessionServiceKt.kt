@@ -12,16 +12,16 @@ import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.media.MediaPlayer.OnCompletionListener
 import android.media.AudioManager.OnAudioFocusChangeListener
-import android.media.session.MediaSession
+import android.media.MediaMetadata
 import android.media.MediaPlayer
-import android.media.session.MediaController
 import android.media.session.MediaSessionManager
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.telephony.PhoneStateListener
-import android.telephony.ServiceState
 import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
 import androidx.core.app.ActivityCompat
@@ -33,7 +33,6 @@ import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.*
 import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.service.StudySessionViewModel.Event
-import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,8 +46,8 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 	OnAudioFocusChangeListener {
 	// Media Session
 	private var mediaSessionManager: MediaSessionManager? = null
-	private var mediaSession: MediaSession? = null
-	private var transportControls: MediaController.TransportControls? = null
+	private var mediaSession: MediaSessionCompat? = null
+	private var transportControls: MediaControllerCompat.TransportControls? = null
 
 	@Inject
 	lateinit var viewModel: StudySessionViewModel
@@ -74,6 +73,7 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 	// Broadcast Receivers
 	private val becomingNoisyReceiver: BroadcastReceiver = BecomingNoisyReceiver()
 	private val startSessionReceiver: BroadcastReceiver = StartSessionReceiver()
+
 	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 		// check if we have attached our bundle or not
 		if (intent?.extras == null) stopSelf()
@@ -97,6 +97,7 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 		}
 		setUpMediaPlayer()
 		handleIncomingActions(intent)
+		buildNotification()
 		return super.onStartCommand(intent, flags, startId)
 	}
 
@@ -157,6 +158,10 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 		}
 	}
 
+	override fun onBind(intent: Intent): IBinder {
+		return binder
+	}
+
 	private fun setUpMediaPlayer() {
 		if (mediaPlayer == null) {
 			mediaPlayer = MediaPlayer().apply {
@@ -186,11 +191,10 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 		if (mediaSessionManager != null) return
 
 		mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
-		mediaSession = MediaSession(applicationContext, "Natibo").apply {
+		mediaSession = MediaSessionCompat(applicationContext, "Natibo").apply {
 			transportControls = controller.transportControls
 			isActive = true
-			setFlags(MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS)
-			setCallback(object : MediaSession.Callback() {
+			setCallback(object : MediaSessionCompat.Callback() {
 				override fun onPlay() {
 					super.onPlay()
 					resume()
@@ -219,11 +223,23 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 	}
 
 	private fun updateNotificationText() {
+		mediaSession?.setMetadata(
+			MediaMetadataCompat.Builder()
+				.putString(
+					MediaMetadata.METADATA_KEY_TITLE,
+					currentSentence.value?.native?.original
+				)
+				.putString(
+					MediaMetadata.METADATA_KEY_ALBUM,
+					currentSentence.value?.target?.original
+				)
+				.build()
+		)
 		if (notificationBuilder != null) {
-//			notificationBuilder!!
-//				.setContentText(sentenceGroup.getSentences().first().getText())
-//				.setContentTitle(sentenceGroup.getSentences().last().getText())
-//				.setOngoing(studyState.value == PlaybackStatus.PLAYING)
+			notificationBuilder!!
+				.setContentText(currentSentence.value?.native?.original)
+				.setContentTitle(currentSentence.value?.target?.original)
+				.setOngoing(studyState.value == StudyState.PLAYING)
 			val notificationManager: NotificationManager =
 				getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 			notificationManager.notify(NOTIFICATION_ID, notificationBuilder!!.build())
@@ -292,12 +308,12 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 //		}
 		var playPauseDrawable = android.R.drawable.ic_media_pause
 		var playPauseAction: PendingIntent? = null
-		if (studyState.value == StudyState.PLAYING) {
-			playPauseDrawable = android.R.drawable.ic_media_pause
-			playPauseAction = iconAction(ACTION_ID_PAUSE)
-		} else if (studyState.value == StudyState.PAUSED) {
+		if (studyState.value == StudyState.PAUSED) {
 			playPauseDrawable = android.R.drawable.ic_media_play
 			playPauseAction = iconAction(ACTION_ID_PLAY)
+		} else {
+			playPauseDrawable = android.R.drawable.ic_media_pause
+			playPauseAction = iconAction(ACTION_ID_PAUSE)
 		}
 
 		// create the notification channel
@@ -317,8 +333,8 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 
 
 		// create the notification
-		val activityIntent = Intent(this, MainActivity::class.java)
-		//		PendingIntent contentIntent = PendingIntent.getActivity(this, MainActivity.REQUEST_LOAD_SESSION, activityIntent, 0);
+//		val activityIntent = Intent(this, MainActivity::class.java)
+//				PendingIntent contentIntent = PendingIntent.getActivity(this, MainActivity.REQUEST_LOAD_SESSION, activityIntent, 0);
 		notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
 			.setVisibility(NotificationCompat.VISIBILITY_PUBLIC) //				.setContentIntent(contentIntent)
 			.setShowWhen(false)
@@ -328,11 +344,11 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 			.setColorized(false)
 			.setStyle(
 				androidx.media.app.NotificationCompat.MediaStyle()
-					.setMediaSession(MediaSessionCompat.Token.fromToken(mediaSession!!.sessionToken))
-					.setShowActionsInCompactView(1)
+					.setMediaSession(mediaSession!!.sessionToken)
+					.setShowActionsInCompactView(0, 1, 2)
 			)
-//			.setContentText(sentenceGroup.getSentences().first().getText())
-//			.setContentTitle(sentenceGroup.getSentences().last().getText())
+			.setContentText(currentSentence.value?.native?.original)
+			.setContentTitle(currentSentence.value?.target?.original)
 			.addAction(
 				android.R.drawable.ic_media_previous,
 				"prev sentence",
@@ -373,12 +389,11 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 		if (playbackAction?.action == null) return
 
 		val actionString = playbackAction.action
-		when {
-			actionString.equals(ACTION_PLAY, ignoreCase = true) -> transportControls!!.play()
-			actionString.equals(ACTION_PAUSE, ignoreCase = true) -> transportControls!!.pause()
-			actionString.equals(ACTION_NEXT, ignoreCase = true) -> transportControls!!.skipToNext()
-			actionString.equals(ACTION_PREVIOUS, ignoreCase = true) ->
-				transportControls!!.skipToPrevious()
+		when (actionString?.lowercase()) {
+			ACTION_PLAY -> transportControls!!.play()
+			ACTION_PAUSE -> transportControls!!.pause()
+			ACTION_NEXT -> transportControls!!.skipToNext()
+			ACTION_PREVIOUS -> transportControls!!.skipToPrevious()
 		}
 	}
 
@@ -416,10 +431,6 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 				// back from phone call
 				if (isPlaying) resume()
 		}
-	}
-
-	override fun onBind(intent: Intent): IBinder? {
-		return binder
 	}
 
 	private fun requestAudioFocus(): Boolean {

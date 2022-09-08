@@ -99,20 +99,6 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 		super.onDestroy()
 	}
 
-	override fun onResume() {
-		super.onResume()
-		if (isServiceBound && studySessionService != null) {
-			studySessionService!!.removeNotification()
-		}
-	}
-
-	override fun onPause() {
-		super.onPause()
-		if (isServiceBound) {
-			studySessionService!!.buildNotification()
-		}
-	}
-
 	/**
 	 * Opens a file browser to search for a language pack to import into the app.
 	 */
