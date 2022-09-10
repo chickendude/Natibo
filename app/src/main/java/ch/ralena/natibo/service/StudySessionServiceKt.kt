@@ -24,7 +24,6 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
@@ -35,11 +34,18 @@ import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.service.StudySessionViewModel.Event
 import ch.ralena.natibo.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * TODO: Improve the pause/play functionality.
+ *  Playing after the audio has completed and before the next sentence is loaded will sometimes
+ *  replay the current audio file.
+ */
 @AndroidEntryPoint
 internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 	OnAudioFocusChangeListener {
@@ -79,6 +85,7 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 
 		val courseId = Utils.Storage(applicationContext).courseId
 		viewModel.start(courseId)
+
 		if (!requestAudioFocus()) stopSelf()
 
 		lifecycleScope.launch {
@@ -86,8 +93,8 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 				.collect { event ->
 					when (event) {
 						is Event.SessionFinished -> studyState.value = StudyState.COMPLETE
-						is Event.SessionLoaded -> {studyState.value = StudyState.READY ; Log.d("----", "READY2")}
-						is Event.SentenceLoaded -> {loadSentence(event.sentence) ; Log.d("----", "LOADED2") }
+						is Event.SessionLoaded -> studyState.value = StudyState.PLAYING
+						is Event.SentenceLoaded -> loadSentence(event.sentence)
 					}
 				}
 		}
@@ -131,16 +138,12 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 	}
 
 	override fun onCompletion(mp: MediaPlayer) {
-		// when file has completed playing
-		viewModel.nextSentence()
-//		if (day.nextSentence(realm)) {
-//			val handler = Handler()
-//			val runnable = Runnable {
-//				loadSentence()
-//				if (studyState.value == PlaybackStatus.PLAYING) play()
-//			}
-//			handler.postDelayed(runnable, course.getPauseMillis().toLong())
-//		}
+		lifecycleScope.launch {
+			// TODO: Use settings to determine delay
+			delay(1000)
+			studyState.first { it == StudyState.PLAYING }
+			viewModel.nextSentence()
+		}
 	}
 
 	override fun onAudioFocusChange(focusChange: Int) {
@@ -159,9 +162,7 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 		}
 	}
 
-	override fun onBind(intent: Intent): IBinder {
-		return binder
-	}
+	override fun onBind(intent: Intent): IBinder = binder
 
 	private fun setUpMediaPlayer() {
 		if (mediaPlayer == null) {
@@ -180,9 +181,13 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 			reset()
 			setDataSource(sentence.mp3)
 			prepare()
-			play()
 			// TODO: Handle speed from settings
 			playbackParams = playbackParams.setSpeed(1f)
+		}
+		if (studyState.value == StudyState.PLAYING)
+			play()
+		else {
+			studyState.value = StudyState.READY
 		}
 		updateNotificationText()
 	}
@@ -210,7 +215,7 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 
 				override fun onSkipToNext() {
 					super.onSkipToNext()
-					nextSentence()
+					viewModel.nextSentence()
 					buildNotification()
 				}
 
@@ -248,6 +253,7 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 	}
 
 	private fun play() {
+		if (studyState.value == StudyState.READY) mediaPlayer?.prepare()
 		studyState.value = StudyState.PLAYING
 		if (mediaPlayer?.isPlaying == false) {
 			mediaPlayer?.start()
@@ -268,26 +274,13 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 
 	fun resume() {
 		if (requestAudioFocus()) {
-			studyState.value = StudyState.PLAYING
-			if (mediaPlayer != null && !mediaPlayer!!.isPlaying) {
-				mediaPlayer!!.start()
-			} else {
-				viewModel.nextSentence()
-				play()
-			}
+			play()
 		}
 	}
 
 	fun togglePausePlay() {
 		if (studyState.value == StudyState.PLAYING) pause()
 		else resume()
-	}
-
-	private fun nextSentence() {
-		viewModel.nextSentence()
-		if (studyState.value == StudyState.PLAYING) {
-			play()
-		}
 	}
 
 	private fun previousSentence() {
@@ -452,8 +445,8 @@ internal class StudySessionServiceKt : LifecycleService(), OnCompletionListener,
 	}
 
 	private fun pauseAndRelease() {
-		stop()
-		mediaPlayer!!.release()
+		pause()
+		mediaPlayer?.release()
 		mediaPlayer = null
 	}
 
@@ -531,7 +524,7 @@ internal enum class StudyState {
 	/** Audio is currently playing. */
 	PLAYING,
 
-	/** Session has been initialized and is ready to use. */
+	/** Sentence is loaded but audio has not been prepared. */
 	READY,
 
 	/** Session has completed. */

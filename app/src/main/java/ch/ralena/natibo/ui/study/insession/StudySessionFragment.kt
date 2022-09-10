@@ -57,6 +57,7 @@ class StudySessionFragment :
 	private var studySessionService: StudySessionServiceKt? = null
 	private var millisLeft: Long = 0
 	private var countDownTimer: CountDownTimer? = null
+	// TODO: Look at removing
 	private var isPaused = false
 
 	private var serviceDisposable: Disposable? = null
@@ -82,7 +83,7 @@ class StudySessionFragment :
 			}
 
 			// handle playing/pausing
-			playPauseImage.setOnClickListener { v: View -> playPause(v) }
+			playPauseImage.setOnClickListener { playPause() }
 		}
 	}
 
@@ -120,11 +121,10 @@ class StudySessionFragment :
 					startTimer()
 				}
 				updateTime()
-//				updatePlayPauseImage()
 			}
 	}
 
-	private fun playPause(view: View) {
+	private fun playPause() {
 		studySessionService?.let { service ->
 			if (service.studyState().value == StudyState.PLAYING) {
 				service.pause()
@@ -134,17 +134,8 @@ class StudySessionFragment :
 				service.resume()
 				startTimer()
 			}
-//			updatePlayPauseImage()
 		}
 	}
-
-//	private fun updatePlayPauseImage() {
-//		if (studySessionService?.studyState()?.value == StudyState.PLAYING) {
-//			binding.playPauseImage.setImageResource(R.drawable.ic_pause)
-//		} else {
-//			binding.playPauseImage.setImageResource(R.drawable.ic_play)
-//		}
-//	}
 
 	private fun sessionFinished(day: Day) {
 		// mark day as completed
