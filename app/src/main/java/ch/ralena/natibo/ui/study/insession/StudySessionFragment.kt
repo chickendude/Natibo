@@ -57,13 +57,11 @@ class StudySessionFragment :
 	private var studySessionService: StudySessionServiceKt? = null
 	private var millisLeft: Long = 0
 	private var countDownTimer: CountDownTimer? = null
+
 	// TODO: Look at removing
 	private var isPaused = false
 
 	private var serviceDisposable: Disposable? = null
-
-	//	var sentenceDisposable: Disposable? = null
-	private var finishDisposable: Disposable? = null
 
 	override fun setupViews(view: View) {
 		// load schedules from database
@@ -73,17 +71,8 @@ class StudySessionFragment :
 		// connect to the studySessionService and start the session
 		connectToService()
 
-//		// if the current day is done, start the next one
-//		if (course.currentDay == null || course.currentDay.isCompleted)
-//			course.prepareNextDay(realm)
-
 		binding.apply {
-			settingsIcon.setOnClickListener {
-				viewModel.settingsIconClicked()
-			}
-
-			// handle playing/pausing
-			playPauseImage.setOnClickListener { playPause() }
+			settingsIcon.setOnClickListener { viewModel.settingsIconClicked() }
 		}
 	}
 
@@ -97,6 +86,44 @@ class StudySessionFragment :
 		return super.onCreateView(inflater, container, savedInstanceState)
 	}
 
+	override fun onSaveInstanceState(outState: Bundle) {
+		super.onSaveInstanceState(outState)
+		outState.putBoolean(KEY_IS_PAUSED, isPaused)
+	}
+
+	override fun onPause() {
+		super.onPause()
+		serviceDisposable?.dispose()
+		countDownTimer?.cancel()
+	}
+
+	override fun onResume() {
+		super.onResume()
+		connectToService()
+	}
+
+	override fun onDestroy() {
+		super.onDestroy()
+		countDownTimer?.cancel()
+	}
+
+	// region ViewModel Listener--------------------------------------------------------------------
+	override fun makeToast(@StringRes stringRes: Int) {
+		Toast.makeText(activity, stringRes, Toast.LENGTH_SHORT).show()
+	}
+
+	override fun onCourseLoaded(course: CourseRoom) {
+		activity.startSession(course)
+		binding.courseTitleText.text = course.title
+	}
+
+	override fun onCourseNotFound(errorMsgRes: Int?) {
+		if (errorMsgRes != null)
+			makeToast(errorMsgRes)
+	}
+	// endregion ViewModel Listener-----------------------------------------------------------------
+
+	// region Helper functions----------------------------------------------------------------------
 	private fun connectToService() {
 		serviceDisposable =
 			activity.sessionPublish.subscribe { service: StudySessionServiceKt ->
@@ -122,19 +149,6 @@ class StudySessionFragment :
 				}
 				updateTime()
 			}
-	}
-
-	private fun playPause() {
-		studySessionService?.let { service ->
-			if (service.studyState().value == StudyState.PLAYING) {
-				service.pause()
-				setPaused(true)
-				countDownTimer?.cancel()
-			} else {
-				service.resume()
-				startTimer()
-			}
-		}
 	}
 
 	private fun sessionFinished(day: Day) {
@@ -173,46 +187,6 @@ class StudySessionFragment :
 		countDownTimer?.start()
 	}
 
-	override fun onSaveInstanceState(outState: Bundle) {
-		super.onSaveInstanceState(outState)
-		outState.putBoolean(KEY_IS_PAUSED, isPaused)
-	}
-
-	override fun onPause() {
-		super.onPause()
-		if (serviceDisposable != null) serviceDisposable!!.dispose()
-//		if (sentenceDisposable != null) sentenceDisposable!!.dispose()
-		if (finishDisposable != null) finishDisposable!!.dispose()
-		countDownTimer?.cancel()
-	}
-
-	override fun onResume() {
-		super.onResume()
-		connectToService()
-	}
-
-	override fun onDestroy() {
-		super.onDestroy()
-		countDownTimer?.cancel()
-	}
-
-	// region ViewModel Listener--------------------------------------------------------------------
-	override fun makeToast(@StringRes stringRes: Int) {
-		Toast.makeText(activity, stringRes, Toast.LENGTH_SHORT).show()
-	}
-
-	override fun onCourseLoaded(course: CourseRoom) {
-		activity.startSession(course)
-		binding.courseTitleText.text = course.title
-	}
-
-	override fun onCourseNotFound(errorMsgRes: Int?) {
-		if (errorMsgRes != null)
-			makeToast(errorMsgRes)
-	}
-	// endregion ViewModel Listener-----------------------------------------------------------------
-
-	// region Helper functions----------------------------------------------------------------------
 	private fun setPaused(isPaused: Boolean) {
 		this.isPaused = isPaused
 	}
