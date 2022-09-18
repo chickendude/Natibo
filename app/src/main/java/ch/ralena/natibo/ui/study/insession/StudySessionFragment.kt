@@ -9,33 +9,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.Day
 import ch.ralena.natibo.databinding.FragmentStudySessionBinding
-import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.service.StudySessionServiceKt
-import ch.ralena.natibo.service.StudyState
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.study.insession.views.PlayPause
 import ch.ralena.natibo.ui.study.insession.views.Sentences
 import ch.ralena.natibo.ui.study.overview.StudySessionOverviewFragment
-import ch.ralena.natibo.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class StudySessionFragment :
+internal class StudySessionFragment :
 	BaseFragment<
 			FragmentStudySessionBinding,
 			StudySessionViewModel.Listener,
@@ -49,6 +42,9 @@ class StudySessionFragment :
 
 	@Inject
 	lateinit var activity: MainActivity
+
+	@Inject
+	lateinit var studySessionManager: StudySessionManager
 
 	lateinit var course: CourseRoom
 
@@ -129,11 +125,11 @@ class StudySessionFragment :
 			activity.sessionPublish.subscribe { service: StudySessionServiceKt ->
 				studySessionService = service
 				lifecycleScope.launch {
-					service.studyState().first { it != StudyState.UNINITIALIZED }
+					studySessionManager.studyState().first { it != StudyState.UNINITIALIZED }
 					binding.sentences.setContent {
-						Sentences(service.currentSentence(), service.viewModel.session)
+						Sentences(studySessionManager)
 					}
-					binding.playPauseImage.setContent { PlayPause(service) }
+					binding.playPauseImage.setContent { PlayPause(studySessionManager) }
 				}
 //				if (course.getCurrentDay().getCurrentSentenceGroup() != null) nextSentence(
 //					course.getCurrentDay().getCurrentSentenceGroup()
@@ -141,8 +137,8 @@ class StudySessionFragment :
 //				finishDisposable = studySessionService.finishObservable()
 //					.subscribe(Consumer<Day> { day: Day -> sessionFinished(day) })
 				setPaused(
-					service.studyState().value == StudyState.UNINITIALIZED ||
-							service.studyState().value == StudyState.PAUSED
+					studySessionManager.studyState().value == StudyState.UNINITIALIZED ||
+							studySessionManager.studyState().value == StudyState.PAUSED
 				)
 				if (!isPaused) {
 					startTimer()
