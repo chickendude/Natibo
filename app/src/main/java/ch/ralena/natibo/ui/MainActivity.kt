@@ -93,8 +93,8 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 	override fun onDestroy() {
 		if (isServiceBound) {
 			unbindService(serviceConnection)
-			studySessionService!!.removeNotification()
-			studySessionService!!.stopSelf()
+			val serviceIntent = Intent(this, StudySessionServiceKt::class.java)
+			stopService(serviceIntent)
 		}
 		super.onDestroy()
 	}
