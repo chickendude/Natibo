@@ -54,10 +54,10 @@ internal class NotificationHelper @Inject constructor(
 				)
 				.build()
 		)
-		val (playPauseDrawable, playPauseAction) = if (studyState == StudyState.PAUSED) {
-			android.R.drawable.ic_media_play to iconAction(StudySessionServiceKt.ACTION_ID_PLAY)
+		val playPauseDrawable = if (studyState == StudyState.PAUSED) {
+			android.R.drawable.ic_media_play
 		} else {
-			android.R.drawable.ic_media_pause to iconAction(StudySessionServiceKt.ACTION_ID_PAUSE)
+			android.R.drawable.ic_media_pause
 		}
 		val notification = baseNotification
 			.setOngoing(studyState == StudyState.PLAYING)
@@ -73,7 +73,11 @@ internal class NotificationHelper @Inject constructor(
 				"prev sentence",
 				iconAction(StudySessionServiceKt.ACTION_ID_PREVIOUS)
 			)
-			.addAction(playPauseDrawable, "pause", playPauseAction)
+			.addAction(
+				playPauseDrawable,
+				"pause",
+				iconAction(StudySessionServiceKt.ACTION_ID_PLAY_PAUSE)
+			)
 			.addAction(
 				android.R.drawable.ic_media_next,
 				"next sentence",
@@ -104,10 +108,8 @@ internal class NotificationHelper @Inject constructor(
 	private fun iconAction(actionId: Int): PendingIntent? {
 		val iconIntent = Intent(applicationContext, StudySessionServiceKt::class.java)
 		when (actionId) {
-			StudySessionServiceKt.ACTION_ID_PLAY ->
-				iconIntent.action = StudySessionServiceKt.ACTION_PLAY
-			StudySessionServiceKt.ACTION_ID_PAUSE ->
-				iconIntent.action = StudySessionServiceKt.ACTION_PAUSE
+			StudySessionServiceKt.ACTION_ID_PLAY_PAUSE ->
+				iconIntent.action = StudySessionServiceKt.ACTION_PLAY_PAUSE
 			StudySessionServiceKt.ACTION_ID_NEXT ->
 				iconIntent.action = StudySessionServiceKt.ACTION_NEXT
 			StudySessionServiceKt.ACTION_ID_PREVIOUS ->

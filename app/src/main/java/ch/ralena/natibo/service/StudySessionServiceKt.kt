@@ -2,7 +2,6 @@ package ch.ralena.natibo.service
 
 import android.Manifest
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -12,7 +11,6 @@ import android.media.AudioManager
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import android.support.v4.media.session.MediaControllerCompat
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
@@ -52,16 +50,16 @@ internal class StudySessionServiceKt : LifecycleService() {
 	private val startSessionReceiver: BroadcastReceiver = StartSessionReceiver()
 
 	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-		startForeground(STUDY_SESSION_NOTIFICATION_ID, notificationHelper.baseNotification.build())
-
+		super.onStartCommand(intent, flags, startId)
 		// check if we have attached our bundle or not
-		if (intent?.extras == null) stopSelf()
-
-		val courseId = Utils.Storage(applicationContext).courseId
-		studySessionManager.start(courseId)
-
-		handleIncomingActions(intent)
-		return super.onStartCommand(intent, flags, startId)
+		if (intent?.action == null) {
+			startForeground(STUDY_SESSION_NOTIFICATION_ID, notificationHelper.baseNotification.build())
+			val courseId = Utils.Storage(applicationContext).courseId
+			studySessionManager.start(courseId)
+		} else {
+			handleIncomingActions(intent)
+		}
+		return START_STICKY
 	}
 
 	override fun onCreate() {
@@ -105,8 +103,7 @@ internal class StudySessionServiceKt : LifecycleService() {
 
 		val actionString = playbackAction.action
 		when (actionString?.lowercase()) {
-//			ACTION_PLAY -> studySessionManager.togglePausePlay()
-//			ACTION_PAUSE -> studySessionManager.togglePausePlay()
+			ACTION_PLAY_PAUSE -> studySessionManager.togglePausePlay()
 			ACTION_NEXT -> studySessionManager.nextSentence()
 			ACTION_PREVIOUS -> studySessionManager.previousSentence()
 		}
@@ -143,7 +140,7 @@ internal class StudySessionServiceKt : LifecycleService() {
 //				pause()
 			}
 			TelephonyManager.CALL_STATE_IDLE -> {}
-				// back from phone call
+			// back from phone call
 //				if (isPlaying) resume()
 		}
 	}
@@ -188,10 +185,8 @@ internal class StudySessionServiceKt : LifecycleService() {
 
 	companion object {
 		const val BROADCAST_START_SESSION = "broadcast_start_session"
-		const val ACTION_PLAY = "action_play"
-		const val ACTION_ID_PLAY = 0
-		const val ACTION_PAUSE = "action_pause"
-		const val ACTION_ID_PAUSE = 1
+		const val ACTION_PLAY_PAUSE = "action_play"
+		const val ACTION_ID_PLAY_PAUSE = 0
 		const val ACTION_PREVIOUS = "action_previous"
 		const val ACTION_ID_PREVIOUS = 2
 		const val ACTION_NEXT = "action_next"

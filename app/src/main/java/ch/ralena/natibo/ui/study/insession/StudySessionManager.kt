@@ -107,6 +107,11 @@ internal class StudySessionManager @Inject constructor(
 	fun togglePausePlay() {
 		if (studyState.value == StudyState.PLAYING) pause()
 		else resume()
+		notificationHelper.updateStudySessionNotification(
+			studyState.value,
+			mediaSession!!,
+			currentSentence.value!!
+		)
 	}
 
 	private fun loadSentence(sentence: SentenceRoom) {
