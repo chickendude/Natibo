@@ -27,6 +27,7 @@ import ch.ralena.natibo.utils.STUDY_SESSION_NOTIFICATION_ID
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -43,9 +44,7 @@ internal class StudySessionManager @Inject constructor(
 	@ApplicationContext private val applicationContext: Context,
 	dispatcherProvider: DispatcherProvider
 ) {
-	// Media Session
-	private var mediaSession: MediaSessionCompat? = null
-	private var transportControls: MediaControllerCompat.TransportControls? = null
+	private val mediaSession = MediaSessionCompat(applicationContext, "Natibo")
 
 	private var mediaPlayer: MediaPlayer? = null
 	private var audioManager: AudioManager? = null
@@ -63,6 +62,12 @@ internal class StudySessionManager @Inject constructor(
 	private var studyState = MutableStateFlow(StudyState.UNINITIALIZED)
 	fun studyState() = studyState.asStateFlow()
 
+	init {
+		setUpMediaPlayer()
+		initMediaSession()
+		notificationHelper.mediaSession = mediaSession
+	}
+
 	fun start(courseId: Long) {
 		coroutineScope.launch {
 			val result = courseRepository.fetchCourse(courseId)
@@ -71,8 +76,6 @@ internal class StudySessionManager @Inject constructor(
 				else -> Log.e(TAG, "Unable to load course with id $courseId")
 			}
 		}
-		setUpMediaPlayer()
-		initMediaSession()
 	}
 
 	fun stop() {
@@ -86,7 +89,6 @@ internal class StudySessionManager @Inject constructor(
 	}
 
 	private fun play() {
-//		if (studyState.value == StudyState.READY) mediaPlayer?.prepare()
 		studyState.value = StudyState.PLAYING
 		if (mediaPlayer?.isPlaying == false) {
 			mediaPlayer?.start()
@@ -109,7 +111,6 @@ internal class StudySessionManager @Inject constructor(
 		else resume()
 		notificationHelper.updateStudySessionNotification(
 			studyState.value,
-			mediaSession!!,
 			currentSentence.value!!
 		)
 	}
@@ -131,7 +132,6 @@ internal class StudySessionManager @Inject constructor(
 		}
 		notificationHelper.updateStudySessionNotification(
 			studyState.value,
-			mediaSession!!,
 			currentSentence.value!!
 		)
 	}
@@ -216,8 +216,7 @@ internal class StudySessionManager @Inject constructor(
 	}
 
 	private fun initMediaSession() {
-		mediaSession = MediaSessionCompat(applicationContext, "Natibo").apply {
-			transportControls = controller.transportControls
+		mediaSession.apply {
 			isActive = true
 			setCallback(object : MediaSessionCompat.Callback() {
 				override fun onPlay() {

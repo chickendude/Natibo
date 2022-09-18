@@ -6,6 +6,7 @@ import android.content.Intent
 import android.media.MediaMetadata
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
+import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -14,6 +15,7 @@ import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.ui.study.insession.StudyState
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.realm.Realm.init
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,11 +27,23 @@ internal class NotificationHelper @Inject constructor(
 	@ApplicationContext private val applicationContext: Context
 ) {
 	private val notificationManager = NotificationManagerCompat.from(applicationContext)
+	private val playAction = NotificationAction(
+		android.R.drawable.ic_media_play,
+		"prev sentence",
+		iconAction(StudySessionServiceKt.ACTION_ID_PLAY_PAUSE)
+	)
+	private val prevAction = NotificationAction(
+		android.R.drawable.ic_media_previous,
+		"prev sentence",
+		iconAction(StudySessionServiceKt.ACTION_ID_PREVIOUS)
+	)
+	private val nextAction = NotificationAction(
+		android.R.drawable.ic_media_next,
+		"prev sentence",
+		iconAction(StudySessionServiceKt.ACTION_ID_NEXT)
+	)
 
-	init {
-		createChannel()
-	}
-
+	var mediaSession: MediaSessionCompat? = null
 	val baseNotification
 		get() = NotificationCompat.Builder(applicationContext, STUDY_SESSION_CHANNEL_ID)
 			.setPriority(NotificationCompat.PRIORITY_LOW)
@@ -37,12 +51,15 @@ internal class NotificationHelper @Inject constructor(
 			.setOnlyAlertOnce(true)
 			.setSmallIcon(R.drawable.ic_logo)
 
+	init {
+		createChannel()
+	}
+
 	fun updateStudySessionNotification(
 		studyState: StudyState,
-		mediaSession: MediaSessionCompat,
 		sentence: NatiboSentence,
 	) {
-		mediaSession.setMetadata(
+		mediaSession?.setMetadata(
 			MediaMetadataCompat.Builder()
 				.putString(
 					MediaMetadata.METADATA_KEY_TITLE,
@@ -54,7 +71,7 @@ internal class NotificationHelper @Inject constructor(
 				)
 				.build()
 		)
-		val playPauseDrawable = if (studyState == StudyState.PAUSED) {
+		playAction.drawable = if (studyState == StudyState.PAUSED) {
 			android.R.drawable.ic_media_play
 		} else {
 			android.R.drawable.ic_media_pause
@@ -63,26 +80,15 @@ internal class NotificationHelper @Inject constructor(
 			.setOngoing(studyState == StudyState.PLAYING)
 			.setStyle(
 				androidx.media.app.NotificationCompat.MediaStyle()
-					.setMediaSession(mediaSession.sessionToken)
+					.setMediaSession(mediaSession?.sessionToken)
 					.setShowActionsInCompactView(0, 1, 2)
 			)
 			.setContentText(sentence.native.original)
 			.setContentTitle(sentence.target?.original)
-			.addAction(
-				android.R.drawable.ic_media_previous,
-				"prev sentence",
-				iconAction(StudySessionServiceKt.ACTION_ID_PREVIOUS)
-			)
-			.addAction(
-				playPauseDrawable,
-				"pause",
-				iconAction(StudySessionServiceKt.ACTION_ID_PLAY_PAUSE)
-			)
-			.addAction(
-				android.R.drawable.ic_media_next,
-				"next sentence",
-				iconAction(StudySessionServiceKt.ACTION_ID_NEXT)
-			).build()
+			.addAction(prevAction.drawable, prevAction.title, prevAction.intent)
+			.addAction(playAction.drawable, playAction.title, playAction.intent)
+			.addAction(nextAction.drawable, nextAction.title, nextAction.intent)
+			.build()
 		notificationManager.notify(STUDY_SESSION_NOTIFICATION_ID, notification)
 	}
 
@@ -120,3 +126,9 @@ internal class NotificationHelper @Inject constructor(
 	}
 	// endregion Helper functions ------------------------------------------------------------------
 }
+
+private data class NotificationAction(
+	@DrawableRes var drawable: Int,
+	val title: String,
+	val intent: PendingIntent?
+)
