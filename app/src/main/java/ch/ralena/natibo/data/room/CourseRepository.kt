@@ -1,13 +1,10 @@
 package ch.ralena.natibo.data.room
 
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.Result
+import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.`object`.*
 import ch.ralena.natibo.data.room.dao.CourseDao
 import io.realm.Realm
-import io.realm.RealmList
-import io.realm.kotlin.executeTransactionAwait
-import java.util.*
 import javax.inject.Inject
 
 /**
@@ -79,18 +76,18 @@ class CourseRepository @Inject constructor(
 	/**
 	 * Fetches a single course.
 	 *
-	 * This fetches a single course and returns [Result.Success] if it was successful, otherwise
-	 * it returns [Result.Failure].
+	 * This fetches a single course and returns [NatiboResult.Success] if it was successful, otherwise
+	 * it returns [NatiboResult.Failure].
 	 *
 	 * @param courseId The ID of the course to look for.
-	 * @return [Result.Success] if it was successful, otherwise [Result.Failure].
+	 * @return [NatiboResult.Success] if it was successful, otherwise [NatiboResult.Failure].
 	 */
-	suspend fun fetchCourse(courseId: Long): Result<CourseRoom> {
+	suspend fun fetchCourse(courseId: Long): NatiboResult<CourseRoom> {
 		val course = courseDao.getCourseById(courseId)
 		return if (course == null)
-			Result.Failure(R.string.course_not_found)
+			NatiboResult.Failure(R.string.course_not_found)
 		else
-			Result.Success(course)
+			NatiboResult.Success(course)
 	}
 
 	suspend fun deleteCourse(course: CourseRoom) {

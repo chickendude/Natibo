@@ -89,6 +89,7 @@ class CourseDetailFragment
 	// region Helper functions----------------------------------------------------------------------
 	private fun loadCourseInfo(course: CourseRoom) {
 		binding.totalRepsText.text = String.format(Locale.US, "%d", course.repCount)
+		// TODO: Restore
 //		binding.totalSentencesSeenText.text =
 //			String.format(Locale.US, "%d", course.numSentencesSeen)
 		// Use native language if there is no target language.

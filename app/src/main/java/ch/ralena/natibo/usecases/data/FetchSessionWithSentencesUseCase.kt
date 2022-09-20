@@ -1,6 +1,6 @@
 package ch.ralena.natibo.usecases.data
 
-import ch.ralena.natibo.data.Result
+import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.SentenceRepository
 import ch.ralena.natibo.data.room.SessionRepository
@@ -16,7 +16,7 @@ class FetchSessionWithSentencesUseCase @Inject constructor(
 	suspend fun fetchSessionWithSentences(sessionId: Long): NatiboSession? {
 		val session = sessionRepository.fetchSession(sessionId) ?: return null
 		val result = courseRepository.fetchCourse(session.courseId)
-		if (result !is Result.Success) return null
+		if (result !is NatiboResult.Success) return null
 
 		val course = result.data
 		val startingIndex = course.schedule.curSentenceIndex

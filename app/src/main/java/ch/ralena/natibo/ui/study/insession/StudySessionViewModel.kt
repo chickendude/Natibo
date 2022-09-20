@@ -2,24 +2,18 @@ package ch.ralena.natibo.ui.study.insession
 
 import androidx.annotation.StringRes
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.Result
+import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.CourseRepository
-import ch.ralena.natibo.data.room.PackRepository
-import ch.ralena.natibo.data.room.SentenceRepository
 import ch.ralena.natibo.data.room.SessionRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
-import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.data.room.`object`.SessionRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.DispatcherProvider
 import kotlinx.coroutines.*
-import java.io.File.separator
 import javax.inject.Inject
 
 class StudySessionViewModel @Inject constructor(
 	private val courseRepository: CourseRepository,
-	private val packRepository: PackRepository,
-	private val sentenceRepository: SentenceRepository,
 	private val sessionRepository: SessionRepository,
 	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<StudySessionViewModel.Listener>() {
@@ -41,8 +35,8 @@ class StudySessionViewModel @Inject constructor(
 				courseRepository.fetchCourse(id)
 			}
 			when (result) {
-				is Result.Success -> loadCourse(result.data)
-				is Result.Failure -> listeners.forEach { it.onCourseNotFound(result.stringRes) }
+				is NatiboResult.Success -> loadCourse(result.data)
+				is NatiboResult.Failure -> listeners.forEach { it.onCourseNotFound(result.stringRes) }
 			}
 		}
 	}

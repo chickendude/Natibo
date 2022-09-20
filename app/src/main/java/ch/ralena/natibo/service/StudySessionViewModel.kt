@@ -1,7 +1,7 @@
 package ch.ralena.natibo.service
 
 import android.util.Log
-import ch.ralena.natibo.data.Result
+import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.SessionRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
@@ -40,7 +40,7 @@ internal class StudySessionViewModel @Inject constructor(
 		coroutineScope.launch {
 			val result = courseRepository.fetchCourse(courseId)
 			when (result) {
-				is Result.Success -> loadSession(result.data)
+				is NatiboResult.Success -> loadSession(result.data)
 				else -> Log.e(TAG, "Unable to load course with id $courseId")
 			}
 		}

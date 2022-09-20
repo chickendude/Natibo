@@ -2,7 +2,7 @@ package ch.ralena.natibo.data.room
 
 import ch.ralena.natibo.R
 import ch.ralena.natibo.testutils.*
-import ch.ralena.natibo.data.Result
+import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.dao.CourseDao
 import io.kotest.matchers.shouldBe
@@ -41,7 +41,7 @@ internal class CourseRepositoryTest {
 		val result = sut.fetchCourse(COURSE_ID)
 
 		// Then
-		result.shouldBeInstanceOf<Result.Success<CourseRoom>>()
+		result.shouldBeInstanceOf<NatiboResult.Success<CourseRoom>>()
 		result.data.id.shouldBe(COURSE_ID)
 	}
 
@@ -54,7 +54,7 @@ internal class CourseRepositoryTest {
 		val result = sut.fetchCourse(COURSE_ID)
 
 		// Then
-		result.shouldBeInstanceOf<Result.Failure<Any>>()
+		result.shouldBeInstanceOf<NatiboResult.Failure<Any>>()
 		result.stringRes.shouldBe(R.string.course_not_found)
 	}
 

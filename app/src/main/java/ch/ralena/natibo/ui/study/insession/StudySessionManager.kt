@@ -3,18 +3,11 @@ package ch.ralena.natibo.ui.study.insession
 import android.content.Context
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.media.session.MediaSessionManager
 import android.os.Build
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.lifecycleScope
-import androidx.media.AudioManagerCompat.requestAudioFocus
-import ch.ralena.natibo.data.Result
+import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
@@ -23,11 +16,9 @@ import ch.ralena.natibo.model.NatiboSession
 import ch.ralena.natibo.usecases.data.FetchSessionWithSentencesUseCase
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.NotificationHelper
-import ch.ralena.natibo.utils.STUDY_SESSION_NOTIFICATION_ID
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -72,7 +63,7 @@ internal class StudySessionManager @Inject constructor(
 		coroutineScope.launch {
 			val result = courseRepository.fetchCourse(courseId)
 			when (result) {
-				is Result.Success -> loadSession(result.data)
+				is NatiboResult.Success -> loadSession(result.data)
 				else -> Log.e(TAG, "Unable to load course with id $courseId")
 			}
 		}
@@ -141,7 +132,7 @@ internal class StudySessionManager @Inject constructor(
 			session.nextSentence()
 			currentSentence.value = session.currentSentencePair
 			val sentence = session.currentSentence
-			if (sentence == null) events.emit(Event.SessionFinished)
+			if (sentence == null) studyState.value = StudyState.COMPLETE
 			else {
 				loadSentence(sentence)
 				events.emit(Event.SentenceLoaded(sentence))

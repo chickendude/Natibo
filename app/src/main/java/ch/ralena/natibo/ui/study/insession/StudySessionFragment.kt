@@ -1,6 +1,5 @@
 package ch.ralena.natibo.ui.study.insession
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -12,9 +11,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.lifecycleScope
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.CourseRoom
-import ch.ralena.natibo.data.room.`object`.Day
 import ch.ralena.natibo.databinding.FragmentStudySessionBinding
-import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import ch.ralena.natibo.ui.study.insession.views.PlayPause
@@ -49,8 +46,6 @@ internal class StudySessionFragment :
 	lateinit var course: CourseRoom
 
 	// fields
-	private val prefs: SharedPreferences? = null
-	private var studySessionService: StudySessionServiceKt? = null
 	private var millisLeft: Long = 0
 	private var countDownTimer: CountDownTimer? = null
 
@@ -109,6 +104,7 @@ internal class StudySessionFragment :
 	}
 
 	override fun onCourseLoaded(course: CourseRoom) {
+		this.course = course
 		activity.startSession(course)
 		binding.courseTitleText.text = course.title
 	}
@@ -122,14 +118,15 @@ internal class StudySessionFragment :
 	// region Helper functions----------------------------------------------------------------------
 	private fun connectToService() {
 		serviceDisposable =
-			activity.sessionPublish.subscribe { service: StudySessionServiceKt ->
-				studySessionService = service
+			activity.sessionPublish.subscribe {
 				lifecycleScope.launch {
 					studySessionManager.studyState().first { it != StudyState.UNINITIALIZED }
 					binding.sentences.setContent {
 						Sentences(studySessionManager)
 					}
 					binding.playPauseImage.setContent { PlayPause(studySessionManager) }
+					studySessionManager.studyState().first { it == StudyState.COMPLETE }
+					sessionFinished()
 				}
 //				if (course.getCurrentDay().getCurrentSentenceGroup() != null) nextSentence(
 //					course.getCurrentDay().getCurrentSentenceGroup()
@@ -147,7 +144,7 @@ internal class StudySessionFragment :
 			}
 	}
 
-	private fun sessionFinished(day: Day) {
+	private fun sessionFinished() {
 		// mark day as completed
 //		realm.executeTransaction { r: Realm? ->
 //			course.addReps(course.currentDay.totalReviews)
@@ -196,5 +193,5 @@ internal class StudySessionFragment :
 			secondsLeft % 60
 		)
 	}
-	// endregion Helper functions-------------------------------------------------------------------
+// endregion Helper functions-------------------------------------------------------------------
 }

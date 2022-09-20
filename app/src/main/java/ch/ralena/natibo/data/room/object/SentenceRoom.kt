@@ -37,7 +37,7 @@ data class SentenceRoom(
 	/** The pack the sentence belongs to. */
 	val packId: Long,
 
-	/** The pack the sentence belongs to. */
+	/** The language ID of the sentence. */
 	val languageId: Long,
 
 	@PrimaryKey(autoGenerate = true) val id: Long = 0

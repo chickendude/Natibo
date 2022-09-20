@@ -1,6 +1,6 @@
 package ch.ralena.natibo.ui.course.detail
 
-import ch.ralena.natibo.data.Result
+import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.PackRepository
@@ -121,12 +121,12 @@ internal class CourseDetailViewModelTest {
 
 	// region Helper methods------------------------------------------------------------------------
 	private fun fetchCourseSuccess() {
-		val success = Result.Success(COURSE)
+		val success = NatiboResult.Success(COURSE)
 		coEvery { courseRepository.fetchCourse(COURSE_ID) } returns success
 	}
 
 	private fun fetchCourseFailure() {
-		val failure = mockk<Result.Failure<CourseRoom>>()
+		val failure = mockk<NatiboResult.Failure<CourseRoom>>()
 		coEvery { courseRepository.fetchCourse(COURSE_ID) } returns failure
 	}
 

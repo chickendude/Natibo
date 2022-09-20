@@ -2,7 +2,7 @@ package ch.ralena.natibo.ui.course.detail
 
 import androidx.annotation.StringRes
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.Result
+import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.PackRepository
@@ -38,7 +38,7 @@ class CourseDetailViewModel @Inject constructor(
 	fun fetchData(id: Long) {
 		coroutineScope.launch {
 			val result = courseRepository.fetchCourse(id)
-			if (result is Result.Success<CourseRoom>) {
+			if (result is NatiboResult.Success<CourseRoom>) {
 				val course = result.data
 				// Notify that the course was found
 				withContext(dispatcherProvider.main()) {
