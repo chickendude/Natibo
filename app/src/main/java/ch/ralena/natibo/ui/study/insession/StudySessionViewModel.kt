@@ -81,32 +81,34 @@ class StudySessionViewModel @Inject constructor(
 			repeat(numTimes) { sentences.add(startingIndex + i) }
 		}
 		sentences.shuffle()
+		sentences.addAll(0, initialSentences)
 
 		// make sure no sentences are repeated twice in a row
 		val repeatedSentences = mutableListOf<Int>()
 		sentences.forEachIndexed { i, sentence ->
-			if (i > 0) {
-				if (sentences[i - 1] == sentence) {
-					repeatedSentences.add(sentence)
-					sentences[i] = -1
-				}
-			} else {
-				if (sentence == initialSentences.last()) sentences[i] = 0
+			if (i > 0 && sentences[i - 1] == sentence) {
+				repeatedSentences.add(sentence)
+				sentences[i] = -1
 			}
 		}
 		sentences.removeAll { it == -1 }
 
 		// Insert sentences back into list where they won't be repeated
 		repeatedSentences.forEach { sentence ->
+			var wasInserted = false
 			for (index in 1 until sentences.size) {
-				if (sentences[index] != sentence &&	sentences[index -1] != sentence) {
+				if (sentences[index] != sentence && sentences[index - 1] != sentence) {
 					sentences.add(index, sentence)
+					wasInserted = true
 					break
 				}
 			}
+			// If we couldn't find a place for it, just add it to the end.
+			// Should only be an issue with really small sizes, e.g. 1-2 unique sentences
+			if (!wasInserted) sentences.add(sentence)
 		}
 
-		return (initialSentences + sentences).joinToString(separator = ",")
+		return sentences.joinToString(separator = ",")
 	}
 // endregion Helper functions ------------------------------------------------------------------
 }
