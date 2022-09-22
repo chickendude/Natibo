@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.lifecycle.LifecycleService
 import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.CourseRepository
+import ch.ralena.natibo.data.room.SessionRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.model.NatiboSentence
@@ -30,6 +31,7 @@ private val TAG = StudySessionManager::class.simpleName
 @Singleton
 internal class StudySessionManager @Inject constructor(
 	private val courseRepository: CourseRepository,
+	private val sessionRepository: SessionRepository,
 	private val fetchSessionWithSentencesUseCase: FetchSessionWithSentencesUseCase,
 	private val notificationHelper: NotificationHelper,
 	@ApplicationContext private val applicationContext: Context,
@@ -137,6 +139,7 @@ internal class StudySessionManager @Inject constructor(
 				loadSentence(sentence)
 				events.emit(Event.SentenceLoaded(sentence))
 			}
+			sessionRepository.saveNatiboSession(session)
 		}
 	}
 

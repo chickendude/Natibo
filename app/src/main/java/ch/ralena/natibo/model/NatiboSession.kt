@@ -5,6 +5,7 @@ import ch.ralena.natibo.data.room.`object`.SentenceRoom
 data class NatiboSession(
 	val sentences: List<NatiboSentence>,
 	val sentenceIndices: List<Int>,
+	val sessionId: Long,
 	val languageOrder: List<Int>,
 	var currentSentenceIndex: Int = -1,
 	/** Language to play next, e.g. 0110 would play four sentences, Native/Target/Target/Native */

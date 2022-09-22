@@ -5,6 +5,7 @@ import ch.ralena.natibo.data.room.`object`.SessionRoom
 import ch.ralena.natibo.data.room.`object`.SessionSentenceCrossRef
 import ch.ralena.natibo.data.room.`object`.SessionWithSentences
 import ch.ralena.natibo.data.room.dao.SessionDao
+import ch.ralena.natibo.model.NatiboSession
 import javax.inject.Inject
 
 class SessionRepository @Inject constructor(
@@ -21,6 +22,13 @@ class SessionRepository @Inject constructor(
 		sentences.forEach {
 			val sessionSentenceCrossRef = SessionSentenceCrossRef(sessionId, it.id)
 			sessionDao.insertSessionSentenceCrossRef(sessionSentenceCrossRef)
+		}
+	}
+
+	suspend fun saveNatiboSession(natiboSession: NatiboSession) {
+		val session = fetchSession(natiboSession.sessionId)
+		session?.copy(progress = natiboSession.currentSentenceIndex)?.let { updatedSession ->
+			sessionDao.update(updatedSession)
 		}
 	}
 

@@ -47,6 +47,6 @@ class FetchSessionWithSentencesUseCase @Inject constructor(
 			if (course.targetLanguageId != null && target == null) continue
 			sentences.add(NatiboSentence(native, target))
 		}
-		return NatiboSession(sentences, sentenceIndices = indices, languageOrder = languageOrder)
+		return NatiboSession(sentences, sentenceIndices = indices, languageOrder = languageOrder, sessionId = sessionId)
 	}
 }
