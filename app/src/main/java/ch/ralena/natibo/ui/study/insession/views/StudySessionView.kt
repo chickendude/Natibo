@@ -12,13 +12,8 @@ import ch.ralena.natibo.ui.study.insession.StudySessionViewModel
 
 @Composable
 internal fun StudySession(
-	activity: MainActivity,
 //	viewModel: StudySessionViewModel = hiltViewModel()
 ) {
-	val disposable = activity.sessionPublish.subscribe { service: StudySessionServiceKt ->
-//		studySessionService = service
-	}
-
 	Column() {
 //		Sentences(currentSentence = service.currentSentence(), session = service.viewModel.session)
 //		PlayPause(service = service)

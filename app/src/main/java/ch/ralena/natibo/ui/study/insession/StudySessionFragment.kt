@@ -2,7 +2,6 @@ package ch.ralena.natibo.ui.study.insession
 
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.telecom.VideoProfile.isPaused
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -61,7 +60,7 @@ internal class StudySessionFragment :
 		viewModel.fetchCourse(id)
 
 		// connect to the studySessionService and start the session
-		connectToService()
+		connectToStudySession()
 
 		binding.apply {
 			settingsIcon.setOnClickListener { viewModel.settingsIconClicked() }
@@ -91,7 +90,7 @@ internal class StudySessionFragment :
 
 	override fun onResume() {
 		super.onResume()
-		connectToService()
+		connectToStudySession()
 	}
 
 	override fun onDestroy() {
@@ -117,7 +116,7 @@ internal class StudySessionFragment :
 	// endregion ViewModel Listener-----------------------------------------------------------------
 
 	// region Helper functions----------------------------------------------------------------------
-	private fun connectToService() {
+	private fun connectToStudySession() {
 		lifecycleScope.launch {
 			studySessionManager.studyState().first { it != StudyState.UNINITIALIZED }
 			binding.sentences.setContent {
@@ -129,18 +128,10 @@ internal class StudySessionFragment :
 		}
 		isPaused = studySessionManager.studyState().value == StudyState.UNINITIALIZED ||
 				studySessionManager.studyState().value == StudyState.PAUSED
-		serviceDisposable =
-			activity.sessionPublish.subscribe {
-//				if (course.getCurrentDay().getCurrentSentenceGroup() != null) nextSentence(
-//					course.getCurrentDay().getCurrentSentenceGroup()
-//				) else sessionFinished(course.getCurrentDay())
-//				finishDisposable = studySessionService.finishObservable()
-//					.subscribe(Consumer<Day> { day: Day -> sessionFinished(day) })
-				if (!isPaused) {
-					startTimer()
-				}
-				updateTime()
-			}
+		if (!isPaused) {
+			startTimer()
+		}
+		updateTime()
 	}
 
 	private fun sessionFinished() {

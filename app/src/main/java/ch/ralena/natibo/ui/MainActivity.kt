@@ -27,7 +27,6 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 	companion object {
 		private val TAG = MainActivity::class.java.simpleName
-		private const val KEY_SERVICE_BOUND = "key_service_bound"
 		private const val REQUEST_PICK_GLS = 1
 		const val REQUEST_LOAD_SESSION = 2
 	}
@@ -40,23 +39,6 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 
 	// fields
 	private lateinit var bottomNavigationView: BottomNavigationView
-	private var studySessionService: StudySessionServiceKt? = null
-	private var isServiceBound = false
-	internal val sessionPublish = PublishSubject.create<StudySessionServiceKt?>()
-
-	private val serviceConnection: ServiceConnection = object : ServiceConnection {
-		override fun onServiceConnected(name: ComponentName, service: IBinder) {
-			val binder = service as StudySessionServiceKt.StudyBinder
-			studySessionService = binder.service
-			isServiceBound = true
-			// publish the service object
-			sessionPublish.onNext(studySessionService!!)
-		}
-
-		override fun onServiceDisconnected(name: ComponentName) {
-			isServiceBound = false
-		}
-	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -67,7 +49,7 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 		val toolbar = findViewById<Toolbar>(R.id.toolbar)
 		setSupportActionBar(toolbar)
 
-		bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+		bottomNavigationView = findViewById(R.id.bottomNavigationView)
 		bottomNavigationView.setOnNavigationItemSelectedListener {
 			when (it.itemId) {
 				R.id.menu_course -> {
@@ -88,15 +70,6 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 
 		// if the device wasn't rotated, load the starting page
 		if (savedInstanceState == null) screenNavigator.toCourseListFragment()
-	}
-
-	override fun onDestroy() {
-		if (isServiceBound) {
-			unbindService(serviceConnection)
-			val serviceIntent = Intent(this, StudySessionServiceKt::class.java)
-			stopService(serviceIntent)
-		}
-		super.onDestroy()
 	}
 
 	/**
