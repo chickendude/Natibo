@@ -1,12 +1,15 @@
 package ch.ralena.natibo.ui.language.detail
 
 import ch.ralena.natibo.data.room.LanguageRepository
-import ch.ralena.natibo.data.room.`object`.*
+import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
+import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.ScreenNavigator
-import io.realm.Realm
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class LanguageDetailViewModel @Inject constructor(

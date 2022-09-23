@@ -1,8 +1,13 @@
 package ch.ralena.natibo.ui.course.create.pick_schedule
 
 import android.text.InputType
-import android.view.*
-import android.widget.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R

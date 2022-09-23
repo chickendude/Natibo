@@ -2,8 +2,8 @@ package ch.ralena.natibo.di
 
 import android.media.MediaPlayer
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
-import ch.ralena.natibo.ui.course.create.pick_language.adapter.NativeLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailablePacksAdapter
+import ch.ralena.natibo.ui.course.create.pick_language.adapter.NativeLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.TargetLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.pick_schedule.adapter.PackAdapter
 import ch.ralena.natibo.ui.course.list.adapter.CourseListAdapter

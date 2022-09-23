@@ -6,11 +6,13 @@ import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.ui.language.importer.worker.listener.PackImporterListener
 import ch.ralena.natibo.ui.language.importer.worker.usecase.*
 import ch.ralena.natibo.utils.DispatcherProvider
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
-import java.lang.Exception
 import javax.inject.Inject
 
 class ImportException(message: String) : Exception(message)

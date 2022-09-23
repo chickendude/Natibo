@@ -1,7 +1,7 @@
 package ch.ralena.natibo.data.room
 
-import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.data.room.`object`.PackRoom
+import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.data.room.dao.SentenceDao
 import javax.inject.Inject
 

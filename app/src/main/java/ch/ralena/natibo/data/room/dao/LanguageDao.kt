@@ -1,7 +1,9 @@
 package ch.ralena.natibo.data.room.dao
 
 import androidx.room.*
-import ch.ralena.natibo.data.room.`object`.*
+import ch.ralena.natibo.data.room.`object`.LanguagePackCrossRef
+import ch.ralena.natibo.data.room.`object`.LanguageRoom
+import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
 
 @Dao
 interface LanguageDao {

@@ -15,7 +15,6 @@ import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.ui.study.insession.StudyState
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.realm.Realm.init
 import javax.inject.Inject
 import javax.inject.Singleton
 

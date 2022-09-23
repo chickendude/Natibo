@@ -1,28 +1,25 @@
 package ch.ralena.natibo.ui.study.overview
 
 import android.view.View
-import android.widget.TextView
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.LanguageData.languages
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
-import ch.ralena.natibo.data.room.`object`.SentenceGroup
 import ch.ralena.natibo.databinding.FragmentStudySessionOverviewBinding
 import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.model.NatiboSession
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
-import ch.ralena.natibo.ui.study.insession.StudySessionFragment.Companion.KEY_COURSE_ID
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.ArrayList
 
 // Constants
 private val LANGUAGE_WIDTH = 35.dp

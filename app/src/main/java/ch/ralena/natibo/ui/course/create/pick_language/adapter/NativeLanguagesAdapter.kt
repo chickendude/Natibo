@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
-import kotlin.collections.ArrayList
 
 class NativeLanguagesAdapter(
 	private val languages: ArrayList<LanguageRoom>,

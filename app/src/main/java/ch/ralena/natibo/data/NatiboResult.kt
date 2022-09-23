@@ -1,6 +1,8 @@
 package ch.ralena.natibo.data
 
 import androidx.annotation.StringRes
+import ch.ralena.natibo.data.NatiboResult.Failure
+import ch.ralena.natibo.data.NatiboResult.Success
 
 /**
  * Wrapper for passing values.

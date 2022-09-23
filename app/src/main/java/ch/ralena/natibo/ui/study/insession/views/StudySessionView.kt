@@ -5,10 +5,7 @@ import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
 import ch.ralena.natibo.service.StudySessionServiceKt
-import ch.ralena.natibo.ui.MainActivity
-import ch.ralena.natibo.ui.study.insession.StudySessionViewModel
 
 @Composable
 internal fun StudySession(

@@ -1,7 +1,6 @@
 package ch.ralena.natibo.data
 
 import ch.ralena.natibo.R
-import java.util.*
 
 object LanguageData {
 	@JvmField

@@ -1,26 +1,18 @@
 package ch.ralena.natibo.ui
 
-import android.content.ComponentName
 import android.content.Intent
-import android.content.ServiceConnection
-import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.CourseRoom
-import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.ui.language.importer.LanguageImportFragment
 import ch.ralena.natibo.ui.study.insession.StudySessionFragment
 import ch.ralena.natibo.utils.ScreenNavigator
-import ch.ralena.natibo.utils.Utils
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
 
 @AndroidEntryPoint

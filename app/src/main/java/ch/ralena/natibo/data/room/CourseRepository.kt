@@ -2,7 +2,8 @@ package ch.ralena.natibo.data.room
 
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.NatiboResult
-import ch.ralena.natibo.data.room.`object`.*
+import ch.ralena.natibo.data.room.`object`.CourseRoom
+import ch.ralena.natibo.data.room.`object`.ScheduleRoom
 import ch.ralena.natibo.data.room.dao.CourseDao
 import io.realm.Realm
 import javax.inject.Inject

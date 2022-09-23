@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
-import ch.ralena.natibo.data.room.`object`.PackWithSentences
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.databinding.FragmentSentenceListBinding
 import ch.ralena.natibo.ui.MainActivity

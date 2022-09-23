@@ -5,8 +5,10 @@ import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.PackRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
-import ch.ralena.natibo.testutils.*
-import ch.ralena.natibo.ui.course.detail.CourseDetailViewModel.*
+import ch.ralena.natibo.testutils.COURSE
+import ch.ralena.natibo.testutils.COURSE_ID
+import ch.ralena.natibo.testutils.TestDispatcherProvider
+import ch.ralena.natibo.ui.course.detail.CourseDetailViewModel.Listener
 import ch.ralena.natibo.utils.ScreenNavigator
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -14,7 +16,9 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

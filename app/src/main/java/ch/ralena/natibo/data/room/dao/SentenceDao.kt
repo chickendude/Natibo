@@ -1,8 +1,6 @@
 package ch.ralena.natibo.data.room.dao
 
 import androidx.room.*
-import ch.ralena.natibo.data.room.`object`.CourseRoom
-import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
 
 @Dao

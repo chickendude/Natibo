@@ -19,7 +19,6 @@ import androidx.lifecycle.LifecycleService
 import ch.ralena.natibo.ui.study.insession.StudySessionManager
 import ch.ralena.natibo.utils.NotificationHelper
 import ch.ralena.natibo.utils.STUDY_SESSION_NOTIFICATION_ID
-import ch.ralena.natibo.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

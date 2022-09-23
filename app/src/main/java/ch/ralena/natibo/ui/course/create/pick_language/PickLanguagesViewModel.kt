@@ -8,7 +8,10 @@ import ch.ralena.natibo.ui.base.BaseViewModel
 import ch.ralena.natibo.ui.course.create.pick_schedule.PickScheduleFragment
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.ScreenNavigator
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PickLanguagesViewModel @Inject constructor(

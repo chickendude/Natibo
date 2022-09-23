@@ -7,10 +7,16 @@ import ch.ralena.natibo.data.room.SentenceRepository
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.Utils.readZip
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.io.*
+import kotlinx.coroutines.launch
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
 

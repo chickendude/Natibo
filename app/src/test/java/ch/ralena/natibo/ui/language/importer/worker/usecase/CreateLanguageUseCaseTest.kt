@@ -1,7 +1,7 @@
 package ch.ralena.natibo.ui.language.importer.worker.usecase
 
 import ch.ralena.natibo.data.room.LanguageRepository
-import ch.ralena.natibo.testutils.*
+import ch.ralena.natibo.testutils.LANGUAGE
 import ch.ralena.natibo.ui.language.importer.worker.ImportException
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe

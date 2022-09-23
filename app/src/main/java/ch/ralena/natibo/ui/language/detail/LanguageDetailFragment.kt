@@ -1,14 +1,13 @@
 package ch.ralena.natibo.ui.language.detail
 
-import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.*
+import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
+import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.databinding.FragmentLanguageDetailBinding
 import ch.ralena.natibo.ui.base.BaseFragment
-import ch.ralena.natibo.ui.sentences.SentenceListFragment
 import ch.ralena.natibo.ui.language.detail.adapter.LanguageDetailAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

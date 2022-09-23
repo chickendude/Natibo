@@ -1,16 +1,11 @@
 package ch.ralena.natibo.ui.study.insession
 
 import android.content.Context
-import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
-import androidx.media.AudioManagerCompat.requestAudioFocus
-import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.SessionRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
@@ -18,14 +13,12 @@ import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.model.NatiboSession
 import ch.ralena.natibo.service.StudyServiceManager
-import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.usecases.data.FetchSessionWithSentencesUseCase
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.NotificationHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

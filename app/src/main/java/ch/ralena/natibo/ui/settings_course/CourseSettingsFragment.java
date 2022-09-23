@@ -2,6 +2,7 @@ package ch.ralena.natibo.ui.settings_course;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.core.math.MathUtils;
 import androidx.preference.EditTextPreference;
@@ -9,9 +10,9 @@ import androidx.preference.Preference;
 
 import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 
-import ch.ralena.natibo.ui.MainActivity;
 import ch.ralena.natibo.R;
 import ch.ralena.natibo.data.room.object.Course;
+import ch.ralena.natibo.ui.MainActivity;
 import io.realm.Realm;
 
 

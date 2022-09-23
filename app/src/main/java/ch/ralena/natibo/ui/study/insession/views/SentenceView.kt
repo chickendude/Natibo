@@ -11,10 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import ch.ralena.natibo.model.NatiboSentence
-import ch.ralena.natibo.model.NatiboSession
 import ch.ralena.natibo.ui.study.insession.StudySessionManager
-import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 internal fun Sentences(studySessionManager: StudySessionManager) {

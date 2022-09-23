@@ -1,6 +1,8 @@
 package ch.ralena.natibo.data.room.`object`
 
-import androidx.room.*
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity
 data class CourseRoom(

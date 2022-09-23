@@ -3,7 +3,6 @@ package ch.ralena.natibo
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import ch.ralena.natibo.di.AppModule
 import dagger.hilt.android.HiltAndroidApp
 import io.realm.Realm
 import io.realm.RealmConfiguration

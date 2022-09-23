@@ -1,13 +1,16 @@
 package ch.ralena.natibo.data.room
 
 import ch.ralena.natibo.R
-import ch.ralena.natibo.testutils.*
 import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.dao.CourseDao
+import ch.ralena.natibo.testutils.COURSE
+import ch.ralena.natibo.testutils.COURSE_ID
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import io.realm.Realm
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest

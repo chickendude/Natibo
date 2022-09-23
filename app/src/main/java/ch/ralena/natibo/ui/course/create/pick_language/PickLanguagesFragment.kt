@@ -1,16 +1,16 @@
 package ch.ralena.natibo.ui.course.create.pick_language
 
-import android.view.*
+import android.view.MenuItem
+import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.databinding.FragmentCoursePickLanguagesBinding
 import ch.ralena.natibo.ui.MainActivity
-import ch.ralena.natibo.ui.course.create.pick_language.adapter.NativeLanguagesAdapter
-import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailablePacksAdapter
 import ch.ralena.natibo.ui.base.BaseFragment
+import ch.ralena.natibo.ui.course.create.pick_language.adapter.AvailablePacksAdapter
+import ch.ralena.natibo.ui.course.create.pick_language.adapter.NativeLanguagesAdapter
 import ch.ralena.natibo.ui.course.create.pick_language.adapter.TargetLanguagesAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

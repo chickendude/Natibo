@@ -10,7 +10,6 @@ import ch.ralena.natibo.R
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.ui.base.BaseRecyclerAdapter
-import io.realm.RealmList
 import javax.inject.Inject
 
 class SentenceListAdapter @Inject constructor() :
