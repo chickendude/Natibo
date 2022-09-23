@@ -2,6 +2,7 @@ package ch.ralena.natibo.ui.study.insession
 
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.telecom.VideoProfile.isPaused
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -105,7 +106,7 @@ internal class StudySessionFragment :
 
 	override fun onCourseLoaded(course: CourseRoom) {
 		this.course = course
-		activity.startSession(course)
+		studySessionManager.start(course)
 		binding.courseTitleText.text = course.title
 	}
 
@@ -117,26 +118,24 @@ internal class StudySessionFragment :
 
 	// region Helper functions----------------------------------------------------------------------
 	private fun connectToService() {
+		lifecycleScope.launch {
+			studySessionManager.studyState().first { it != StudyState.UNINITIALIZED }
+			binding.sentences.setContent {
+				Sentences(studySessionManager)
+			}
+			binding.playPauseImage.setContent { PlayPause(studySessionManager) }
+			studySessionManager.studyState().first { it == StudyState.COMPLETE }
+			sessionFinished()
+		}
+		isPaused = studySessionManager.studyState().value == StudyState.UNINITIALIZED ||
+				studySessionManager.studyState().value == StudyState.PAUSED
 		serviceDisposable =
 			activity.sessionPublish.subscribe {
-				lifecycleScope.launch {
-					studySessionManager.studyState().first { it != StudyState.UNINITIALIZED }
-					binding.sentences.setContent {
-						Sentences(studySessionManager)
-					}
-					binding.playPauseImage.setContent { PlayPause(studySessionManager) }
-					studySessionManager.studyState().first { it == StudyState.COMPLETE }
-					sessionFinished()
-				}
 //				if (course.getCurrentDay().getCurrentSentenceGroup() != null) nextSentence(
 //					course.getCurrentDay().getCurrentSentenceGroup()
 //				) else sessionFinished(course.getCurrentDay())
 //				finishDisposable = studySessionService.finishObservable()
 //					.subscribe(Consumer<Day> { day: Day -> sessionFinished(day) })
-				setPaused(
-					studySessionManager.studyState().value == StudyState.UNINITIALIZED ||
-							studySessionManager.studyState().value == StudyState.PAUSED
-				)
 				if (!isPaused) {
 					startTimer()
 				}
@@ -150,6 +149,7 @@ internal class StudySessionFragment :
 //			course.addReps(course.currentDay.totalReviews)
 //			day.isCompleted = true
 //		}
+		studySessionManager.finishSession()
 		val fragment = StudySessionOverviewFragment()
 		fragment.arguments = Bundle().apply {
 			putLong(StudySessionOverviewFragment.KEY_COURSE_ID, course.id)

@@ -36,9 +36,6 @@ internal class StudySessionServiceKt : LifecycleService() {
 	@Inject
 	lateinit var notificationHelper: NotificationHelper
 
-	@Inject
-	lateinit var viewModel: StudySessionViewModel
-
 	private var phoneStateListener: PhoneStateListener? = null
 	private lateinit var telephonyManager: TelephonyManager
 
@@ -54,8 +51,6 @@ internal class StudySessionServiceKt : LifecycleService() {
 		// check if we have attached our bundle or not
 		if (intent?.action == null) {
 			startForeground(STUDY_SESSION_NOTIFICATION_ID, notificationHelper.baseNotification.build())
-			val courseId = Utils.Storage(applicationContext).courseId
-			studySessionManager.start(courseId)
 		} else {
 			handleIncomingActions(intent)
 		}

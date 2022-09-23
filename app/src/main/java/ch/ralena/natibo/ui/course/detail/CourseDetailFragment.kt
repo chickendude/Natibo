@@ -8,6 +8,7 @@ import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.PackRoom
 import ch.ralena.natibo.databinding.FragmentCourseDetailBinding
+import ch.ralena.natibo.service.StudyServiceManager
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
 import com.google.android.material.snackbar.Snackbar
@@ -31,6 +32,9 @@ class CourseDetailFragment
 	@Inject
 	lateinit var activity: MainActivity
 
+	@Inject
+	lateinit var studyServiceManager: StudyServiceManager
+
 	override fun setupViews(view: View) {
 		activity.enableBackButton()
 
@@ -45,7 +49,7 @@ class CourseDetailFragment
 				Snackbar.make(view, R.string.confirm_delete, Snackbar.LENGTH_INDEFINITE)
 					.setAction(R.string.delete) {
 						viewModel.deleteCourse()
-						activity.stopSession()
+						studyServiceManager.stopService()
 					}.show()
 			}
 

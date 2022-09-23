@@ -179,35 +179,4 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 		snackbar.setAction(R.string.ok) { v: View? -> snackbar.dismiss() }
 		snackbar.show()
 	}
-
-	// --- study session service methods ---
-	fun startSession(course: CourseRoom) {
-		// TODO: inject and/or move into ViewModel
-		val storage = Utils.Storage(this)
-		storage.courseId = course.id
-//		storage.putDayId(course.getCurrentDay().getId())
-
-		// if we aren't bound to the service, start it if necessary and bind to it so that we can interact with it.
-		// if we are bound to it, we need to tell it to start a new session
-		if (!isServiceBound) {
-			val intent = Intent(this, StudySessionServiceKt::class.java)
-			if (Build.VERSION.SDK_INT >= 26)
-				startForegroundService(intent)
-			else
-				startService(intent)
-			bindService(intent, serviceConnection, BIND_AUTO_CREATE)
-		} else {
-			val intent = Intent(StudySessionServiceKt.BROADCAST_START_SESSION)
-			sendBroadcast(intent)
-			sessionPublish.onNext(studySessionService!!)
-		}
-	}
-
-	fun stopSession() {
-		if (isServiceBound) {
-			unbindService(serviceConnection)
-			studySessionService!!.removeNotification()
-			studySessionService!!.stopSelf()
-		}
-	}
 }

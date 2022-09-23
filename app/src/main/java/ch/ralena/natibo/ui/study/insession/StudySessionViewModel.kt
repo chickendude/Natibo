@@ -44,19 +44,24 @@ class StudySessionViewModel @Inject constructor(
 	// region Helper functions ---------------------------------------------------------------------
 	private suspend fun loadCourse(course: CourseRoom) {
 		// TODO: Remove
-		if (courseRepository.countSessions(course.id) > 0)
-			sessionRepository.deleteAll()
+//		if (courseRepository.countSessions(course.id) > 0)
+//			sessionRepository.deleteAll()
 
-		if (courseRepository.countSessions(course.id) == 0)
-			createSession(course)
+		// TODO: Create next session if previous session is finished
+		val session = sessionRepository.fetchSession(course.sessionId)
+		if (courseRepository.countSessions(course.id) == 0 ||
+			session != null && session.progress > session.sentenceIndices.split(",").size
+		) {
+			createSession(course, session)
+		}
 		listeners.forEach { it.onCourseLoaded(course) }
 	}
 
-	private suspend fun createSession(course: CourseRoom) {
+	private suspend fun createSession(course: CourseRoom, previousSession: SessionRoom?) {
 		val numSessions = courseRepository.countSessions(course.id)
 		val session = SessionRoom(
 			index = numSessions + 1,
-			progress = 0,
+			progress = previousSession?.progress ?: 0,
 			courseId = course.id,
 			sentenceIndices = getSentenceIndices(course)
 		)

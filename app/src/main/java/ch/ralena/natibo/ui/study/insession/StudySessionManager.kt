@@ -1,12 +1,15 @@
 package ch.ralena.natibo.ui.study.insession
 
 import android.content.Context
+import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
+import androidx.media.AudioManagerCompat.requestAudioFocus
 import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.SessionRepository
@@ -14,12 +17,15 @@ import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.model.NatiboSession
+import ch.ralena.natibo.service.StudyServiceManager
+import ch.ralena.natibo.service.StudySessionServiceKt
 import ch.ralena.natibo.usecases.data.FetchSessionWithSentencesUseCase
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.NotificationHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -35,6 +41,7 @@ internal class StudySessionManager @Inject constructor(
 	private val fetchSessionWithSentencesUseCase: FetchSessionWithSentencesUseCase,
 	private val notificationHelper: NotificationHelper,
 	@ApplicationContext private val applicationContext: Context,
+	private val studyServiceManager: StudyServiceManager,
 	dispatcherProvider: DispatcherProvider
 ) {
 	private val mediaSession = MediaSessionCompat(applicationContext, "Natibo")
@@ -61,13 +68,14 @@ internal class StudySessionManager @Inject constructor(
 		notificationHelper.mediaSession = mediaSession
 	}
 
-	fun start(courseId: Long) {
+	fun start(course: CourseRoom) {
 		coroutineScope.launch {
-			val result = courseRepository.fetchCourse(courseId)
-			when (result) {
-				is NatiboResult.Success -> loadSession(result.data)
-				else -> Log.e(TAG, "Unable to load course with id $courseId")
-			}
+			session = fetchSessionWithSentencesUseCase.fetchSessionWithSentences(course.sessionId)
+				?: return@launch
+			events.emit(Event.SessionLoaded)
+			nextSentence()
+			play()
+			studyServiceManager.startService()
 		}
 	}
 
@@ -79,13 +87,7 @@ internal class StudySessionManager @Inject constructor(
 		}
 		removeAudioFocus()
 		notificationHelper.removeNotification()
-	}
-
-	private fun play() {
-		studyState.value = StudyState.PLAYING
-		if (mediaPlayer?.isPlaying == false) {
-			mediaPlayer?.start()
-		}
+		studyServiceManager.stopService()
 	}
 
 	fun pause() {
@@ -106,6 +108,13 @@ internal class StudySessionManager @Inject constructor(
 			studyState.value,
 			currentSentence.value!!
 		)
+	}
+
+	private fun play() {
+		studyState.value = StudyState.PLAYING
+		if (mediaPlayer?.isPlaying == false) {
+			mediaPlayer?.start()
+		}
 	}
 
 	private fun loadSentence(sentence: SentenceRoom) {
@@ -147,6 +156,11 @@ internal class StudySessionManager @Inject constructor(
 		// TODO: Not implemented yet
 	}
 
+	fun finishSession() {
+		studyState.value = StudyState.UNINITIALIZED
+		currentSentence.value = null
+	}
+
 	private fun setUpMediaPlayer() {
 		mediaPlayer = mediaPlayer ?: MediaPlayer().apply {
 			setAudioStreamType(AudioManager.STREAM_MUSIC)
@@ -178,14 +192,6 @@ internal class StudySessionManager @Inject constructor(
 
 	private fun removeAudioFocus(): Boolean {
 		return audioManager?.abandonAudioFocus(audioFocusChangeListener) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
-	}
-
-	private suspend fun loadSession(course: CourseRoom) {
-		session =
-			fetchSessionWithSentencesUseCase.fetchSessionWithSentences(course.sessionId) ?: return
-		events.emit(Event.SessionLoaded)
-		nextSentence()
-		play()
 	}
 
 	private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
