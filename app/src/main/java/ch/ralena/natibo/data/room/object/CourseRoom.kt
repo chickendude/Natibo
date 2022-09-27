@@ -27,7 +27,7 @@ data class CourseRoom(
 	val schedule: ScheduleRoom,
 
 	/** The ID of the current session. */
-	val sessionId: Long,
+	var sessionId: Long,
 
 	/** The amount of time to pause between sentences. Measured in milliseconds. */
 	val pause: Int = 1000,

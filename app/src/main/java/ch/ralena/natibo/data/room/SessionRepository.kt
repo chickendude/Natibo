@@ -1,9 +1,6 @@
 package ch.ralena.natibo.data.room
 
-import ch.ralena.natibo.data.room.`object`.SentenceRoom
-import ch.ralena.natibo.data.room.`object`.SessionRoom
-import ch.ralena.natibo.data.room.`object`.SessionSentenceCrossRef
-import ch.ralena.natibo.data.room.`object`.SessionWithSentences
+import ch.ralena.natibo.data.room.`object`.*
 import ch.ralena.natibo.data.room.dao.SessionDao
 import ch.ralena.natibo.model.NatiboSession
 import javax.inject.Inject
@@ -26,10 +23,13 @@ class SessionRepository @Inject constructor(
 	}
 
 	suspend fun saveNatiboSession(natiboSession: NatiboSession) {
-		val session = fetchSession(natiboSession.sessionId)
-		session?.copy(progress = natiboSession.currentSentenceIndex)?.let { updatedSession ->
-			sessionDao.update(updatedSession)
-		}
+		val session = fetchSession(natiboSession.sessionId) ?: return
+		val updatedSession = session.copy(progress = natiboSession.currentSentenceIndex)
+		sessionDao.update(updatedSession)
+	}
+
+	suspend fun finishSession(sessionId: Long) {
+		sessionDao.finishSession(sessionId)
 	}
 
 	// region Delete -------------------------------------------------------------------------------

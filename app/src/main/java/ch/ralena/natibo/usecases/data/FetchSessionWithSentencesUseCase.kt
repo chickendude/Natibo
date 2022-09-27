@@ -49,7 +49,6 @@ class FetchSessionWithSentencesUseCase @Inject constructor(
 		}
 		return NatiboSession(
 			sentences,
-			currentSentenceIndex = session.progress,
 			sentenceIndices = indices,
 			languageOrder = languageOrder,
 			sessionId = sessionId

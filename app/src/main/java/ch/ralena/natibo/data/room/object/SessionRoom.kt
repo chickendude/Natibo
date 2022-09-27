@@ -16,6 +16,9 @@ data class SessionRoom(
 	/** Indices of the sentences to be studied, comma-separated. */
 	val sentenceIndices: String,
 
+	/** Whether the session has been completed or not. */
+	val isCompleted: Boolean = false,
+
 	@PrimaryKey(autoGenerate = true) val id: Long = 0
 )
 

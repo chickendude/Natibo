@@ -12,7 +12,6 @@ import javax.inject.Inject
  * Repository for obtaining [CourseRoom] data.
  */
 class CourseRepository @Inject constructor(
-	private val realm: Realm,
 	private val courseDao: CourseDao
 ) {
 	/**
@@ -40,38 +39,7 @@ class CourseRepository @Inject constructor(
 		)
 		val courseRoom =
 			CourseRoom(title, baseLanguageId, targetLanguageId, packId, scheduleRoom, 0)
-		val courseId = courseDao.insert(courseRoom)
-
-//		// --- begin transaction
-//		realm.beginTransaction()
-//
-//		// Create sentence schedule
-//		val schedule =
-//			realm.createObject(Schedule::class.java, UUID.randomUUID().toString()).apply {
-//				this.order = order
-//				numSentences = numSentencesPerDay
-//				sentenceIndex = startingSentence - 1
-//				for (review in dailyReviews)
-//					reviewPattern.add(review.toInt())
-//			}
-//
-//		// Build course
-//		val course = realm.createObject(Course::class.java, UUID.randomUUID().toString()).apply {
-//			this.title = title
-//			this.languages.clear()
-//			this.languages.addAll(languages)
-//			pauseMillis = 1000
-//			this.schedule = schedule
-//			// TODO: make sure triangulation packs are handled
-//			packs = languages.first().getMatchingPacks(languages.last())
-//			buildFirstDay(this)
-//		}
-//		realm.commitTransaction()
-//		// --- end transaction
-//		for (set in course.currentDay.sentenceSets)
-//			set.buildSentences(realm)
-
-		return courseId
+		return courseDao.insert(courseRoom)
 	}
 
 	/**

@@ -9,7 +9,7 @@ data class NatiboSession(
 	val languageOrder: List<Int>,
 	var currentSentenceIndex: Int = -1,
 	/** Language to play next, e.g. 0110 would play four sentences, Native/Target/Target/Native */
-	var currentLanguageIndex: Int = 0
+	var currentLanguageIndex: Int = -1
 ) {
 	val currentSentencePair: NatiboSentence?
 		get() = sentenceIndices

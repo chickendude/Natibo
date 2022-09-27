@@ -19,6 +19,7 @@ import ch.ralena.natibo.utils.NotificationHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -42,6 +43,7 @@ internal class StudySessionManager @Inject constructor(
 	private var mediaPlayer: MediaPlayer? = null
 	private var audioManager: AudioManager? = null
 	lateinit var session: NatiboSession
+	lateinit var course: CourseRoom
 
 	private val job = Job()
 	private val coroutineScope = CoroutineScope(job + dispatcherProvider.default())
@@ -62,6 +64,7 @@ internal class StudySessionManager @Inject constructor(
 	}
 
 	fun start(course: CourseRoom) {
+		this.course = course
 		coroutineScope.launch {
 			session = fetchSessionWithSentencesUseCase.fetchSessionWithSentences(course.sessionId)
 				?: return@launch
@@ -103,6 +106,36 @@ internal class StudySessionManager @Inject constructor(
 		)
 	}
 
+	fun nextSentence() {
+		coroutineScope.launch {
+			session.nextSentence()
+			currentSentence.value = session.currentSentencePair
+			val sentence = session.currentSentence
+			if (sentence == null) studyState.value = StudyState.COMPLETE
+			else {
+				loadSentence(sentence)
+				events.emit(Event.SentenceLoaded(sentence))
+			}
+			sessionRepository.saveNatiboSession(session)
+		}
+	}
+
+	fun previousSentence() {
+		// TODO: Not implemented yet
+	}
+
+	fun finishSession() {
+		coroutineScope.launch {
+			sessionRepository.finishSession(session.sessionId)
+			val scheduleIndex = course.schedule.curSentenceIndex
+			val sessionIndex = session.currentSentenceIndex
+			val schedule = course.schedule.copy(curSentenceIndex = scheduleIndex + sessionIndex)
+			courseRepository.updateCourse(course.copy(schedule = schedule))
+			studyState.value = StudyState.UNINITIALIZED
+			currentSentence.value = null
+		}
+	}
+
 	private fun play() {
 		studyState.value = StudyState.PLAYING
 		if (mediaPlayer?.isPlaying == false) {
@@ -129,29 +162,6 @@ internal class StudySessionManager @Inject constructor(
 			studyState.value,
 			currentSentence.value!!
 		)
-	}
-
-	fun nextSentence() {
-		coroutineScope.launch {
-			session.nextSentence()
-			currentSentence.value = session.currentSentencePair
-			val sentence = session.currentSentence
-			if (sentence == null) studyState.value = StudyState.COMPLETE
-			else {
-				loadSentence(sentence)
-				events.emit(Event.SentenceLoaded(sentence))
-			}
-			sessionRepository.saveNatiboSession(session)
-		}
-	}
-
-	fun previousSentence() {
-		// TODO: Not implemented yet
-	}
-
-	fun finishSession() {
-		studyState.value = StudyState.UNINITIALIZED
-		currentSentence.value = null
 	}
 
 	private fun setUpMediaPlayer() {

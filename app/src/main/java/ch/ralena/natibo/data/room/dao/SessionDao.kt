@@ -7,6 +7,9 @@ import ch.ralena.natibo.data.room.`object`.SessionWithSentences
 
 @Dao
 interface SessionDao {
+	@Query("UPDATE sessionroom SET isCompleted = 1 WHERE id = :id")
+	suspend fun finishSession(id: Long)
+
 	@Query("SELECT * FROM sessionroom")
 	suspend fun getAll(): List<SessionRoom>
 

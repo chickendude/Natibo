@@ -135,11 +135,6 @@ internal class StudySessionFragment :
 	}
 
 	private fun sessionFinished() {
-		// mark day as completed
-//		realm.executeTransaction { r: Realm? ->
-//			course.addReps(course.currentDay.totalReviews)
-//			day.isCompleted = true
-//		}
 		studySessionManager.finishSession()
 		val fragment = StudySessionOverviewFragment()
 		fragment.arguments = Bundle().apply {
