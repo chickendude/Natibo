@@ -11,4 +11,5 @@
 	<color name="colorTextDark">#444</color>
 	<color name="colorTextLight">#AAA</color>
 	<color name="colorTextWhite">#F5F5F5</color>
+	<color name="navigationBackground">#DDD</color>
 </resources>
