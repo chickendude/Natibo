@@ -64,10 +64,6 @@ internal class StudySessionServiceKt : LifecycleService() {
 	}
 
 	override fun onDestroy() {
-		super.onDestroy()
-
-		studySessionManager.stop()
-
 		// cancel the phone state listener
 		if (phoneStateListener != null) {
 			telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
@@ -76,20 +72,12 @@ internal class StudySessionServiceKt : LifecycleService() {
 		// unregister broadcast receivers
 		unregisterReceiver(becomingNoisyReceiver)
 		unregisterReceiver(startSessionReceiver)
+		super.onDestroy()
 	}
 
 	override fun onBind(intent: Intent): IBinder {
 		super.onBind(intent)
 		return binder
-	}
-
-	// --- notification ---
-	fun removeNotification() {
-		// TODO: Remove
-		val notificationManager: NotificationManager =
-			getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-		notificationManager.cancel(NOTIFICATION_ID)
-		stopForeground(true)
 	}
 
 	private fun handleIncomingActions(playbackAction: Intent?) {
@@ -185,7 +173,6 @@ internal class StudySessionServiceKt : LifecycleService() {
 		const val ACTION_ID_PREVIOUS = 2
 		const val ACTION_NEXT = "action_next"
 		const val ACTION_ID_NEXT = 3
-		private const val NOTIFICATION_ID = 1337
 	}
 }
 
