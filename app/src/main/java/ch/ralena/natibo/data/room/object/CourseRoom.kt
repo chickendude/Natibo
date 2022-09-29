@@ -24,7 +24,7 @@ data class CourseRoom(
 
 	/** Contains information on the scheduling of the course. */
 	@Embedded
-	val schedule: ScheduleRoom,
+	var schedule: ScheduleRoom,
 
 	/** The ID of the current session. */
 	var sessionId: Long,
@@ -46,7 +46,7 @@ data class ScheduleRoom(
 	val numSentences: Int,
 
 	/** The index of the first new sentence. */
-	val curSentenceIndex: Int,
+	var curSentenceIndex: Int,
 
 	/**
 	 * The order to play sentences in. E.g. "Base Target Target" or "Target Base Target".

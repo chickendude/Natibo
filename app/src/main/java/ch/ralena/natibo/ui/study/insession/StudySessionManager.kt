@@ -127,10 +127,6 @@ internal class StudySessionManager @Inject constructor(
 	fun finishSession() {
 		coroutineScope.launch {
 			sessionRepository.finishSession(session.sessionId)
-			val scheduleIndex = course.schedule.curSentenceIndex
-			val sentencesStudied = session.sentences.size
-			val schedule = course.schedule.copy(curSentenceIndex = scheduleIndex + sentencesStudied)
-			courseRepository.updateCourse(course.copy(schedule = schedule))
 			studyState.value = StudyState.UNINITIALIZED
 			currentSentence.value = null
 		}

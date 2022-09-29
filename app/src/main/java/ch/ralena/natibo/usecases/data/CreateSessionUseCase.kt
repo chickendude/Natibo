@@ -14,6 +14,13 @@ class CreateSessionUseCase @Inject constructor(
 		val previousSession = sessionRepository.fetchSession(course.sessionId)
 		if (previousSession?.isCompleted == false) return
 
+		// Advance schedule starting sentence if we're starting a new session
+		if (previousSession?.isCompleted == true) {
+			val scheduleIndex = course.schedule.curSentenceIndex
+			val sentencesStudied = previousSession.sentenceIndices.split(",").distinct().size
+			course.schedule.curSentenceIndex = scheduleIndex + sentencesStudied
+		}
+
 		val numSessions = courseRepository.countSessions(course.id)
 		val session = SessionRoom(
 			index = numSessions + 1,
