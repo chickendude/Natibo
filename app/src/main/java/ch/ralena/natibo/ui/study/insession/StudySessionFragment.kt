@@ -119,9 +119,7 @@ internal class StudySessionFragment :
 	private fun connectToStudySession() {
 		lifecycleScope.launch {
 			studySessionManager.studyState().first { it != StudyState.UNINITIALIZED }
-			binding.sentences.setContent {
-				Sentences(studySessionManager)
-			}
+			binding.sentences.setContent { Sentences(studySessionManager) }
 			binding.playPauseImage.setContent { PlayPause(studySessionManager) }
 			studySessionManager.studyState().first { it == StudyState.COMPLETE }
 			sessionFinished()
