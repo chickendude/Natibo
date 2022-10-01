@@ -95,7 +95,5 @@
         android:layout_width="180dp"
         android:layout_height="0dp"
         android:layout_gravity="center"
-        android:layout_weight="1"
-        android:contentDescription="@string/play_and_pause_button"
-        android:src="@drawable/ic_play" />
+        android:layout_weight="1" />
 </LinearLayout>
