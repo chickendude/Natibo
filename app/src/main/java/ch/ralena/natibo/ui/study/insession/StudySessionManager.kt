@@ -1,6 +1,7 @@
 package ch.ralena.natibo.ui.study.insession
 
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
@@ -19,7 +20,6 @@ import ch.ralena.natibo.utils.NotificationHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -36,7 +36,7 @@ internal class StudySessionManager @Inject constructor(
 	private val notificationHelper: NotificationHelper,
 	@ApplicationContext private val applicationContext: Context,
 	private val studyServiceManager: StudyServiceManager,
-	dispatcherProvider: DispatcherProvider
+	private val dispatchers: DispatcherProvider
 ) {
 	private val mediaSession = MediaSessionCompat(applicationContext, "Natibo")
 
@@ -46,7 +46,7 @@ internal class StudySessionManager @Inject constructor(
 	lateinit var course: CourseRoom
 
 	private val job = Job()
-	private val coroutineScope = CoroutineScope(job + dispatcherProvider.default())
+	private val coroutineScope = CoroutineScope(job + dispatchers.default())
 
 	private val events = MutableSharedFlow<Event>()
 	fun events() = events.asSharedFlow()
@@ -70,7 +70,6 @@ internal class StudySessionManager @Inject constructor(
 				?: return@launch
 			events.emit(Event.SessionLoaded)
 			nextSentence()
-			play()
 			studyServiceManager.startService()
 		}
 	}
@@ -134,9 +133,7 @@ internal class StudySessionManager @Inject constructor(
 
 	private fun play() {
 		studyState.value = StudyState.PLAYING
-		if (mediaPlayer?.isPlaying == false) {
-			mediaPlayer?.start()
-		}
+		mediaPlayer?.start()
 	}
 
 	private fun loadSentence(sentence: SentenceRoom) {
@@ -144,6 +141,7 @@ internal class StudySessionManager @Inject constructor(
 			reset()
 			setDataSource(sentence.mp3)
 			prepare()
+			setOnPreparedListener { play() }
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 				// TODO: Handle speed from settings
 				playbackParams = playbackParams.setSpeed(1f)
@@ -162,7 +160,11 @@ internal class StudySessionManager @Inject constructor(
 
 	private fun setUpMediaPlayer() {
 		mediaPlayer = mediaPlayer ?: MediaPlayer().apply {
-			setAudioStreamType(AudioManager.STREAM_MUSIC)
+			setAudioAttributes(
+				AudioAttributes.Builder()
+					.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+					.build()
+			)
 			setOnCompletionListener {
 				coroutineScope.launch {
 					// TODO: Use settings to determine delay
@@ -179,7 +181,8 @@ internal class StudySessionManager @Inject constructor(
 			// TODO: Maybe incorrect
 			nextSentence()
 		}
-		play()
+		// TODO: Maybe incorrect
+//		play()
 
 		// restore full volume levels
 		setVolume(1.0f)
@@ -230,6 +233,8 @@ internal class StudySessionManager @Inject constructor(
 
 				override fun onSkipToNext() {
 					super.onSkipToNext()
+					// TODO: Skip to next sentence pair, not next sentence
+					//  Currently, it'll go from English -> Tagalog, we want English#1 to English#2
 					nextSentence()
 				}
 
