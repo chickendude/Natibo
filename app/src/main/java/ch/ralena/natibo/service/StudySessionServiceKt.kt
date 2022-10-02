@@ -64,6 +64,8 @@ internal class StudySessionServiceKt : LifecycleService() {
 	}
 
 	override fun onDestroy() {
+		studySessionManager.stop()
+
 		// cancel the phone state listener
 		if (phoneStateListener != null) {
 			telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)

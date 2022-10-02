@@ -77,8 +77,8 @@ internal class StudySessionManager @Inject constructor(
 	fun stop() {
 		studyState.value = StudyState.PAUSED
 		mediaPlayer?.run {
-			release()
 			if (isPlaying) stop()
+			release()
 		}
 		removeAudioFocus()
 		notificationHelper.removeNotification()

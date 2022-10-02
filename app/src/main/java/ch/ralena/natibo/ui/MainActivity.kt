@@ -107,6 +107,11 @@ class MainActivity : AppCompatActivity(), MainViewModel.Listener {
 		return super.onOptionsItemSelected(item)
 	}
 
+	override fun onDestroy() {
+		viewModel.stopService()
+		super.onDestroy()
+	}
+
 	// public methods
 
 	fun setMenuToCourses() {
