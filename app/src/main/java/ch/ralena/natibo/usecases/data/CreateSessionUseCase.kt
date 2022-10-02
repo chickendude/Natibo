@@ -10,6 +10,7 @@ class CreateSessionUseCase @Inject constructor(
 	private val courseRepository: CourseRepository,
 	private val sessionRepository: SessionRepository
 ) {
+	// TODO: 1. Unable to restart a session where you left off, always resets to first sentence
 	suspend fun createSessionIfNecessary(course: CourseRoom) {
 		val previousSession = sessionRepository.fetchSession(course.sessionId)
 		if (previousSession?.isCompleted == false) return
@@ -24,7 +25,7 @@ class CreateSessionUseCase @Inject constructor(
 		val numSessions = courseRepository.countSessions(course.id)
 		val session = SessionRoom(
 			index = numSessions + 1,
-			progress = course.schedule.curSentenceIndex,
+			progress = 0,
 			courseId = course.id,
 			sentenceIndices = getSentenceIndices(course)
 		)

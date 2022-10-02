@@ -51,7 +51,8 @@ class StudySessionViewModel @Inject constructor(
 		// TODO: Remove
 //		if (courseRepository.countSessions(course.id) > 0) {
 //			sessionRepository.deleteAll()
-//			courseRepository.updateCourse(course.copy(sessionId = 0))
+//			course.schedule.curSentenceIndex = 1
+//			courseRepository.updateCourse(course.copy(sessionId = 0, ))
 //		}
 
 		createSessionUseCase.createSessionIfNecessary(course)

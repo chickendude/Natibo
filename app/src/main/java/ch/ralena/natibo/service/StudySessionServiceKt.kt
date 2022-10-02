@@ -88,8 +88,8 @@ internal class StudySessionServiceKt : LifecycleService() {
 		val actionString = playbackAction.action
 		when (actionString?.lowercase()) {
 			ACTION_PLAY_PAUSE -> studySessionManager.togglePausePlay()
-			ACTION_NEXT -> studySessionManager.nextSentence()
-			ACTION_PREVIOUS -> studySessionManager.previousSentence()
+			ACTION_NEXT -> studySessionManager.nextSentencePair()
+			ACTION_PREVIOUS -> studySessionManager.previousSentencePair()
 		}
 	}
 

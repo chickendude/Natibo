@@ -19,6 +19,8 @@ class FetchSessionWithSentencesUseCase @Inject constructor(
 		if (result !is NatiboResult.Success) return null
 
 		val course = result.data
+		// TODO: Try using session.progress or creating a course manager class with functions like
+		//  'nextSentence' that saves values to the course and session.
 		val startingIndex = course.schedule.curSentenceIndex
 		val endingIndex = course.schedule.curSentenceIndex + course.schedule.numSentences
 		val languageOrder = course.schedule.order.toCharArray().map { it.digitToInt() }
@@ -49,6 +51,7 @@ class FetchSessionWithSentencesUseCase @Inject constructor(
 		}
 		return NatiboSession(
 			sentences,
+			currentSentenceIndex = session.progress,
 			sentenceIndices = indices,
 			languageOrder = languageOrder,
 			sessionId = sessionId

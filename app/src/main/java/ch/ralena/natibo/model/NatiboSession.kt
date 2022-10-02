@@ -1,6 +1,7 @@
 package ch.ralena.natibo.model
 
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
+import java.lang.Integer.max
 
 data class NatiboSession(
 	val sentences: List<NatiboSentence>,
@@ -20,12 +21,27 @@ data class NatiboSession(
 		get() = if (languageOrder[currentLanguageIndex] == 0) currentSentencePair?.native
 		else currentSentencePair?.target
 
+	init {
+		if (currentSentenceIndex < 0) currentSentenceIndex = 0
+		if (currentLanguageIndex < 0) currentLanguageIndex = 0
+	}
+
 	fun nextSentence() {
 		currentLanguageIndex += 1
 		if (currentLanguageIndex >= languageOrder.size || currentSentenceIndex < 0) {
 			currentLanguageIndex = 0
 			currentSentenceIndex++
 		}
+	}
+
+	fun nextSentencePair() {
+		currentSentenceIndex++
+		currentLanguageIndex = 0
+	}
+
+	fun previousSentencePair() {
+		currentSentenceIndex = max(0, currentSentenceIndex - 1)
+		currentLanguageIndex = 0
 	}
 }
 

@@ -36,9 +36,12 @@ internal class StudySessionManager @Inject constructor(
 	private val notificationHelper: NotificationHelper,
 	@ApplicationContext private val applicationContext: Context,
 	private val studyServiceManager: StudyServiceManager,
-	private val dispatchers: DispatcherProvider
+	dispatchers: DispatcherProvider
 ) {
 	private val mediaSession = MediaSessionCompat(applicationContext, "Natibo")
+
+	// todo: remove
+	private var times = 0
 
 	private var mediaPlayer: MediaPlayer? = null
 	private var audioManager: AudioManager? = null
@@ -58,18 +61,19 @@ internal class StudySessionManager @Inject constructor(
 	fun studyState() = studyState.asStateFlow()
 
 	init {
-		setUpMediaPlayer()
 		initMediaSession()
 		notificationHelper.mediaSession = mediaSession
 	}
 
 	fun start(course: CourseRoom) {
 		this.course = course
+		if (mediaPlayer == null) setUpMediaPlayer()
 		coroutineScope.launch {
 			session = fetchSessionWithSentencesUseCase.fetchSessionWithSentences(course.sessionId)
 				?: return@launch
 			events.emit(Event.SessionLoaded)
-			nextSentence()
+			loadSentence()
+			play()
 			studyServiceManager.startService()
 		}
 	}
@@ -80,6 +84,7 @@ internal class StudySessionManager @Inject constructor(
 			if (isPlaying) stop()
 			release()
 		}
+		mediaPlayer = null
 		removeAudioFocus()
 		notificationHelper.removeNotification()
 		studyServiceManager.stopService()
@@ -108,19 +113,25 @@ internal class StudySessionManager @Inject constructor(
 	fun nextSentence() {
 		coroutineScope.launch {
 			session.nextSentence()
-			currentSentence.value = session.currentSentencePair
-			val sentence = session.currentSentence
-			if (sentence == null) studyState.value = StudyState.COMPLETE
-			else {
-				loadSentence(sentence)
-				events.emit(Event.SentenceLoaded(sentence))
-			}
+			loadSentence()
 			sessionRepository.saveNatiboSession(session)
 		}
 	}
 
-	fun previousSentence() {
-		// TODO: Not implemented yet
+	fun nextSentencePair() {
+		coroutineScope.launch {
+			session.nextSentencePair()
+			loadSentence()
+			sessionRepository.saveNatiboSession(session)
+		}
+	}
+
+	fun previousSentencePair() {
+		coroutineScope.launch {
+			session.previousSentencePair()
+			loadSentence()
+			sessionRepository.saveNatiboSession(session)
+		}
 	}
 
 	fun finishSession() {
@@ -136,12 +147,20 @@ internal class StudySessionManager @Inject constructor(
 		mediaPlayer?.start()
 	}
 
-	private fun loadSentence(sentence: SentenceRoom) {
-		mediaPlayer?.apply {
+	private suspend fun loadSentence() {
+		currentSentence.value = session.currentSentencePair
+		val sentence = session.currentSentence
+		if (sentence == null) {
+			studyState.value = StudyState.COMPLETE
+			return
+		}
+		events.emit(Event.SentenceLoaded(sentence))
+
+		mediaPlayer?.run {
 			reset()
 			setDataSource(sentence.mp3)
+			setOnPreparedListener { }
 			prepare()
-			setOnPreparedListener { play() }
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 				// TODO: Handle speed from settings
 				playbackParams = playbackParams.setSpeed(1f)
@@ -152,6 +171,7 @@ internal class StudySessionManager @Inject constructor(
 		else {
 			studyState.value = StudyState.READY
 		}
+
 		notificationHelper.updateStudySessionNotification(
 			studyState.value,
 			currentSentence.value!!
@@ -233,14 +253,13 @@ internal class StudySessionManager @Inject constructor(
 
 				override fun onSkipToNext() {
 					super.onSkipToNext()
-					// TODO: Skip to next sentence pair, not next sentence
-					//  Currently, it'll go from English -> Tagalog, we want English#1 to English#2
-					nextSentence()
+					nextSentencePair()
 				}
+
 
 				override fun onSkipToPrevious() {
 					super.onSkipToPrevious()
-					previousSentence()
+					previousSentencePair()
 				}
 			})
 		}

@@ -138,9 +138,10 @@ internal class StudySessionFragment :
 		fragment.arguments = Bundle().apply {
 			putLong(StudySessionOverviewFragment.KEY_COURSE_ID, course.id)
 		}
-		parentFragmentManager.beginTransaction()
-			.replace(R.id.fragmentPlaceHolder, fragment)
-			.commit()
+		if (!parentFragmentManager.isStateSaved)
+			parentFragmentManager.beginTransaction()
+				.replace(R.id.fragmentPlaceHolder, fragment)
+				.commit()
 	}
 
 	private fun startTimer() {
