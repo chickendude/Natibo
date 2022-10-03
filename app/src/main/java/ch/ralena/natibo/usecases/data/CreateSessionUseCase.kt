@@ -65,7 +65,7 @@ class CreateSessionUseCase @Inject constructor(
 		// Insert sentences back into list where they won't be repeated
 		repeatedSentences.forEach { sentence ->
 			var wasInserted = false
-			for (index in 1 until sentences.size) {
+			for (index in schedule.numSentences until sentences.size) {
 				if (sentences[index] != sentence && sentences[index - 1] != sentence) {
 					sentences.add(index, sentence)
 					wasInserted = true
