@@ -63,11 +63,11 @@ internal class NotificationHelper @Inject constructor(
 			MediaMetadataCompat.Builder()
 				.putString(
 					MediaMetadata.METADATA_KEY_TITLE,
-					sentence.native.original
+					sentence.target?.original
 				)
 				.putString(
-					MediaMetadata.METADATA_KEY_ALBUM,
-					sentence.target?.original
+					MediaMetadata.METADATA_KEY_ARTIST,
+					sentence.native.original
 				)
 				.build()
 		)
@@ -83,8 +83,6 @@ internal class NotificationHelper @Inject constructor(
 					.setMediaSession(mediaSession?.sessionToken)
 					.setShowActionsInCompactView(0, 1, 2)
 			)
-			.setContentText(sentence.native.original)
-			.setContentTitle(sentence.target?.original)
 			.addAction(prevAction.drawable, prevAction.title, prevAction.intent)
 			.addAction(playAction.drawable, playAction.title, playAction.intent)
 			.addAction(nextAction.drawable, nextAction.title, nextAction.intent)
