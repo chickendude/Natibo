@@ -21,8 +21,11 @@ class FetchSessionWithSentencesUseCase @Inject constructor(
 		val course = result.data
 		// TODO: Try using session.progress or creating a course manager class with functions like
 		//  'nextSentence' that saves values to the course and session.
-		val startingIndex = course.schedule.curSentenceIndex
-		val endingIndex = course.schedule.curSentenceIndex + course.schedule.numSentences
+		val indices = session.sentenceIndices.split(",").map { it.toInt() }
+		val startingIndex = indices.min()
+		val endingIndex = indices.max()
+//		val startingIndex = course.schedule.curSentenceIndex
+//		val endingIndex = course.schedule.curSentenceIndex + course.schedule.numSentences
 		val languageOrder = course.schedule.order.toCharArray().map { it.digitToInt() }
 		val targetSentences = if (course.targetLanguageId != null) {
 			sentenceRepository.fetchSentencesInPack(
@@ -39,7 +42,6 @@ class FetchSessionWithSentencesUseCase @Inject constructor(
 				start = startingIndex,
 				end = endingIndex
 			)
-		val indices = session.sentenceIndices.split(",").map { it.toInt() }
 		// If native = null, skip the sentence. If target == null, only skip it if it's not supposed
 		// to be null
 		val sentences = mutableListOf<NatiboSentence>()

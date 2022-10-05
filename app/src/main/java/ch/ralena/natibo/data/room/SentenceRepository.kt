@@ -29,7 +29,7 @@ class SentenceRepository @Inject constructor(
 	 *
 	 * @param packId Id of the [PackRoom] whose sentences should be grabbed.
 	 * @param start The starting index (inclusive), the first sentence in the pack to grab.
-	 * @param end The ending index (non-inclusive), the sentence in the pack to grab to stop at.
+	 * @param end The ending index (inclusive), the sentence in the pack to grab to stop at.
 	 */
 	suspend fun fetchSentencesInPack(
 		packId: Long,

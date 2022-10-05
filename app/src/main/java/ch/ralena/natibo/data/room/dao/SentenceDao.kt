@@ -17,7 +17,7 @@ interface SentenceDao {
 	@Query("SELECT * FROM sentenceroom WHERE packId = :packId AND languageId = :languageId")
 	suspend fun getAllInPack(packId: Long, languageId: Long): List<SentenceRoom>
 
-	@Query("SELECT * FROM sentenceroom WHERE packId = :packId AND languageId = :languageId AND `index` >= :start AND `index` < :end")
+	@Query("SELECT * FROM sentenceroom WHERE packId = :packId AND languageId = :languageId AND `index` >= :start AND `index` <= :end")
 	suspend fun getPackSentencesInRange(
 		packId: Long,
 		languageId: Long,

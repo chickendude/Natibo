@@ -110,7 +110,7 @@ internal class StudySessionManager @Inject constructor(
 		)
 	}
 
-	fun nextSentence() {
+	private fun nextSentence() {
 		coroutineScope.launch {
 			session.nextSentence()
 			loadSentence()
