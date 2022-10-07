@@ -25,38 +25,6 @@ object Utils {
 		return true
 	}
 
-	class Storage(private val context: Context) {
-		fun putDayId(dayId: String?) {
-			val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-			preferences.edit().putString(KEY_DAY_ID, dayId).apply()
-		}
-
-		val dayId: String?
-			get() {
-				val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-				return preferences.getString(KEY_DAY_ID, "")
-			}
-
-		fun putCourseId(id: Long) {
-		}
-
-		var courseId: Long
-			get() {
-				val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-				return preferences.getLong(KEY_COURSE_ID, 0L)
-			}
-			set(value) {
-				val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-				preferences.edit().putLong(KEY_COURSE_ID, value).apply()
-			}
-
-		companion object {
-			private const val PREFERENCES = "ch.ralena.natibo.PREFERENCES"
-			private const val KEY_DAY_ID = "key_day_id"
-			private const val KEY_COURSE_ID = "key_course_id"
-		}
-	}
-
 	internal fun readZip(inputStream: InputStream, body: (zis: ZipInputStream) -> Unit) {
 		BufferedInputStream(inputStream).use { bis ->
 			ZipInputStream(bis).use { zis ->
