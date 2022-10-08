@@ -24,8 +24,6 @@ class FetchSessionWithSentencesUseCase @Inject constructor(
 		val indices = session.sentenceIndices.split(",").map { it.toInt() }
 		val startingIndex = indices.min()
 		val endingIndex = indices.max()
-//		val startingIndex = course.schedule.curSentenceIndex
-//		val endingIndex = course.schedule.curSentenceIndex + course.schedule.numSentences
 		val languageOrder = course.schedule.order.toCharArray().map { it.digitToInt() }
 		val targetSentences = if (course.targetLanguageId != null) {
 			sentenceRepository.fetchSentencesInPack(

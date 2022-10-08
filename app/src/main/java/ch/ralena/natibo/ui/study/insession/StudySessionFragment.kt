@@ -46,7 +46,7 @@ internal class StudySessionFragment :
 	lateinit var course: CourseRoom
 
 	// fields
-	private var millisLeft: Long = 0
+	private var millisLeft: Int = 0
 	private var countDownTimer: CountDownTimer? = null
 
 	// TODO: Look at removing
@@ -119,6 +119,7 @@ internal class StudySessionFragment :
 	private fun connectToStudySession() {
 		lifecycleScope.launch {
 			studySessionManager.studyState().first { it != StudyState.UNINITIALIZED }
+			updateTime()
 			binding.sentences.setContent { Sentences(studySessionManager) }
 			binding.playPauseImage.setContent { PlayPause(studySessionManager) }
 			studySessionManager.studyState().first { it == StudyState.COMPLETE }
@@ -129,7 +130,6 @@ internal class StudySessionFragment :
 		if (!isPaused) {
 			startTimer()
 		}
-		updateTime()
 	}
 
 	private fun sessionFinished() {
@@ -146,13 +146,13 @@ internal class StudySessionFragment :
 
 	private fun startTimer() {
 		millisLeft = millisLeft - millisLeft % 1000 - 1
-		updateTime()
+//		updateTime()
 		// Make sure no two active timers are displayed at the same time
 		countDownTimer?.cancel()
-		countDownTimer = object : CountDownTimer(millisLeft, 100) {
+		countDownTimer = object : CountDownTimer(millisLeft.toLong(), 100) {
 			override fun onTick(millisUntilFinished: Long) {
 				if (!isPaused) {
-					millisLeft = millisUntilFinished
+					millisLeft = millisUntilFinished.toInt()
 					updateTime()
 				}
 			}
@@ -170,13 +170,30 @@ internal class StudySessionFragment :
 	}
 
 	private fun updateTime() {
-		val secondsLeft = (millisLeft / 1000).toInt()
-		binding.remainingTimeText.text = String.format(
-			Locale.US,
-			"%d:%02d",
-			secondsLeft / 60,
-			secondsLeft % 60
-		)
+		lifecycleScope.launch {
+			studySessionManager.currentSentence().collect { sentence ->
+				millisLeft = studySessionManager.session.run {
+					binding.remainingRepsText.text =
+						"${sentenceIndices.size - currentSentenceIndex}"
+					sentenceIndices
+						.subList(currentSentenceIndex, sentenceIndices.size)
+						.map { index -> sentences.find { it.native.index == index } }
+						.sumOf {
+							it?.native?.mp3Length
+								?.plus(it.target?.mp3Length ?: 0)
+								?.plus(1000)
+								?: 0
+						}
+				}
+				val secondsLeft = millisLeft / 1000
+				binding.remainingTimeText.text = String.format(
+					Locale.US,
+					"%d:%02d",
+					secondsLeft / 60,
+					secondsLeft % 60
+				)
+			}
+		}
 	}
 // endregion Helper functions-------------------------------------------------------------------
 }
