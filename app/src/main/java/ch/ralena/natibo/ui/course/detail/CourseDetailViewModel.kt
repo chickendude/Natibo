@@ -6,6 +6,7 @@ import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.PackRepository
+import ch.ralena.natibo.data.room.SessionRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.PackRoom
@@ -22,6 +23,7 @@ class CourseDetailViewModel @Inject constructor(
 	private val courseRepository: CourseRepository,
 	private val packRepository: PackRepository,
 	private val languageRepository: LanguageRepository,
+	private val sessionRepository: SessionRepository,
 	private val screenNavigator: ScreenNavigator,
 	private val dispatcherProvider: DispatcherProvider
 ) : BaseViewModel<CourseDetailViewModel.Listener>() {
@@ -86,10 +88,12 @@ class CourseDetailViewModel @Inject constructor(
 	// region Helper functions----------------------------------------------------------------------
 	private suspend fun fetchCourseSuccess(course: CourseRoom) {
 		this.course = course
+		val session = sessionRepository.fetchSession(course.sessionId)
+
 		withContext(dispatcherProvider.main()) {
 			listeners.forEach { it.onCourseFetched(course) }
 			val msgId =
-				if (course.sessionId == 0L) R.string.start_session else R.string.continue_session
+				if (session?.isCompleted == true) R.string.start_session else R.string.continue_session
 			listeners.forEach { it.updateSessionStatusText(msgId) }
 		}
 	}
