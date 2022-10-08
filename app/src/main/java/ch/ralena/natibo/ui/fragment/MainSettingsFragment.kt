@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
@@ -18,9 +17,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
-import ch.ralena.natibo.R
+import ch.ralena.natibo.settings.MainSettings
+import ch.ralena.natibo.settings.types.BooleanSetting
 import ch.ralena.natibo.ui.MainActivity
-import ch.ralena.natibo.utils.StorageManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -46,7 +45,6 @@ class MainSettingsFragment : Fragment() {
 						textAlign = TextAlign.Center
 					)
 					BooleanSetting(settings.pauseOnOpen)
-					BooleanSetting(settings.pauseOnClose)
 				}
 			}
 		}
@@ -79,44 +77,8 @@ fun BooleanSetting(setting: BooleanSetting) {
 		Spacer(modifier = Modifier.weight(1f))
 		Switch(checked = checkedState.value,
 			onCheckedChange = {
-				setting.value = it
-				setting.save()
+				setting.set(it)
 				checkedState.value = it
 			})
 	}
 }
-
-interface NatiboSetting<T> {
-	val key: String
-	val nameId: Int
-	val descriptionId: Int
-	fun get(): T
-	fun save()
-}
-
-class MainSettings @Inject constructor(storageManager: StorageManager) {
-	val pauseOnOpen: BooleanSetting = BooleanSetting(
-		"main_pause_on_open",
-		R.string.settings_pause_on_open_title,
-		R.string.settings_pause_on_open_description,
-		storageManager
-	)
-	val pauseOnClose: BooleanSetting = BooleanSetting(
-		"main_setting2",
-		R.string.settings_pause_on_open_title,
-		R.string.settings_pause_on_open_description,
-		storageManager
-	)
-}
-
-data class BooleanSetting(
-	override val key: String,
-	@StringRes override val nameId: Int,
-	@StringRes override val descriptionId: Int,
-	private val storageManager: StorageManager,
-	var value: Boolean = false,
-) : NatiboSetting<Boolean> {
-	override fun get() = storageManager.getBoolean(key, value)
-	override fun save() = storageManager.putBoolean(key, value)
-}
-
