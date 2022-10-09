@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import ch.ralena.natibo.settings.MainSettings
 import ch.ralena.natibo.settings.types.BooleanSetting
+import ch.ralena.natibo.settings.views.BooleanSettingView
 import ch.ralena.natibo.ui.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -44,7 +45,7 @@ class MainSettingsFragment : Fragment() {
 							.fillMaxWidth(),
 						textAlign = TextAlign.Center
 					)
-					BooleanSetting(settings.pauseOnOpen)
+					BooleanSettingView(settings.pauseOnOpen)
 				}
 			}
 		}
@@ -60,25 +61,3 @@ class MainSettingsFragment : Fragment() {
 	}
 }
 
-@Composable
-fun BooleanSetting(setting: BooleanSetting) {
-	val checkedState = remember { mutableStateOf(setting.get()) }
-	Row(modifier = Modifier.padding(vertical = 4.dp)) {
-		Column(modifier = Modifier.fillMaxWidth(0.8f)) {
-			Text(
-				text = stringResource(id = setting.nameId),
-				fontSize = 15.sp
-			)
-			Text(
-				text = stringResource(id = setting.descriptionId),
-				fontSize = 12.sp
-			)
-		}
-		Spacer(modifier = Modifier.weight(1f))
-		Switch(checked = checkedState.value,
-			onCheckedChange = {
-				setting.set(it)
-				checkedState.value = it
-			})
-	}
-}

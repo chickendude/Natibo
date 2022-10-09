@@ -1,141 +1,178 @@
-package ch.ralena.natibo.ui.settings_course;
+package ch.ralena.natibo.ui.settings_course
 
-import android.content.SharedPreferences;
-import android.os.Bundle;
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.preference.Preference
+import ch.ralena.natibo.R
+import ch.ralena.natibo.data.NatiboResult
+import ch.ralena.natibo.data.room.CourseRepository
+import ch.ralena.natibo.data.room.`object`.CourseRoom
+import ch.ralena.natibo.settings.types.IntSetting
+import ch.ralena.natibo.settings.views.IntSettingView
+import ch.ralena.natibo.ui.MainActivity
+import ch.ralena.natibo.utils.StorageManager
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-import androidx.annotation.Nullable;
-import androidx.core.math.MathUtils;
-import androidx.preference.EditTextPreference;
-import androidx.preference.Preference;
+@AndroidEntryPoint
+class CourseSettingsFragment : Fragment() {
+	@Inject
+	lateinit var courseRepository: CourseRepository
 
-import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
+	@Inject
+	lateinit var courseSettings: CourseSettings
 
-import ch.ralena.natibo.R;
-import ch.ralena.natibo.data.room.object.Course;
-import ch.ralena.natibo.ui.MainActivity;
-import io.realm.Realm;
+	private var course: CourseRoom? = null
 
+	//	private val sharedPreferenceChangeListener =
+//		SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+//			when (key) {
+//				PREF_PAUSE -> realm!!.executeTransaction { r: Realm? ->
+//					course.setPauseMillis(
+//						sharedPreferences.getString(PREF_PAUSE, "1000")!!.toInt()
+//					)
+//				}
+//				PREF_PLAYBACK_SPEED -> realm!!.executeTransaction { r: Realm? ->
+//					val speed = sharedPreferences.getString(
+//						getString(R.string.playback_speed_key),
+//						getString(R.string.playback_speed_default)
+//					)!!
+//						.toFloat()
+//					course.setPlaybackSpeed(speed)
+//				}
+//			}
+//		}
+//
+	fun onPreferenceTreeClick(preference: Preference): Boolean {
+		when (preference.key) {
+			PREF_START -> loadCourseBookListFragment()
+		}
+		return true
+	}
 
-/*
-Settings:
-1. Pause between sentences.
-*/
-public class CourseSettingsFragment extends PreferenceFragmentCompat {
-	public static final String TAG = CourseSettingsFragment.class.getSimpleName();
-	public static final String PREF_PAUSE = "pref_pause";
-	public static final String PREF_START = "pref_start";
-	public static final String PREF_PLAYBACK_SPEED = "pref_playback_speed";
-	public static final String KEY_ID = "key_id";
+	override fun onCreateView(
+		inflater: LayoutInflater,
+		container: ViewGroup?,
+		savedInstanceState: Bundle?
+	): View {
+		(requireActivity() as MainActivity).enableBackButton()
 
-	private static final float PLAYBACK_MIN_SPEED = 0.5f;
-	private static final float PLAYBACK_MAX_SPEED = 2.5f;
-
-	private SharedPreferences prefs;
-	private Realm realm;
-	private Course course;
-
-	private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-		@Override
-		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-			switch (key) {
-				case PREF_PAUSE:
-					realm.executeTransaction(r -> course.setPauseMillis(Integer.parseInt(sharedPreferences.getString(PREF_PAUSE, "1000"))));
-					break;
-				case PREF_PLAYBACK_SPEED:
-					realm.executeTransaction(r -> {
-						float speed = Float.parseFloat(sharedPreferences.getString(getString(R.string.playback_speed_key), getString(R.string.playback_speed_default)));
-						course.setPlaybackSpeed(speed);
-					});
-					break;
+		val courseId = requireArguments().getLong(KEY_ID)
+		val courseState = MutableStateFlow<CourseRoom?>(null)
+		lifecycleScope.launch {
+			val result = courseRepository.fetchCourse(courseId)
+			when (result) {
+				is NatiboResult.Success -> courseState.value = result.data
+				else -> Unit
 			}
 		}
-	};
 
-	@Override
-	public boolean onPreferenceTreeClick(Preference preference) {
-		switch (preference.getKey()) {
-			case PREF_START:
-				loadCourseBookListFragment();
-				break;
-		}
-		return super.onPreferenceTreeClick(preference);
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		getActivity().setTitle(getString(R.string.settings));
-
-	}
-
-	@Override
-	public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
-		((MainActivity) getActivity()).enableBackButton();
-
-		// load course from fragment arguments
-		String courseId = getArguments().getString(KEY_ID);
-		realm = Realm.getDefaultInstance();
-		course = realm.where(Course.class).equalTo("id", courseId).findFirst();
-
-		// unregister SharedPreferencesChangedListener so that we don't unnecessarily trigger
-		// it when we load the default value from the course
-		prefs = getPreferenceManager().getSharedPreferences();
-		unregisterChangeListener();
-
-		// load preferences from course into our shared preferences
-		prefs.edit()
-				.putString(PREF_PAUSE, course.getPauseMillis() + "")
-				.putString(PREF_PLAYBACK_SPEED, course.getPlaybackSpeed() + "")
-				.apply();
-		registerChangeListener();
-
-		addPreferencesFromResource(R.xml.course_settings);
-
-		// check if you should be able to choose the starting sentence or not
-		Preference start = findPreference(PREF_START);
-		start.setEnabled(course.getPacks().size() > 0);
-
-		EditTextPreference playbackSpeed = (EditTextPreference) findPreference(PREF_PLAYBACK_SPEED);
-		playbackSpeed.setOnPreferenceChangeListener((preference, newValue) -> {
-			float newSpeed = Float.parseFloat((String) newValue);
-			// Set speed to the allowed range between 0.5 and 2.5 and round to one decimal place
-			float speed = ((int) (newSpeed * 10)) / 10f;
-			speed = MathUtils.clamp(speed, PLAYBACK_MIN_SPEED, PLAYBACK_MAX_SPEED);
-			if (newSpeed != speed) {
-				playbackSpeed.setText(speed + "");
-				return false;
+		return ComposeView(requireContext()).apply {
+			setContent {
+				CourseSettings(courseSettings, courseState)
 			}
-			return true;
-		});
+		}
 	}
 
-	@Override
-	public void onStop() {
-		super.onStop();
-		unregisterChangeListener();
+	override fun onStart() {
+		super.onStart()
+		requireActivity().title = getString(R.string.settings)
 	}
 
-	private void loadCourseBookListFragment() {
-		CoursePickSentenceFragment fragment = new CoursePickSentenceFragment();
+//	fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String) {
+//		// unregister SharedPreferencesChangedListener so that we don't unnecessarily trigger
+//		// it when we load the default value from the course
+//		prefs = preferenceManager.sharedPreferences
+//
+//		// load preferences from course into our shared preferences
+////		prefs.edit()
+////			.putString(PREF_PAUSE, course.getPauseMillis().toString() + "")
+////			.putString(PREF_PLAYBACK_SPEED, course.getPlaybackSpeed().toString() + "")
+////			.apply()
+//		addPreferencesFromResource(R.xml.course_settings)
+//
+//		// check if you should be able to choose the starting sentence or not
+//		val start = findPreference(PREF_START)
+//		start.isEnabled = course.getPacks().size > 0
+//		val playbackSpeed = findPreference(PREF_PLAYBACK_SPEED) as EditTextPreference
+//		playbackSpeed.onPreferenceChangeListener =
+//			Preference.OnPreferenceChangeListener { preference: Preference?, newValue: Any? ->
+//				val newSpeed: Float = newValue as kotlin.String?. toFloat ()
+//				// Set speed to the allowed range between 0.5 and 2.5 and round to one decimal place
+//				var speed = (newSpeed * 10).toInt() / 10f
+//				speed = MathUtils.clamp(speed, PLAYBACK_MIN_SPEED, PLAYBACK_MAX_SPEED)
+//				if (newSpeed != speed) {
+//					playbackSpeed.text = speed.toString() + ""
+//					return@OnPreferenceChangeListener false
+//				}
+//				true
+//			}
+//	}
+
+	private fun loadCourseBookListFragment() {
+		val fragment = CoursePickSentenceFragment()
 
 		// attach course id to bundle
-		Bundle bundle = new Bundle();
-		bundle.putString(CoursePickSentenceFragment.TAG_COURSE_ID, course.getId());
-		fragment.setArguments(bundle);
+		val bundle = Bundle()
+		bundle.putLong(CoursePickSentenceFragment.TAG_COURSE_ID, course?.id ?: -1)
+		fragment.arguments = bundle
 
 		// load fragment
-		getFragmentManager()
-				.beginTransaction()
-				.replace(R.id.fragmentPlaceHolder, fragment)
-				.addToBackStack(null)
-				.commit();
+		requireFragmentManager()
+			.beginTransaction()
+			.replace(R.id.fragmentPlaceHolder, fragment)
+			.addToBackStack(null)
+			.commit()
 	}
 
-	private void registerChangeListener() {
-		prefs.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
-	}
-
-	private void unregisterChangeListener() {
-		prefs.unregisterOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
+	companion object {
+		val TAG = CourseSettingsFragment::class.java.simpleName
+		const val PREF_PAUSE = "pref_pause"
+		const val PREF_START = "pref_start"
+		const val PREF_PLAYBACK_SPEED = "pref_playback_speed"
+		const val KEY_ID = "key_id"
+		private const val PLAYBACK_MIN_SPEED = 0.5f
+		private const val PLAYBACK_MAX_SPEED = 2.5f
 	}
 }
+
+@Composable
+fun CourseSettings(settings: CourseSettings, courseState: StateFlow<CourseRoom?>) {
+	val course by courseState.collectAsState(initial = null)
+	if (course != null) {
+		Column {
+			Text(text = "Settings for: ${course?.title}")
+			IntSettingView(
+				setting = settings.delayBetweenSentences,
+				labelResId = R.string.settings_course_sentence_delay_label
+			)
+		}
+	} else {
+		Text(text = "Error loading course, press back and try again.")
+	}
+}
+
+class CourseSettings @Inject constructor(storageManager: StorageManager) {
+	val delayBetweenSentences: IntSetting = IntSetting(
+		"course_delay_between_sentences",
+		R.string.settings_course_sentence_delay_title,
+		R.string.settings_course_sentence_delay_description,
+		storageManager,
+		1000
+	)
+}
+

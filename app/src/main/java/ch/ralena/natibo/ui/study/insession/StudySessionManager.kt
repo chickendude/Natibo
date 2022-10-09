@@ -14,6 +14,7 @@ import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.model.NatiboSession
 import ch.ralena.natibo.service.StudyServiceManager
+import ch.ralena.natibo.ui.settings_course.CourseSettings
 import ch.ralena.natibo.usecases.data.FetchSessionWithSentencesUseCase
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.NotificationHelper
@@ -30,18 +31,15 @@ private val TAG = StudySessionManager::class.simpleName
 
 @Singleton
 internal class StudySessionManager @Inject constructor(
-	private val courseRepository: CourseRepository,
 	private val sessionRepository: SessionRepository,
 	private val fetchSessionWithSentencesUseCase: FetchSessionWithSentencesUseCase,
 	private val notificationHelper: NotificationHelper,
 	@ApplicationContext private val applicationContext: Context,
 	private val studyServiceManager: StudyServiceManager,
+	private val courseSettings: CourseSettings,
 	dispatchers: DispatcherProvider
 ) {
 	private val mediaSession = MediaSessionCompat(applicationContext, "Natibo")
-
-	// todo: remove
-	private var times = 0
 
 	private var mediaPlayer: MediaPlayer? = null
 	private var audioManager: AudioManager? = null
@@ -187,8 +185,7 @@ internal class StudySessionManager @Inject constructor(
 			)
 			setOnCompletionListener {
 				coroutineScope.launch {
-					// TODO: Use settings to determine delay
-					delay(1000)
+					delay(courseSettings.delayBetweenSentences.get().toLong())
 					studyState.first { it == StudyState.PLAYING }
 					nextSentence()
 				}
