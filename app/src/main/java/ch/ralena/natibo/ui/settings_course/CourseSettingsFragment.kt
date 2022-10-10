@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.material.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -14,7 +16,7 @@ import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.settings.CourseSettings
 import ch.ralena.natibo.ui.MainActivity
-import ch.ralena.natibo.ui.settings_course.views.CourseSettings
+import ch.ralena.natibo.ui.settings_course.views.CourseSettingsView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -75,7 +77,13 @@ class CourseSettingsFragment : Fragment() {
 
 		return ComposeView(requireContext()).apply {
 			setContent {
-				CourseSettings(courseSettings, courseState)
+				val course = courseState.collectAsState().value
+				if (course != null) {
+					courseSettings.course = course
+					CourseSettingsView(courseSettings)
+				} else {
+					Text(text = "Error loading course, press back and try again.")
+				}
 			}
 		}
 	}
