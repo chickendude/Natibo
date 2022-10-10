@@ -1,15 +1,9 @@
 package ch.ralena.natibo.ui.settings_course
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -18,13 +12,11 @@ import ch.ralena.natibo.R
 import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
-import ch.ralena.natibo.settings.types.IntSetting
-import ch.ralena.natibo.settings.views.IntSettingView
+import ch.ralena.natibo.settings.CourseSettings
 import ch.ralena.natibo.ui.MainActivity
-import ch.ralena.natibo.utils.StorageManager
+import ch.ralena.natibo.ui.settings_course.views.CourseSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -150,29 +142,4 @@ class CourseSettingsFragment : Fragment() {
 	}
 }
 
-@Composable
-fun CourseSettings(settings: CourseSettings, courseState: StateFlow<CourseRoom?>) {
-	val course by courseState.collectAsState(initial = null)
-	if (course != null) {
-		Column {
-			Text(text = "Settings for: ${course?.title}")
-			IntSettingView(
-				setting = settings.delayBetweenSentences,
-				labelResId = R.string.settings_course_sentence_delay_label
-			)
-		}
-	} else {
-		Text(text = "Error loading course, press back and try again.")
-	}
-}
-
-class CourseSettings @Inject constructor(storageManager: StorageManager) {
-	val delayBetweenSentences: IntSetting = IntSetting(
-		"course_delay_between_sentences",
-		R.string.settings_course_sentence_delay_title,
-		R.string.settings_course_sentence_delay_description,
-		storageManager,
-		1000
-	)
-}
 

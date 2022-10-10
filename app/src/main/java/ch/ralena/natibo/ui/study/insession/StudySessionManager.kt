@@ -7,14 +7,13 @@ import android.media.MediaPlayer
 import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.lifecycle.LifecycleService
-import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.SessionRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.SentenceRoom
 import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.model.NatiboSession
 import ch.ralena.natibo.service.StudyServiceManager
-import ch.ralena.natibo.ui.settings_course.CourseSettings
+import ch.ralena.natibo.settings.CourseSettings
 import ch.ralena.natibo.usecases.data.FetchSessionWithSentencesUseCase
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.NotificationHelper
