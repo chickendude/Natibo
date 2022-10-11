@@ -5,10 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.material.Text
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.preference.Preference
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.NatiboResult
@@ -22,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @AndroidEntryPoint
 class CourseSettingsFragment : Fragment() {
 	@Inject
@@ -30,16 +36,8 @@ class CourseSettingsFragment : Fragment() {
 	@Inject
 	lateinit var courseSettings: CourseSettings
 
-	private var course: CourseRoom? = null
-
-	//	private val sharedPreferenceChangeListener =
 //		SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
 //			when (key) {
-//				PREF_PAUSE -> realm!!.executeTransaction { r: Realm? ->
-//					course.setPauseMillis(
-//						sharedPreferences.getString(PREF_PAUSE, "1000")!!.toInt()
-//					)
-//				}
 //				PREF_PLAYBACK_SPEED -> realm!!.executeTransaction { r: Realm? ->
 //					val speed = sharedPreferences.getString(
 //						getString(R.string.playback_speed_key),
@@ -51,13 +49,6 @@ class CourseSettingsFragment : Fragment() {
 //			}
 //		}
 //
-	fun onPreferenceTreeClick(preference: Preference): Boolean {
-		when (preference.key) {
-			PREF_START -> loadCourseBookListFragment()
-		}
-		return true
-	}
-
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
@@ -80,7 +71,7 @@ class CourseSettingsFragment : Fragment() {
 				val course = courseState.collectAsState().value
 				if (course != null) {
 					courseSettings.course = course
-					CourseSettingsView(courseSettings)
+					SettingsScreen(settings = courseSettings)
 				} else {
 					Text(text = "Error loading course, press back and try again.")
 				}
@@ -93,21 +84,24 @@ class CourseSettingsFragment : Fragment() {
 		requireActivity().title = getString(R.string.settings)
 	}
 
-//	fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String) {
-//		// unregister SharedPreferencesChangedListener so that we don't unnecessarily trigger
-//		// it when we load the default value from the course
-//		prefs = preferenceManager.sharedPreferences
-//
-//		// load preferences from course into our shared preferences
-////		prefs.edit()
-////			.putString(PREF_PAUSE, course.getPauseMillis().toString() + "")
-////			.putString(PREF_PLAYBACK_SPEED, course.getPlaybackSpeed().toString() + "")
-////			.apply()
-//		addPreferencesFromResource(R.xml.course_settings)
-//
-//		// check if you should be able to choose the starting sentence or not
-//		val start = findPreference(PREF_START)
-//		start.isEnabled = course.getPacks().size > 0
+	@Composable
+	fun SettingsScreen(
+		settings: CourseSettings,
+		navController: NavHostController = rememberNavController()
+	) {
+		NavHost(navController = navController, startDestination = "home") {
+			composable("home") {
+				CourseSettingsView(
+					settings = settings,
+					onNavigateToSentencePick = { navController.navigate("pick_sentence") })
+			}
+			composable("pick_sentence") {
+				SentencePick(course = settings.course, viewModel = hiltViewModel())
+			}
+
+		}
+	}
+
 //		val playbackSpeed = findPreference(PREF_PLAYBACK_SPEED) as EditTextPreference
 //		playbackSpeed.onPreferenceChangeListener =
 //			Preference.OnPreferenceChangeListener { preference: Preference?, newValue: Any? ->
@@ -123,27 +117,8 @@ class CourseSettingsFragment : Fragment() {
 //			}
 //	}
 
-	private fun loadCourseBookListFragment() {
-		val fragment = CoursePickSentenceFragment()
-
-		// attach course id to bundle
-		val bundle = Bundle()
-		bundle.putLong(CoursePickSentenceFragment.TAG_COURSE_ID, course?.id ?: -1)
-		fragment.arguments = bundle
-
-		// load fragment
-		requireFragmentManager()
-			.beginTransaction()
-			.replace(R.id.fragmentPlaceHolder, fragment)
-			.addToBackStack(null)
-			.commit()
-	}
-
 	companion object {
 		val TAG = CourseSettingsFragment::class.java.simpleName
-		const val PREF_PAUSE = "pref_pause"
-		const val PREF_START = "pref_start"
-		const val PREF_PLAYBACK_SPEED = "pref_playback_speed"
 		const val KEY_ID = "key_id"
 		private const val PLAYBACK_MIN_SPEED = 0.5f
 		private const val PLAYBACK_MAX_SPEED = 2.5f
