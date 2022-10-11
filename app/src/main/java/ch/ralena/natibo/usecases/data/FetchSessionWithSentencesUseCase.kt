@@ -19,8 +19,6 @@ class FetchSessionWithSentencesUseCase @Inject constructor(
 		if (result !is NatiboResult.Success) return null
 
 		val course = result.data
-		// TODO: Try using session.progress or creating a course manager class with functions like
-		//  'nextSentence' that saves values to the course and session.
 		val indices = session.sentenceIndices.split(",").map { it.toInt() }
 		val startingIndex = indices.min()
 		val endingIndex = indices.max()
