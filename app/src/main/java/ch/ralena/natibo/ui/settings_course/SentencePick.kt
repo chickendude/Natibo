@@ -1,19 +1,29 @@
 package ch.ralena.natibo.ui.settings_course
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ch.ralena.natibo.data.room.CourseRepository
 import ch.ralena.natibo.data.room.LanguageRepository
 import ch.ralena.natibo.data.room.SentenceRepository
+import ch.ralena.natibo.data.room.SessionRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.model.NatiboSentence
 import ch.ralena.natibo.ui.shared_components.SentenceList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,24 +31,35 @@ import javax.inject.Inject
 fun SentencePick(course: CourseRoom, viewModel: SentencePickViewModel) {
 	val event = viewModel.events.collectAsState(initial = SentencePickViewModel.Event.Loading).value
 	viewModel.fetchSentences(course)
+	var selectedSentence by remember { mutableStateOf(course.schedule.curSentenceIndex) }
+
+	val listState = rememberLazyListState(selectedSentence)
 	Column {
-		Text(text = "Select a sentence")
+		Text(text = "Current starting sentence: ${selectedSentence + 1}")
 
 		when (event) {
 			is SentencePickViewModel.Event.SentencesLoaded -> {
 				SentenceList(
 					sentences = event.sentences,
 					nativeLanguage = event.nativeLanguage,
-					targetLanguage = event.targetLanguage
+					targetLanguage = event.targetLanguage,
+					listState = listState,
+					onSentenceClicked = {
+						selectedSentence = event.sentences.indexOf(it)
+						viewModel.setNewStartingSentence(course, selectedSentence)
+					}
 				)
 			}
 			else -> Unit
 		}
+
 	}
 }
 
 @HiltViewModel
 class SentencePickViewModel @Inject constructor(
+	private val courseRepository: CourseRepository,
+	private val sessionRepository: SessionRepository,
 	private val sentenceRepository: SentenceRepository,
 	private val languageRepository: LanguageRepository
 ) : ViewModel() {
@@ -63,6 +84,17 @@ class SentencePickViewModel @Inject constructor(
 			val nativeLanguage = languageRepository.fetchLanguage(course.nativeLanguageId)
 			val targetLanguage = languageRepository.fetchLanguage(course.targetLanguageId ?: -1)
 			events.emit(Event.SentencesLoaded(sentences, nativeLanguage, targetLanguage))
+		}
+	}
+
+	fun setNewStartingSentence(course: CourseRoom, index: Int) {
+		viewModelScope.launch {
+			val session = sessionRepository.fetchSession(course.sessionId)
+			if (session?.isCompleted == false) {
+				sessionRepository.deleteSession(course.sessionId)
+			}
+			course.schedule.curSentenceIndex = index
+			courseRepository.updateCourse(course)
 		}
 	}
 

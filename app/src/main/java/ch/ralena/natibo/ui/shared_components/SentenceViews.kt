@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -25,9 +27,10 @@ fun SentenceList(
 	sentences: List<NatiboSentence>,
 	nativeLanguage: LanguageRoom? = null,
 	targetLanguage: LanguageRoom? = null,
+	listState: LazyListState = rememberLazyListState(),
 	onSentenceClicked: ((NatiboSentence) -> Unit)? = null
 ) {
-	LazyColumn {
+	LazyColumn(state = listState) {
 		items(sentences) { sentence ->
 			Sentence(sentence, nativeLanguage, targetLanguage, onClick = onSentenceClicked)
 		}
