@@ -64,6 +64,7 @@ internal class StudySessionManager @Inject constructor(
 
 	fun start(course: CourseRoom) {
 		this.course = course
+		courseSettings.course = course
 		if (mediaPlayer == null) setUpMediaPlayer()
 		coroutineScope.launch {
 			session = fetchSessionWithSentencesUseCase.fetchSessionWithSentences(course.sessionId)
