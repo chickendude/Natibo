@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
@@ -40,6 +41,9 @@ fun Sentence(
 	targetLanguage: LanguageRoom?,
 	onClick: ((NatiboSentence) -> Unit)? = null
 ) {
+	val nativeStyle = TextStyle(fontSize = 15.sp)
+	val targetStyle = TextStyle(fontSize = 12.sp, color = TextLight)
+
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
@@ -49,7 +53,7 @@ fun Sentence(
 		Text(
 			modifier = Modifier.padding(end = 8.dp),
 			text = sentence.native.index.toString(),
-			fontSize = 15.sp
+			style = nativeStyle
 		)
 		Column {
 			sentence.target?.original?.let { targetSentence ->
@@ -57,14 +61,18 @@ fun Sentence(
 					Text(
 						modifier = Modifier.width(LANGUAGE_WIDTH),
 						text = targetLanguage?.code ?: "TL",
-						fontSize = 15.sp
+						style = nativeStyle
 					)
-					Text(text = targetSentence, fontSize = 15.sp)
+					Text(text = targetSentence, style = nativeStyle)
 				}
 			}
 			Row {
-				Text(modifier = Modifier.width(LANGUAGE_WIDTH), text = nativeLanguage?.code ?: "NL")
-				Text(text = sentence.native.original, fontSize = 12.sp)
+				Text(
+					modifier = Modifier.width(LANGUAGE_WIDTH),
+					text = nativeLanguage?.code ?: "NL",
+					style = targetStyle
+				)
+				Text(text = sentence.native.original, style = targetStyle)
 			}
 		}
 	}
