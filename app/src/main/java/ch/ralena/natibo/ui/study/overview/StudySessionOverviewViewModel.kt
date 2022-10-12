@@ -22,7 +22,11 @@ class StudySessionOverviewViewModel @Inject constructor(
 	private val dispatchers: DispatcherProvider
 ) : BaseViewModel<StudySessionOverviewViewModel.Listener>() {
 	interface Listener {
-		fun sessionLoaded(session: NatiboSession, languages: Pair<LanguageRoom?, LanguageRoom?>)
+		fun sessionLoaded(
+			session: NatiboSession,
+			nativeLanguage: LanguageRoom?,
+			targetLanguage: LanguageRoom?
+		)
 	}
 
 	private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -47,7 +51,7 @@ class StudySessionOverviewViewModel @Inject constructor(
 		if (session != null) {
 			withContext(dispatchers.main()) {
 				listeners.forEach {
-					it.sessionLoaded(session, Pair(nativeLanguage, targetLanguage))
+					it.sessionLoaded(session, nativeLanguage, targetLanguage)
 				}
 			}
 		}

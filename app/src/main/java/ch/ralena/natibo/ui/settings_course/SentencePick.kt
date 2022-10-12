@@ -1,8 +1,6 @@
 package ch.ralena.natibo.ui.settings_course
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -13,7 +11,7 @@ import ch.ralena.natibo.data.room.SentenceRepository
 import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.model.NatiboSentence
-import ch.ralena.natibo.ui.study.overview.Sentence
+import ch.ralena.natibo.ui.shared_components.SentenceList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -24,7 +22,7 @@ fun SentencePick(course: CourseRoom, viewModel: SentencePickViewModel) {
 	val event = viewModel.events.collectAsState(initial = SentencePickViewModel.Event.Loading).value
 	viewModel.fetchSentences(course)
 	Column {
-		Text(text = "hi")
+		Text(text = "Select a sentence")
 
 		when (event) {
 			is SentencePickViewModel.Event.SentencesLoaded -> {
@@ -39,25 +37,11 @@ fun SentencePick(course: CourseRoom, viewModel: SentencePickViewModel) {
 	}
 }
 
-@Composable
-fun SentenceList(
-	sentences: List<NatiboSentence>,
-	nativeLanguage: LanguageRoom?,
-	targetLanguage: LanguageRoom?
-) {
-	LazyColumn {
-		items(sentences) {
-			Sentence(it, nativeLanguage, targetLanguage)
-		}
-	}
-}
-
 @HiltViewModel
 class SentencePickViewModel @Inject constructor(
 	private val sentenceRepository: SentenceRepository,
 	private val languageRepository: LanguageRepository
-) :
-	ViewModel() {
+) : ViewModel() {
 	val events = MutableSharedFlow<Event>()
 
 	fun fetchSentences(course: CourseRoom) {
