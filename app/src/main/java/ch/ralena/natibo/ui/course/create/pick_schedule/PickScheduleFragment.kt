@@ -9,12 +9,10 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import androidx.recyclerview.widget.LinearLayoutManager
 import ch.ralena.natibo.R
 import ch.ralena.natibo.databinding.FragmentCoursePickScheduleBinding
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.base.BaseFragment
-import ch.ralena.natibo.ui.course.create.pick_schedule.adapter.PackAdapter
 import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.ScheduleTextWatcher
 import ch.ralena.natibo.ui.course.create.pick_schedule.textwatchers.SentencesPerDayTextWatcher
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,9 +38,6 @@ class PickScheduleFragment :
 	lateinit var activity: MainActivity
 
 	@Inject
-	lateinit var packAdapter: PackAdapter
-
-	@Inject
 	lateinit var scheduleTextWatcher: ScheduleTextWatcher
 
 	@Inject
@@ -52,7 +47,7 @@ class PickScheduleFragment :
 		viewModel.registerListener(this)
 
 		activity.enableBackButton()
-		activity.title = "Create an AI Course"
+		activity.title = "Select your schedule"
 
 		// We have a check button
 		setHasOptionsMenu(true)
@@ -65,11 +60,6 @@ class PickScheduleFragment :
 		}
 
 		binding.apply {
-			packRecyclerview.apply {
-				layoutManager = LinearLayoutManager(context)
-				adapter = packAdapter
-			}
-
 			courseTitleEdit.setOnClickListener {
 				binding.courseTitleEdit.inputType = InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
 			}

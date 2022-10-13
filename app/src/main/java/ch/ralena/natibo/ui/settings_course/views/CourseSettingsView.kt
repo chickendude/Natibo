@@ -14,9 +14,7 @@ import ch.ralena.natibo.settings.views.IntSettingView
 
 @Composable
 fun CourseSettingsView(settings: CourseSettings, onNavigateToSentencePick: () -> Unit) {
-	Column(
-		modifier = Modifier.padding(8.dp)
-	) {
+	Column(modifier = Modifier.padding(8.dp)) {
 		Text(text = "Settings for: ${settings.course.title}")
 		IntSettingView(
 			setting = settings.delayBetweenSentences,

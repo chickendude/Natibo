@@ -3,7 +3,6 @@ package ch.ralena.natibo.ui.language.list
 import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import ch.ralena.natibo.R
-import ch.ralena.natibo.data.room.`object`.Language
 import ch.ralena.natibo.data.room.`object`.LanguageRoom
 import ch.ralena.natibo.data.room.`object`.LanguageWithPacks
 import ch.ralena.natibo.databinding.FragmentLanguageListBinding
@@ -30,8 +29,6 @@ class LanguageListFragment :
 
 	@Inject
 	lateinit var mainActivity: MainActivity
-
-	lateinit var languages: ArrayList<Language>
 
 	override fun setupViews(view: View) {
 		viewModel.registerListener(this)
