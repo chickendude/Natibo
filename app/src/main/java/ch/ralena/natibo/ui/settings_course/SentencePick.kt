@@ -28,11 +28,14 @@ import javax.inject.Inject
 fun SentencePick(course: CourseRoom, viewModel: SentencePickViewModel) {
 	val event = viewModel.events.collectAsState(initial = SentencePickViewModel.Event.Loading).value
 	viewModel.fetchSentences(course)
-	var selectedSentence by remember { mutableStateOf(course.schedule.curSentenceIndex) }
 
-	val listState = rememberLazyListState(selectedSentence)
+	// Remember, the list of sentences for the adapter is 0-indexed whereas the index in the actual
+	// NatiboSentence objects starts at 1.
+	var selectedSentenceIndex by remember { mutableStateOf(course.schedule.curSentenceIndex + 1) }
+
+	val listState = rememberLazyListState(selectedSentenceIndex - 1)
 	Column {
-		Text(text = "Current starting sentence: ${selectedSentence + 1}")
+		Text(text = "Current starting sentence: $selectedSentenceIndex")
 
 		when (event) {
 			is SentencePickViewModel.Event.SentencesLoaded -> {
@@ -41,9 +44,10 @@ fun SentencePick(course: CourseRoom, viewModel: SentencePickViewModel) {
 					nativeLanguage = event.nativeLanguage,
 					targetLanguage = event.targetLanguage,
 					listState = listState,
+					selectedIndex = selectedSentenceIndex,
 					onSentenceClicked = {
-						selectedSentence = event.sentences.indexOf(it)
-						viewModel.setNewStartingSentence(course, selectedSentence)
+						selectedSentenceIndex = it.native.index
+						viewModel.setNewStartingSentence(course, selectedSentenceIndex - 1)
 					}
 				)
 			}

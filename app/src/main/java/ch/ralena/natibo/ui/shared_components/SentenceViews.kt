@@ -1,5 +1,6 @@
 package ch.ralena.natibo.ui.shared_components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,9 +11,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,11 +31,18 @@ fun SentenceList(
 	nativeLanguage: LanguageRoom? = null,
 	targetLanguage: LanguageRoom? = null,
 	listState: LazyListState = rememberLazyListState(),
+	selectedIndex: Int = -1,
 	onSentenceClicked: ((NatiboSentence) -> Unit)? = null
 ) {
 	LazyColumn(state = listState) {
 		items(sentences) { sentence ->
-			Sentence(sentence, nativeLanguage, targetLanguage, onClick = onSentenceClicked)
+			Sentence(
+				sentence,
+				nativeLanguage,
+				targetLanguage,
+				isSelected = sentence.native.index == selectedIndex,
+				onClick = onSentenceClicked
+			)
 		}
 	}
 }
@@ -42,16 +52,19 @@ fun Sentence(
 	sentence: NatiboSentence,
 	nativeLanguage: LanguageRoom?,
 	targetLanguage: LanguageRoom?,
+	isSelected: Boolean,
 	onClick: ((NatiboSentence) -> Unit)? = null
 ) {
 	val nativeStyle = TextStyle(fontSize = 15.sp)
 	val targetStyle = TextStyle(fontSize = 12.sp, color = TextLight)
+	val backgroundColor = if (isSelected) PrimaryLight else Color.Transparent
 
 	Row(
 		modifier = Modifier
-			.fillMaxWidth()
-			.padding(5.dp)
+			.background(backgroundColor)
 			.clickable { onClick?.invoke(sentence) }
+			.padding(5.dp)
+			.fillMaxWidth()
 	) {
 		Text(
 			modifier = Modifier.padding(end = 8.dp),
