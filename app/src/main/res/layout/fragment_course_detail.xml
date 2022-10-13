@@ -1,171 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:background="@color/colorBackgroundDark"
-	android:orientation="vertical">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackgroundDark"
+    android:orientation="vertical">
 
-	<ImageView
-		android:id="@+id/flagImageView"
-		android:layout_width="match_parent"
-		android:layout_height="200dp"
-		android:contentDescription="@string/flag_image"
-		android:scaleType="fitXY"
-		tools:src="@drawable/flag_armenian"/>
+    <ImageView
+        android:id="@+id/flag_image"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:contentDescription="@string/flag_image"
+        android:scaleType="fitXY"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/flag_armenian" />
 
-	<LinearLayout
-		android:id="@+id/recyclerView"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:layout_below="@id/flagImageView"
-		android:gravity="center_horizontal"
-		android:orientation="vertical"
-		>
+    <TextView
+        android:id="@+id/total_reps_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/total_reps"
+        android:textColor="@color/colorTextDark"
+        app:layout_constraintBottom_toBottomOf="@id/settings_icon"
+        app:layout_constraintEnd_toEndOf="@id/guideline_45"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/flag_image" />
 
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:background="@color/colorBackgroundDark"
-			android:gravity="center"
-			android:orientation="horizontal">
+    <TextView
+        android:id="@+id/total_reps_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorTextDark"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toEndOf="@id/guideline_45"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/total_reps_label"
+        app:layout_constraintTop_toTopOf="@id/delete_icon"
+        tools:text="9642" />
 
-			<LinearLayout
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_margin="8dp"
-				android:layout_weight="1"
-				android:gravity="center"
-				android:orientation="vertical">
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_45"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".45" />
 
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="@string/total_reps"
-					android:textColor="@color/colorTextDark"/>
+    <TextView
+        android:id="@+id/total_sentences_seen_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/settings_icon"
+        android:text="@string/sentences_seen"
+        android:textColor="@color/colorTextDark"
+        app:layout_constraintEnd_toStartOf="@id/settings_icon"
+        app:layout_constraintStart_toEndOf="@id/guideline_45"
+        app:layout_constraintTop_toBottomOf="@id/flag_image" />
 
-				<TextView
-					android:id="@+id/totalRepsText"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textColor="@color/colorTextDark"
-					android:textSize="22sp"
-					tools:text="9642"/>
-			</LinearLayout>
+    <TextView
+        android:id="@+id/total_sentences_seen_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/delete_icon"
+        android:textColor="@color/colorTextDark"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toStartOf="@id/settings_icon"
+        app:layout_constraintStart_toEndOf="@id/guideline_45"
+        app:layout_constraintTop_toBottomOf="@id/total_sentences_seen_label"
+        tools:text="500" />
 
-			<LinearLayout
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_margin="8dp"
-				android:layout_weight="1"
-				android:gravity="center"
-				android:orientation="vertical">
+    <ImageView
+        android:id="@+id/settings_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="@dimen/spacing_small"
+        android:contentDescription="@string/settings"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_settings"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/flag_image"
+        app:tint="@color/colorTextLight" />
 
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="@string/sentences_seen"
-					android:textColor="@color/colorTextDark"/>
+    <ImageView
+        android:id="@+id/delete_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="@dimen/spacing_small"
+        android:contentDescription="@string/delete_course"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_delete"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settings_icon"
+        app:tint="@color/colorTextDark" />
 
-				<TextView
-					android:id="@+id/totalSentencesSeenText"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textColor="@color/colorTextDark"
-					android:textSize="22sp"
-					tools:text="500"/>
-			</LinearLayout>
+    <TextView
+        android:id="@+id/milestone_start_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/spacing_small"
+        android:text="@string/zero"
+        android:textColor="@color/colorTextLight"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/delete_icon" />
 
-			<LinearLayout
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:orientation="vertical">
+    <ProgressBar
+        android:id="@+id/milestone_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/spacing_small"
+        android:layout_marginHorizontal="@dimen/spacing_xsmall"
+        android:max="100"
+        android:progressDrawable="@drawable/progressbar"
+        app:layout_constraintBottom_toBottomOf="@id/milestone_start_text"
+        app:layout_constraintEnd_toStartOf="@id/milestone_end_text"
+        app:layout_constraintStart_toEndOf="@id/milestone_start_text"
+        app:layout_constraintTop_toTopOf="@id/milestone_start_text"
+        tools:progress="40" />
 
-				<ImageView
-					android:id="@+id/settingsIcon"
-					android:layout_width="40dp"
-					android:layout_height="40dp"
-					android:scaleType="center"
-					android:src="@drawable/ic_settings"
-					android:tint="@color/colorTextDark"/>
+    <TextView
+        android:id="@+id/milestone_end_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/spacing_small"
+        android:textColor="@color/colorTextLight"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/delete_icon"
+        tools:text="50k" />
 
-				<ImageView
-					android:id="@+id/deleteIcon"
-					android:layout_width="40dp"
-					android:layout_height="40dp"
-					android:scaleType="center"
-					android:src="@drawable/ic_delete"
-					android:tint="@color/colorTextDark"/>
-			</LinearLayout>
+    <ImageView
+        android:id="@+id/time_studied_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/spacing_medium"
+        android:src="@drawable/ic_clock"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/milestone_progress"
+        app:tint="@color/colorTextLight"
+        android:contentDescription="@string/time_studied_clock" />
 
-		</LinearLayout>
+    <TextView
+        android:id="@+id/time_studied_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/spacing_xsmall"
+        android:textColor="@color/colorTextDark"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/time_studied_icon"
+        tools:text="37:22" />
 
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:gravity="center">
+    <TextView
+        android:id="@+id/pack_name_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@id/start_session_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/time_studied_text"
+        tools:text="F1" />
 
-			<TextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_margin="4dp"
-				android:text="0"
-				android:textColor="@color/colorTextLight"/>
-
-			<ProgressBar
-				android:id="@+id/milestoneProgress"
-				style="?android:attr/progressBarStyleHorizontal"
-				android:layout_width="0dp"
-				android:layout_height="4dp"
-				android:layout_weight="1"
-				android:max="100"
-				android:progressDrawable="@drawable/progressbar"
-				tools:progress="40"/>
-
-			<TextView
-				android:id="@+id/milestoneLabel"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_margin="4dp"
-				android:textColor="@color/colorTextLight"
-				tools:text="50k"/>
-		</LinearLayout>
-
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:gravity="center">
-
-			<ImageView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:src="@drawable/ic_clock"
-				android:tint="@color/colorTextLight"/>
-
-			<TextView
-				android:id="@+id/timeStudiedLabel"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_margin="4dp"
-				android:textColor="@color/colorTextDark"
-				tools:text="37:22"/>
-		</LinearLayout>
-
-		<androidx.recyclerview.widget.RecyclerView
-			android:id="@+id/booksRecyclerView"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center"
-			tools:layout_height="40dp"/>
-	</LinearLayout>
-
-	<Button
-		android:id="@+id/startSessionButton"
-		style="@style/Base.Widget.AppCompat.Button.Colored"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true"
-		android:layout_margin="16dp"
-		android:text="@string/start_session"/>
-</RelativeLayout>
+    <Button
+        android:id="@+id/start_session_button"
+        style="@style/Base.Widget.AppCompat.Button.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/spacing_medium"
+        android:text="@string/start_session"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,62 +1,12 @@
 <resources>
-	<string name="app_name">Natibo</string>
-	<string name="shared_preferences_file">ch.ralena.natibo.SHARED_PREFERENCES</string>
-	<string name="drawer_open">Open navigation drawer</string>
-	<string name="drawer_close">Close navigation drawer</string>
-	<string name="mark_days_as_complete">Would you like to mark all days before Day %d as complete? (Swipe right to dismiss)</string>
-	<string name="minutes_abbreviation">mins</string>
-	<string name="add_new_language">Add New Language</string>
-	<string name="import_language_pack">Import Language Pack</string>
-	<string name="settings">Settings</string>
-	<string name="languages">Languages</string>
-	<string name="courses">Courses</string>
-	<string name="opening_file">Opening file…</string>
-	<string name="counting_sentences">Counting sentences</string>
-	<string name="reading_sentences">Reading sentences from text file</string>
-	<string name="extracting_sentence_text">Extracting sentence texts</string>
-	<string name="extracting_sentence_audio">Extracting sentence audio</string>
-	<string name="packs">Packs:</string>
-	<string name="sentenceGroups">Sentences:</string>
-	<string name="language_flag">Language Flag</string>
-	<string name="flag_image">Flag Image</string>
-	<string name="ipa">IPA</string>
-	<string name="rom">ROM</string>
-	<string name="alt">ALT</string>
-	<string name="no_courses">You aren\'t currently studying any courses, please create a course!</string>
-	<string name="no_languages">You haven\'t loaded any languages yet, please load a language pack (or two)!</string>
-	<string name="target_language">Target Language</string>
-	<string name="base_language">Base Language</string>
-	<string name="create">Create</string>
-	<string name="ok">OK</string>
-	<string name="sentences_seen">Sentences Seen</string>
-	<string name="remaining_reps">Remaining Reps</string>
-	<string name="total_reps">Total Reps</string>
-	<string name="session_overview">Session Overview</string>
-	<string name="start_session">Start Session</string>
-	<string name="continue_session">Continue Session</string>
-	<string name="missing_gsp">The pack is incomplete, it\'s missing the sentence text file!</string>
-	<string name="language_not_supported">This language is not yet supported!</string>
-	<string name="error_opening_file">There was an error opening the file!</string>
-	<string name="puase_course">Pause course when you open the individual course settings screen.</string>
-	<string name="pause_on_opening_settings">Pause on opening settings</string>
-	<string name="confirm_delete">Are you sure you want to delete? This cannot be undone.</string>
-	<string name="delete">DELETE</string>
-	<string name="course_settings_not_implemented">Individual course settings have not been implemented yet, sorry!</string>
-	<string name="time_in_milliseconds">The amount of time in milliseconds to wait between each sentence.</string>
-	<string name="pause_between_sentences">Pause between sentences</string>
-	<string name="add_book_first">Please add a book to your course first by clicking on it!</string>
-	<string name="books">Books</string>
-	<string name="where_to_start">Select where in the course you\'d like to start from if you\'ve previously studied the course or are familiar with the language.</string>
-	<string name="change_starting_point">Change starting point</string>
-	<string name="sentence_set">Sentence set to book \'%s\', sentence \'%d\'.</string>
-	<string name="select_languages">Select languages</string>
-	<string name="drag_handle">Drag Handle</string>
-	<string name="base">%s - base</string>
-	<string name="target">%s - target %d</string>
-	<string name="session_in_progress">Session in progress!</string>
-	<string name="reset_session">This will reset your current session, are you sure?</string>
-    <string name="playback_speed">Playback speed</string>
+	<string name="shared_preferences_file" translatable="false">ch.ralena.natibo.SHARED_PREFERENCES</string>
     <string name="playback_speed_key" translatable="false">pref_playback_speed</string>
-	<string name="playback_speed_summary">The playback speed for the target language. Range from 0.5 to 2.5.</string>
 	<string name="playback_speed_default" translatable="false">1.0</string>
+	<string name="custom_day" translatable="false">\? / ? / ?</string>
+	<string name="custom_schedule_hint" translatable="false">5 4 3 2 1</string>
+	<string name="schedule_five_day_radio" translatable="false">7 / 5 / 4 / 3 / 2</string>
+	<string name="schedule_four_day_radio" translatable="false">6 / 4 / 3 / 2</string>
+    <string name="estimated_time">Estimated Time</string>
+	<string name="course_settings_content_description">Course Settings</string>
+	<string name="play_and_pause_button">Play and pause button</string>
 </resources>

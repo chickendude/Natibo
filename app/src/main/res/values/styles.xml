@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
 	<!-- Base application theme. -->
 	<style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -6,11 +6,10 @@
 		<item name="colorPrimary">@color/colorPrimary</item>
 		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
 		<item name="colorAccent">@color/colorAccent</item>
-		<item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
 	</style>
 
 	<style name="dialog">
-		<!-- title encapsulating main part (backgroud) of custom alertdialog -->
+		<!-- title encapsulating main part (background) of custom alertdialog -->
 		<item name="android:windowFrame">@null</item>
 		<!-- turn off any drawable used to draw a frame on the window -->
 		<item name="android:windowBackground">@null</item>
