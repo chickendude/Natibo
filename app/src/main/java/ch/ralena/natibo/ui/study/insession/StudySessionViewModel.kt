@@ -48,13 +48,6 @@ class StudySessionViewModel @Inject constructor(
 
 	// region Helper functions ---------------------------------------------------------------------
 	private suspend fun loadCourse(course: CourseRoom) {
-		// TODO: Remove
-//		if (courseRepository.countSessions(course.id) > 0) {
-//			sessionRepository.deleteAll()
-//			course.schedule.curSentenceIndex = 1
-//			courseRepository.updateCourse(course.copy(sessionId = 0, ))
-//		}
-
 		createSessionUseCase.createSessionIfNecessary(course)
 		listeners.forEach { it.onCourseLoaded(course) }
 	}
