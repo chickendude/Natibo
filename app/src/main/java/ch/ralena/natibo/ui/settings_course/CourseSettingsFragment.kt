@@ -14,7 +14,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.preference.Preference
 import ch.ralena.natibo.R
 import ch.ralena.natibo.data.NatiboResult
 import ch.ralena.natibo.data.room.CourseRepository

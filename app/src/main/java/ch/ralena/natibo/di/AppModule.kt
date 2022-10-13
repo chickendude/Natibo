@@ -11,7 +11,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import io.realm.Realm
 import javax.inject.Singleton
 
 @Module
@@ -25,9 +24,6 @@ object AppModule {
 	@Provides
 	@Singleton
 	fun dispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider()
-
-	@Provides
-	fun realm(): Realm = Realm.getDefaultInstance()
 
 	@Provides
 	@Singleton

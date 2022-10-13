@@ -9,7 +9,6 @@ buildscript {
 	}
 	repositories {
 		google()
-		jcenter()
 		mavenCentral()
 		maven {
 			url 'https://maven.google.com/'
@@ -18,7 +17,6 @@ buildscript {
 	}
 	dependencies {
 		classpath 'com.android.tools.build:gradle:7.2.2'
-		classpath "io.realm:realm-gradle-plugin:10.0.0"
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 		classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
 		// NOTE: Do not place your application dependencies here; they belong
@@ -28,7 +26,6 @@ buildscript {
 
 allprojects {
 	repositories {
-		jcenter()
 		mavenCentral()
 		maven {
 			url 'https://maven.google.com/'

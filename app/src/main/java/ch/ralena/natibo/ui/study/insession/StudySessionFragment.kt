@@ -18,7 +18,6 @@ import ch.ralena.natibo.ui.study.insession.views.PlayPause
 import ch.ralena.natibo.ui.study.insession.views.Sentences
 import ch.ralena.natibo.ui.study.overview.StudySessionOverviewFragment
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.*
@@ -52,8 +51,6 @@ internal class StudySessionFragment :
 	// TODO: Look at removing
 	private var isPaused = false
 
-	private var serviceDisposable: Disposable? = null
-
 	override fun setupViews(view: View) {
 		// load schedules from database
 		val id = requireArguments().getLong(KEY_COURSE_ID)
@@ -84,7 +81,6 @@ internal class StudySessionFragment :
 
 	override fun onPause() {
 		super.onPause()
-		serviceDisposable?.dispose()
 		countDownTimer?.cancel()
 	}
 
