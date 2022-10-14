@@ -7,6 +7,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ch.ralena.natibo.R
 import ch.ralena.natibo.settings.CourseSettings
@@ -21,7 +22,7 @@ fun CourseSettingsView(settings: CourseSettings, onNavigateToSentencePick: () ->
 			labelResId = R.string.settings_course_sentence_delay_label
 		)
 		TextButton(onClick = onNavigateToSentencePick) {
-			Text(text = "Set first new sentence")
+			Text(text = stringResource(R.string.first_new_sentence))
 		}
 	}
 }
