@@ -12,6 +12,8 @@ class SessionRepository @Inject constructor(
 
 	suspend fun fetchSession(id: Long): SessionRoom? = sessionDao.getById(id)
 
+	suspend fun fetchSessionsInCourse(courseId: Long): List<SessionRoom> = sessionDao.getByCourseId(courseId)
+
 	suspend fun fetchSessionWithSentencesById(id: Long): SessionWithSentences =
 		sessionDao.getSessionWithSentencesById(id)
 

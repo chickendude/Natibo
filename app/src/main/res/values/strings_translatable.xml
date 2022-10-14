@@ -101,6 +101,7 @@
     <!-- Error message when the language pack the course needs wasn't found -->
     <string name="pack_not_found">The language pack for this course was not found</string>
 	<string name="first_new_sentence">Set first new sentence</string>
+	<string name="past_study_sessions">View past study sessions</string>
 	<!-- ======================================================================================= -->
 
 </resources>

@@ -21,6 +21,7 @@ import ch.ralena.natibo.data.room.`object`.CourseRoom
 import ch.ralena.natibo.settings.CourseSettings
 import ch.ralena.natibo.ui.MainActivity
 import ch.ralena.natibo.ui.settings_course.views.CourseSettingsView
+import ch.ralena.natibo.ui.shared_components.SessionList
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -35,7 +36,7 @@ class CourseSettingsFragment : Fragment() {
 	@Inject
 	lateinit var courseSettings: CourseSettings
 
-//		SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+	//		SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
 //			when (key) {
 //				PREF_PLAYBACK_SPEED -> realm!!.executeTransaction { r: Realm? ->
 //					val speed = sharedPreferences.getString(
@@ -92,12 +93,16 @@ class CourseSettingsFragment : Fragment() {
 			composable("home") {
 				CourseSettingsView(
 					settings = settings,
-					onNavigateToSentencePick = { navController.navigate("pick_sentence") })
+					onNavigateToSentencePick = { navController.navigate("pick_sentence") },
+					onNavigateToStudySessions = { navController.navigate("study_sessions") }
+				)
 			}
 			composable("pick_sentence") {
 				SentencePick(course = settings.course, viewModel = hiltViewModel())
 			}
-
+			composable("study_sessions") {
+				SessionList(course = settings.course, viewModel = hiltViewModel())
+			}
 		}
 	}
 

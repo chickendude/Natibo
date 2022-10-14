@@ -16,6 +16,9 @@ interface SessionDao {
 	@Query("SELECT * FROM sessionroom WHERE id = :id")
 	suspend fun getById(id: Long): SessionRoom?
 
+	@Query("SELECT * FROM sessionroom WHERE courseId = :courseId")
+	suspend fun getByCourseId(courseId: Long): List<SessionRoom>
+
 	@Query("SELECT * FROM sessionroom WHERE id = :id")
 	suspend fun getSessionWithSentencesById(id: Long): SessionWithSentences
 

@@ -1,6 +1,5 @@
 package ch.ralena.natibo.ui.settings_course.views
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
@@ -11,18 +10,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ch.ralena.natibo.R
 import ch.ralena.natibo.settings.CourseSettings
+import ch.ralena.natibo.settings.views.ButtonSettingView
 import ch.ralena.natibo.settings.views.IntSettingView
 
 @Composable
-fun CourseSettingsView(settings: CourseSettings, onNavigateToSentencePick: () -> Unit) {
+fun CourseSettingsView(
+	settings: CourseSettings,
+	onNavigateToSentencePick: () -> Unit,
+	onNavigateToStudySessions: () -> Unit
+) {
 	Column(modifier = Modifier.padding(8.dp)) {
 		Text(text = "Settings for: ${settings.course.title}")
 		IntSettingView(
 			setting = settings.delayBetweenSentences,
 			labelResId = R.string.settings_course_sentence_delay_label
 		)
-		TextButton(onClick = onNavigateToSentencePick) {
-			Text(text = stringResource(R.string.first_new_sentence))
-		}
+		ButtonSettingView(
+			textResId = R.string.first_new_sentence,
+			onClick = onNavigateToSentencePick
+		)
+		ButtonSettingView(
+			textResId = R.string.past_study_sessions,
+			onClick = onNavigateToStudySessions
+		)
 	}
 }
