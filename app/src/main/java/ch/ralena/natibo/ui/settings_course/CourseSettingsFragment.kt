@@ -36,19 +36,6 @@ class CourseSettingsFragment : Fragment() {
 	@Inject
 	lateinit var courseSettings: CourseSettings
 
-	//		SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-//			when (key) {
-//				PREF_PLAYBACK_SPEED -> realm!!.executeTransaction { r: Realm? ->
-//					val speed = sharedPreferences.getString(
-//						getString(R.string.playback_speed_key),
-//						getString(R.string.playback_speed_default)
-//					)!!
-//						.toFloat()
-//					course.setPlaybackSpeed(speed)
-//				}
-//			}
-//		}
-//
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
