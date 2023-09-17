@@ -6,6 +6,8 @@ import androidx.room.Room
 import ch.ralena.natibo.data.room.AppDatabase
 import ch.ralena.natibo.utils.DefaultDispatcherProvider
 import ch.ralena.natibo.utils.DispatcherProvider
+import ch.ralena.natibo.utils.TimeManager
+import ch.ralena.natibo.utils.TimeManagerImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -53,4 +55,7 @@ object AppModule {
 	@Provides
 	@Singleton
 	fun sesseionDao(database: AppDatabase) = database.sessionDao()
+
+	@Provides
+	fun timerManager(): TimeManager = TimeManagerImpl()
 }

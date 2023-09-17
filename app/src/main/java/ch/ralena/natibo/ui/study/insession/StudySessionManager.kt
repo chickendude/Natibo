@@ -17,6 +17,7 @@ import ch.ralena.natibo.settings.CourseSettings
 import ch.ralena.natibo.usecases.data.FetchSessionWithSentencesUseCase
 import ch.ralena.natibo.utils.DispatcherProvider
 import ch.ralena.natibo.utils.NotificationHelper
+import ch.ralena.natibo.utils.Timer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -36,17 +37,19 @@ internal class StudySessionManager @Inject constructor(
 	@ApplicationContext private val applicationContext: Context,
 	private val studyServiceManager: StudyServiceManager,
 	private val courseSettings: CourseSettings,
-	dispatchers: DispatcherProvider
+	private val timer: Timer,
+	private val dispatchers: DispatcherProvider
 ) {
 	private val mediaSession = MediaSessionCompat(applicationContext, "Natibo")
 
 	private var mediaPlayer: MediaPlayer? = null
 	private var audioManager: AudioManager? = null
+	private var waitingForNextSentence = false
 	lateinit var session: NatiboSession
 	lateinit var course: CourseRoom
 
 	private val job = Job()
-	private val coroutineScope = CoroutineScope(job + dispatchers.default())
+	private val coroutineScope = CoroutineScope(job + dispatchers.io())
 
 	private val events = MutableSharedFlow<Event>()
 	fun events() = events.asSharedFlow()
@@ -89,14 +92,15 @@ internal class StudySessionManager @Inject constructor(
 	}
 
 	fun pause() {
+		timer.pause()
 		studyState.value = StudyState.PAUSED
 		mediaPlayer?.pause()
 	}
 
 	fun resume() {
-		if (requestAudioFocus()) {
-			play()
-		}
+		timer.start()
+		studyState.value = StudyState.PLAYING
+		if (!waitingForNextSentence && requestAudioFocus()) play()
 	}
 
 	fun togglePausePlay() {
@@ -167,6 +171,7 @@ internal class StudySessionManager @Inject constructor(
 		if (studyState.value == StudyState.PLAYING)
 			play()
 		else {
+			pause()
 			studyState.value = StudyState.READY
 		}
 
@@ -184,9 +189,13 @@ internal class StudySessionManager @Inject constructor(
 					.build()
 			)
 			setOnCompletionListener {
-				coroutineScope.launch {
-					delay(courseSettings.delayBetweenSentences.get().toLong())
-					studyState.first { it == StudyState.PLAYING }
+				coroutineScope.launch(dispatchers.io()) {
+					timer.reset()
+					waitingForNextSentence = true
+					while (timer.elapsedTimeMs < courseSettings.delayBetweenSentences.get()) {
+						delay(10)
+					}
+					waitingForNextSentence = false
 					nextSentence()
 				}
 			}
@@ -217,6 +226,7 @@ internal class StudySessionManager @Inject constructor(
 		when (focusChange) {
 			AudioManager.AUDIOFOCUS_GAIN ->
 				if (studyState.value == StudyState.PLAYING) restartPlaying()
+
 			AudioManager.AUDIOFOCUS_LOSS -> stop()
 			AudioManager.AUDIOFOCUS_LOSS_TRANSIENT,
 			AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> pause()
