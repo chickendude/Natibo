@@ -41,7 +41,7 @@ object LanguageData {
 		LanguageType("KR", "Korean", R.drawable.flag_korean),
 		LanguageType("", "Latvian", R.drawable.flag_latvian),
 		LanguageType("", "Lithuanian", R.drawable.flag_lithuanian),
-		LanguageType("MN", "Mongolian", R.drawable.flag_mongolian),
+		LanguageType("KHK", "Mongolian", R.drawable.flag_mongolian),
 		LanguageType("", "Polish", R.drawable.flag_polish),
 		LanguageType("PB", "Portuguese (Brazil)", R.drawable.flag_portuguese_brazil),
 		LanguageType("RU", "Russian", R.drawable.flag_russian),
