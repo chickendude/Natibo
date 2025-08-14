@@ -2,23 +2,22 @@
 
 buildscript {
 	ext {
-		dagger_version = "2.35.1"
-		hilt_version = "2.43.2"
-		kotlin_version = '1.7.10'
-		room_version = "2.4.2"
+		hilt_version = "2.57"
+		kotlin_version = "2.1.21"
+		room_version = "2.7.2"
 	}
 	repositories {
 		google()
 		mavenCentral()
 		maven {
-			url 'https://maven.google.com/'
-			name 'Google'
+			url = 'https://maven.google.com/'
+			name = 'Google'
 		}
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:7.2.2'
+		classpath 'com.android.tools.build:gradle:8.11.1'
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-		classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
+//		classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
 		// NOTE: Do not place your application dependencies here; they belong
 		// in the individual module build.gradle files
 	}
@@ -28,12 +27,12 @@ allprojects {
 	repositories {
 		mavenCentral()
 		maven {
-			url 'https://maven.google.com/'
-			name 'Google'
+			url = 'https://maven.google.com/'
+			name = 'Google'
 		}
 	}
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
 	delete rootProject.buildDir
 }
